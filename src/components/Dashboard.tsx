@@ -9,6 +9,7 @@ import {
   IndianRupee,
   Clock
 } from "lucide-react";
+import jamaLogo from "@/assets/jama-logo.png";
 
 const Dashboard = () => {
   const todayStats = {
@@ -21,8 +22,14 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-card p-4 space-y-6">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-primary">జమ</h1>
+      <div className="text-center space-y-4">
+        <div className="flex justify-center">
+          <img 
+            src={jamaLogo} 
+            alt="Jama Logo - జమ" 
+            className="h-16 w-auto object-contain"
+          />
+        </div>
         <p className="text-sm text-muted-foreground">
           ఇక పెన్ పేపర్ అవసరం లేదు
         </p>
