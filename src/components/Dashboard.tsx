@@ -24,11 +24,11 @@ const Dashboard = () => {
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <img 
-            src={jamaLogo} 
-            alt="Jama Logo - జమ" 
-            className="h-16 w-auto object-contain"
-          />
+          <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money">
+            <h1 className="text-2xl font-bold text-primary-foreground">
+              JAMA <span className="text-lg">జమ</span>
+            </h1>
+          </div>
         </div>
         <p className="text-sm text-muted-foreground">
           ఇక పెన్ పేపర్ అవసరం లేదు
