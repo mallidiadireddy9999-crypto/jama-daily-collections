@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -10,14 +11,43 @@ import {
   Clock
 } from "lucide-react";
 import jamaLogo from "@/assets/jama-logo.png";
+import PaymentKeypad from "./PaymentKeypad";
 
 const Dashboard = () => {
+  const [currentView, setCurrentView] = useState<'dashboard' | 'payment'>('dashboard');
+  const [selectedCustomer, setSelectedCustomer] = useState<string>('');
+  
   const todayStats = {
     totalCollected: 15750,
     pendingBalance: 48200,
     activeLoans: 12,
     newLoansToday: 3
   };
+
+  const handleCollectPayment = () => {
+    setCurrentView('payment');
+    setSelectedCustomer('Customer'); // Default customer name
+  };
+
+  const handleBackToDashboard = () => {
+    setCurrentView('dashboard');
+  };
+
+  const handlePaymentConfirm = (amount: number) => {
+    // Handle payment confirmation logic here
+    console.log(`Payment confirmed: ₹${amount} from ${selectedCustomer}`);
+    setCurrentView('dashboard');
+  };
+
+  if (currentView === 'payment') {
+    return (
+      <PaymentKeypad
+        onBack={handleBackToDashboard}
+        onConfirm={handlePaymentConfirm}
+        customerName={selectedCustomer}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-card p-4 space-y-6">
@@ -115,7 +145,7 @@ const Dashboard = () => {
           </div>
         </Button>
 
-        <Button variant="collect" size="xl" className="w-full">
+        <Button variant="collect" size="xl" className="w-full" onClick={handleCollectPayment}>
           <HandCoins className="h-6 w-6 mr-3" />
           <div className="text-left">
             <p className="font-semibold">Collect Payment</p>
