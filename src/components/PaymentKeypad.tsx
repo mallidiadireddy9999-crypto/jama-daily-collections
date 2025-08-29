@@ -53,14 +53,14 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-xl font-bold text-foreground">Collect Payment</h1>
-          <p className="text-sm text-muted-foreground">చెల్లింపు సేకరించండి</p>
+          <h1 className="text-xl font-bold text-foreground">Record Collection</h1>
+          <p className="text-sm text-muted-foreground">వసూలు నమోదు చేయండి</p>
         </div>
       </div>
 
       {/* Customer Info */}
       <Card className="p-4 text-center shadow-card">
-        <p className="text-sm text-muted-foreground">Collecting from</p>
+        <p className="text-sm text-muted-foreground">Amount received from</p>
         <p className="text-lg font-semibold text-foreground">{customerName}</p>
       </Card>
 
@@ -74,7 +74,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
             </span>
           </div>
           <p className="text-sm text-success-foreground/80">
-            Enter payment amount / చెల్లింపు మొత్తం
+            Enter amount received / వసూలైన మొత్తం
           </p>
         </div>
       </Card>
@@ -148,7 +148,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
           className="w-full"
         >
           <Check className="h-6 w-6 mr-2" />
-          Confirm Payment / చెల్లింపు నిర్ధారించండి
+          Record Collection / వసూలు నమోదు చేయండి
         </Button>
 
         {/* Voice Input Button */}

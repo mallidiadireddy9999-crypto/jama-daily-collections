@@ -36,7 +36,7 @@ const Dashboard = () => {
   };
 
   const handlePaymentConfirm = (amount: number) => {
-    // Update stats
+    // Update stats with received amount
     setTodayStats(prev => ({
       ...prev,
       totalCollected: prev.totalCollected + amount,
@@ -45,8 +45,8 @@ const Dashboard = () => {
 
     // Show success toast
     toast({
-      title: "Payment Collected Successfully! ✅",
-      description: `₹${amount.toLocaleString()} collected from ${selectedCustomer}`,
+      title: "Collection Recorded Successfully! ✅",
+      description: `₹${amount.toLocaleString()} received from ${selectedCustomer}`,
       duration: 3000,
     });
 
@@ -162,8 +162,8 @@ const Dashboard = () => {
         <Button variant="collect" size="xl" className="w-full" onClick={handleCollectPayment}>
           <HandCoins className="h-6 w-6 mr-3" />
           <div className="text-left">
-            <p className="font-semibold">Collect Payment</p>
-            <p className="text-xs opacity-90">చెల్లింపు సేకరించండి</p>
+            <p className="font-semibold">Record Collection</p>
+            <p className="text-xs opacity-90">వసూలు నమోదు చేయండి</p>
           </div>
         </Button>
 
