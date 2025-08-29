@@ -12,17 +12,19 @@ import {
 } from "lucide-react";
 import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'payment'>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
+  const { toast } = useToast();
   
-  const todayStats = {
+  const [todayStats, setTodayStats] = useState({
     totalCollected: 15750,
     pendingBalance: 48200,
     activeLoans: 12,
     newLoansToday: 3
-  };
+  });
 
   const handleCollectPayment = () => {
     setCurrentView('payment');
@@ -34,8 +36,20 @@ const Dashboard = () => {
   };
 
   const handlePaymentConfirm = (amount: number) => {
-    // Handle payment confirmation logic here
-    console.log(`Payment confirmed: ₹${amount} from ${selectedCustomer}`);
+    // Update stats
+    setTodayStats(prev => ({
+      ...prev,
+      totalCollected: prev.totalCollected + amount,
+      pendingBalance: Math.max(0, prev.pendingBalance - amount)
+    }));
+
+    // Show success toast
+    toast({
+      title: "Payment Collected Successfully! ✅",
+      description: `₹${amount.toLocaleString()} collected from ${selectedCustomer}`,
+      duration: 3000,
+    });
+
     setCurrentView('dashboard');
   };
 
