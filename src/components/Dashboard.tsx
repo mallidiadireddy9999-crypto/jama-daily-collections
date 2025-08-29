@@ -12,11 +12,13 @@ import {
 } from "lucide-react";
 import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
+import AddLoanModal from "./AddLoanModal";
 import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'payment'>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
+  const [showAddLoanModal, setShowAddLoanModal] = useState(false);
   const { toast } = useToast();
   
   const [todayStats, setTodayStats] = useState({
@@ -31,8 +33,29 @@ const Dashboard = () => {
     setSelectedCustomer('Customer'); // Default customer name
   };
 
+  const handleAddNewLoan = () => {
+    setShowAddLoanModal(true);
+  };
+
   const handleBackToDashboard = () => {
     setCurrentView('dashboard');
+  };
+
+  const handleLoanSave = (loan: any) => {
+    // Update stats
+    setTodayStats(prev => ({
+      ...prev,
+      activeLoans: prev.activeLoans + 1,
+      newLoansToday: prev.newLoansToday + 1,
+      pendingBalance: prev.pendingBalance + loan.amount
+    }));
+
+    // Show success toast
+    toast({
+      title: "Loan Added Successfully! ✅",
+      description: `₹${loan.amount.toLocaleString()} loan created for ${loan.customerName}`,
+      duration: 3000,
+    });
   };
 
   const handlePaymentConfirm = (amount: number) => {
@@ -151,7 +174,7 @@ const Dashboard = () => {
 
       {/* Action Buttons */}
       <div className="space-y-4">
-        <Button variant="money" size="xl" className="w-full">
+        <Button variant="money" size="xl" className="w-full" onClick={handleAddNewLoan}>
           <PlusCircle className="h-6 w-6 mr-3" />
           <div className="text-left">
             <p className="font-semibold">Add New Loan</p>
@@ -196,6 +219,13 @@ const Dashboard = () => {
           </div>
         </div>
       </Card>
+
+      {/* Add Loan Modal */}
+      <AddLoanModal
+        open={showAddLoanModal}
+        onOpenChange={setShowAddLoanModal}
+        onSave={handleLoanSave}
+      />
     </div>
   );
 };
