@@ -13,10 +13,11 @@ import {
 import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
 import AddLoanModal from "./AddLoanModal";
+import CollectionsList from "./CollectionsList";
 import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'payment'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'payment' | 'collections'>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [showAddLoanModal, setShowAddLoanModal] = useState(false);
   const { toast } = useToast();
@@ -27,6 +28,15 @@ const Dashboard = () => {
     activeLoans: 12,
     newLoansToday: 3
   });
+
+  const [todaysCollections, setTodaysCollections] = useState<Array<{
+    id: string;
+    customerId: string;
+    customerName: string;
+    amount: number;
+    timestamp: string;
+    time: string;
+  }>>([]);
 
   const handleCollectPayment = () => {
     setCurrentView('payment');
@@ -39,6 +49,10 @@ const Dashboard = () => {
 
   const handleBackToDashboard = () => {
     setCurrentView('dashboard');
+  };
+
+  const handleViewCollections = () => {
+    setCurrentView('collections');
   };
 
   const handleLoanSave = (loan: any) => {
@@ -60,6 +74,18 @@ const Dashboard = () => {
 
   const handlePaymentConfirm = (amount: number, customerId: string, customerName: string) => {
     setSelectedCustomer(customerName);
+    const newCollection = {
+      id: Date.now().toString(),
+      customerId,
+      customerName,
+      amount,
+      timestamp: new Date().toISOString(),
+      time: new Date().toLocaleTimeString('te-IN', { hour: '2-digit', minute: '2-digit', hour12: true })
+    };
+
+    // Add to today's collections
+    setTodaysCollections(prev => [newCollection, ...prev]);
+
     // Update stats with received amount
     setTodayStats(prev => ({
       ...prev,
@@ -87,6 +113,15 @@ const Dashboard = () => {
     );
   }
 
+  if (currentView === 'collections') {
+    return (
+      <CollectionsList
+        onBack={handleBackToDashboard}
+        collections={todaysCollections}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-card p-4 space-y-6">
       {/* Header */}
@@ -105,7 +140,10 @@ const Dashboard = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-4">
-        <Card className="p-4 shadow-card bg-gradient-success">
+        <Card 
+          className="p-4 shadow-card bg-gradient-success cursor-pointer hover:scale-105 transition-transform"
+          onClick={handleViewCollections}
+        >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <IndianRupee className="h-5 w-5 text-success-foreground" />
@@ -115,6 +153,9 @@ const Dashboard = () => {
               <p className="text-xs text-success-foreground/80">నేటి వసూలు</p>
               <p className="text-lg font-bold text-success-foreground">
                 ₹{todayStats.totalCollected.toLocaleString()}
+              </p>
+              <p className="text-xs text-success-foreground/60">
+                {todaysCollections.length} వసూలు
               </p>
             </div>
           </div>
