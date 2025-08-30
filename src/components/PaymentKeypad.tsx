@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Check, Mic, Delete, IndianRupee } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Check, Mic, Delete, IndianRupee, User } from "lucide-react";
 
 interface PaymentKeypadProps {
   onBack: () => void;
-  onConfirm: (amount: number) => void;
+  onConfirm: (amount: number, customerId: string, customerName: string) => void;
   customerName?: string;
 }
 
 const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: PaymentKeypadProps) => {
   const [amount, setAmount] = useState('');
+  const [customerId, setCustomerId] = useState('');
+  const [selectedCustomerName, setSelectedCustomerName] = useState('');
 
   const quickAmounts = [100, 500, 1000];
 
@@ -35,8 +39,8 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
 
   const handleConfirm = () => {
     const finalAmount = parseInt(amount) || 0;
-    if (finalAmount > 0) {
-      onConfirm(finalAmount);
+    if (finalAmount > 0 && customerId.trim() && selectedCustomerName.trim()) {
+      onConfirm(finalAmount, customerId.trim(), selectedCustomerName.trim());
     }
   };
 
@@ -57,11 +61,42 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
         </div>
       </div>
 
-      {/* Customer Info */}
-      <Card className="p-4 text-center shadow-card">
-        <p className="text-sm text-muted-foreground">వసూలైన మొత్తం</p>
-        <p className="text-lg font-semibold text-foreground">{customerName}</p>
+      {/* Customer Selection */}
+      <Card className="p-4 shadow-card">
+        <div className="space-y-3">
+          <Label htmlFor="customerId" className="flex items-center gap-2 text-sm font-medium">
+            <User className="h-4 w-4" />
+            కస్టమర్ ID
+          </Label>
+          <Input
+            id="customerId"
+            value={customerId}
+            onChange={(e) => setCustomerId(e.target.value)}
+            placeholder="కస్టమర్ ID నమోదు చేయండి"
+            className="h-11"
+          />
+          
+          <Label htmlFor="customerName" className="flex items-center gap-2 text-sm font-medium">
+            <User className="h-4 w-4" />
+            కస్టమర్ పేరు
+          </Label>
+          <Input
+            id="customerName"
+            value={selectedCustomerName}
+            onChange={(e) => setSelectedCustomerName(e.target.value)}
+            placeholder="కస్టమర్ పేరు నమోదు చేయండి"
+            className="h-11"
+          />
+        </div>
       </Card>
+
+      {/* Customer Info */}
+      {customerId && selectedCustomerName && (
+        <Card className="p-4 text-center shadow-card bg-muted">
+          <p className="text-sm text-muted-foreground">వసూలైన మొత్తం</p>
+          <p className="text-lg font-semibold text-foreground">{selectedCustomerName} (ID: {customerId})</p>
+        </Card>
+      )}
 
       {/* Amount Display */}
       <Card className="p-6 shadow-money bg-gradient-success">
@@ -143,7 +178,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
           variant="money"
           size="xl"
           onClick={handleConfirm}
-          disabled={!amount || parseInt(amount) === 0}
+          disabled={!amount || parseInt(amount) === 0 || !customerId.trim() || !selectedCustomerName.trim()}
           className="w-full"
         >
           <Check className="h-6 w-6 mr-2" />

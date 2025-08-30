@@ -58,7 +58,8 @@ const Dashboard = () => {
     });
   };
 
-  const handlePaymentConfirm = (amount: number) => {
+  const handlePaymentConfirm = (amount: number, customerId: string, customerName: string) => {
+    setSelectedCustomer(customerName);
     // Update stats with received amount
     setTodayStats(prev => ({
       ...prev,
@@ -69,7 +70,7 @@ const Dashboard = () => {
     // Show success toast
     toast({
       title: "వసూలు విజయవంతంగా నమోదు చేయబడింది! ✅",
-      description: `${selectedCustomer} నుండి ₹${amount.toLocaleString()} వసూలైంది`,
+      description: `${customerName} (ID: ${customerId}) నుండి ₹${amount.toLocaleString()} వసూలైంది`,
       duration: 3000,
     });
 
