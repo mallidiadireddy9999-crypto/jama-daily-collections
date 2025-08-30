@@ -53,14 +53,13 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-xl font-bold text-foreground">Record Collection</h1>
-          <p className="text-sm text-muted-foreground">వసూలు నమోదు చేయండి</p>
+          <h1 className="text-xl font-bold text-foreground">వసూలు నమోదు</h1>
         </div>
       </div>
 
       {/* Customer Info */}
       <Card className="p-4 text-center shadow-card">
-        <p className="text-sm text-muted-foreground">Amount received from</p>
+        <p className="text-sm text-muted-foreground">వసూలైన మొత్తం</p>
         <p className="text-lg font-semibold text-foreground">{customerName}</p>
       </Card>
 
@@ -74,7 +73,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
             </span>
           </div>
           <p className="text-sm text-success-foreground/80">
-            Enter amount received / వసూలైన మొత్తం
+            వసూలైన మొత్తం నమోదు చేయండి
           </p>
         </div>
       </Card>
@@ -148,7 +147,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
           className="w-full"
         >
           <Check className="h-6 w-6 mr-2" />
-          Record Collection / వసూలు నమోదు చేయండి
+          వసూలు నమోదు చేయండి
         </Button>
 
         {/* Voice Input Button */}
@@ -158,7 +157,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
           className="w-full border-2 border-dashed border-muted-foreground/30 hover:border-primary"
         >
           <Mic className="h-5 w-5 mr-2" />
-          Voice Input / వాయిస్ ఇన్‌పుట్
+          వాయిస్ ఇన్‌పుట్
         </Button>
       </div>
 
@@ -166,7 +165,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
       {amount && parseInt(amount) > 0 && (
         <Card className="p-3 bg-muted">
           <p className="text-xs text-center text-muted-foreground">
-            Amount: ₹{formatAmount(amount)}
+            మొత్తం: ₹{formatAmount(amount)}
           </p>
         </Card>
       )}

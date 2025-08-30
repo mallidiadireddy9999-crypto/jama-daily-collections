@@ -54,11 +54,7 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
       <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-center">
-            Add New Loan
-            <br />
-            <span className="text-sm text-muted-foreground font-normal">
-              కొత్త లోన్ జోడించండి
-            </span>
+            కొత్త లోన్ జోడించండి
           </DialogTitle>
         </DialogHeader>
 
@@ -67,13 +63,13 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           <div className="space-y-2">
             <Label htmlFor="customerName" className="flex items-center gap-2">
               <User className="h-4 w-4" />
-              Name / పేరు
+              పేరు
             </Label>
             <Input
               id="customerName"
               value={formData.customerName}
               onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-              placeholder="Enter customer name"
+              placeholder="కస్టమర్ పేరు"
               required
               className="h-11"
             />
@@ -83,14 +79,14 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           <div className="space-y-2">
             <Label htmlFor="phone" className="flex items-center gap-2">
               <Phone className="h-4 w-4" />
-              Mobile Number / మొబైల్ నంబర్
+              మొబైల్ నంబర్
             </Label>
             <Input
               id="phone"
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              placeholder="Enter mobile number"
+              placeholder="మొబైల్ నంబర్"
               required
               className="h-11"
             />
@@ -100,14 +96,14 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           <div className="space-y-2">
             <Label htmlFor="amount" className="flex items-center gap-2">
               <IndianRupee className="h-4 w-4" />
-              Principal Amount / ప్రధాన మొత్తం
+              ప్రధాన మొత్తం
             </Label>
             <Input
               id="amount"
               type="number"
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-              placeholder="Enter principal amount"
+              placeholder="ప్రధాన మొత్తం"
               required
               className="h-11"
             />
@@ -117,14 +113,14 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           <div className="space-y-2">
             <Label htmlFor="duration" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Tenure (Days) / వ్యవధి (రోజులు)
+              వ్యవధి (రోజులు)
             </Label>
             <Input
               id="duration"
               type="number"
               value={formData.duration}
               onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-              placeholder="Enter tenure in days"
+              placeholder="వ్యవధి రోజులలో"
               required
               className="h-11"
             />
@@ -134,7 +130,7 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           {formData.amount && formData.duration && (
             <Card className="p-3 bg-gradient-success">
               <div className="text-center">
-                <p className="text-xs text-success-foreground/80">Daily Payment Amount</p>
+                <p className="text-xs text-success-foreground/80">రోజువారీ చెల్లింపు</p>
                 <p className="text-lg font-bold text-success-foreground">
                   ₹{Math.ceil(parseInt(formData.amount) / parseInt(formData.duration)).toLocaleString()}
                 </p>
@@ -145,7 +141,7 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           {/* Submit Button */}
           <Button type="submit" variant="money" size="lg" className="w-full">
             <Save className="h-4 w-4 mr-2" />
-            Save Loan / లోన్ సేవ్ చేయండి
+            లోన్ సేవ్ చేయండి
           </Button>
         </form>
       </DialogContent>

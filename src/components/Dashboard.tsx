@@ -52,8 +52,8 @@ const Dashboard = () => {
 
     // Show success toast
     toast({
-      title: "Loan Added Successfully! ✅",
-      description: `₹${loan.amount.toLocaleString()} loan created for ${loan.customerName}`,
+      title: "లోన్ విజయవంతంగా జోడించబడింది! ✅",
+      description: `${loan.customerName} కోసం ₹${loan.amount.toLocaleString()} లోన్ సృష్టించబడింది`,
       duration: 3000,
     });
   };
@@ -68,8 +68,8 @@ const Dashboard = () => {
 
     // Show success toast
     toast({
-      title: "Collection Recorded Successfully! ✅",
-      description: `₹${amount.toLocaleString()} received from ${selectedCustomer}`,
+      title: "వసూలు విజయవంతంగా నమోదు చేయబడింది! ✅",
+      description: `${selectedCustomer} నుండి ₹${amount.toLocaleString()} వసూలైంది`,
       duration: 3000,
     });
 
@@ -100,9 +100,6 @@ const Dashboard = () => {
         <p className="text-sm text-muted-foreground">
           ఇక పెన్ పేపర్ అవసరం లేదు
         </p>
-        <p className="text-xs text-muted-foreground">
-          No need for pen and paper anymore
-        </p>
       </div>
 
       {/* Stats Cards */}
@@ -114,7 +111,7 @@ const Dashboard = () => {
               <TrendingUp className="h-4 w-4 text-success-foreground" />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-success-foreground/80">Today's Collection</p>
+              <p className="text-xs text-success-foreground/80">నేటి వసూలు</p>
               <p className="text-lg font-bold text-success-foreground">
                 ₹{todayStats.totalCollected.toLocaleString()}
               </p>
@@ -129,7 +126,7 @@ const Dashboard = () => {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Pending Balance</p>
+              <p className="text-xs text-muted-foreground">బాకీ మొత్తం</p>
               <p className="text-lg font-bold text-foreground">
                 ₹{todayStats.pendingBalance.toLocaleString()}
               </p>
@@ -142,11 +139,11 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <Users className="h-5 w-5 text-primary" />
               <span className="text-xs text-success bg-success/10 px-2 py-1 rounded-full">
-                Active
+                క్రియాశీలం
               </span>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Active Loans</p>
+              <p className="text-xs text-muted-foreground">క్రియాశీల లోన్‌లు</p>
               <p className="text-lg font-bold text-foreground">
                 {todayStats.activeLoans}
               </p>
@@ -159,11 +156,11 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <PlusCircle className="h-5 w-5 text-primary" />
               <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
-                New
+                కొత్తది
               </span>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">New Today</p>
+              <p className="text-xs text-muted-foreground">నేడు కొత్తవి</p>
               <p className="text-lg font-bold text-foreground">
                 {todayStats.newLoansToday}
               </p>
@@ -177,24 +174,21 @@ const Dashboard = () => {
         <Button variant="money" size="xl" className="w-full" onClick={handleAddNewLoan}>
           <PlusCircle className="h-6 w-6 mr-3" />
           <div className="text-left">
-            <p className="font-semibold">Add New Loan</p>
-            <p className="text-xs opacity-90">కొత్త లోన్ జోడించండి</p>
+            <p className="font-semibold">కొత్త లోన్ జోడించండి</p>
           </div>
         </Button>
 
         <Button variant="collect" size="xl" className="w-full" onClick={handleCollectPayment}>
           <HandCoins className="h-6 w-6 mr-3" />
           <div className="text-left">
-            <p className="font-semibold">Record Collection</p>
-            <p className="text-xs opacity-90">వసూలు నమోదు చేయండి</p>
+            <p className="font-semibold">వసూలు నమోదు చేయండి</p>
           </div>
         </Button>
 
         <Button variant="report" size="xl" className="w-full">
           <FileText className="h-6 w-6 mr-3" />
           <div className="text-left">
-            <p className="font-semibold">View Reports</p>
-            <p className="text-xs opacity-90">రిపోర్ట్‌లు చూడండి</p>
+            <p className="font-semibold">రిపోర్ట్‌లు చూడండి</p>
           </div>
         </Button>
       </div>
@@ -202,18 +196,18 @@ const Dashboard = () => {
       {/* Quick Summary */}
       <Card className="p-4 shadow-card bg-gradient-card">
         <div className="space-y-3">
-          <h3 className="font-semibold text-foreground">Today's Summary</h3>
+          <h3 className="font-semibold text-foreground">నేటి సారాంశం</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Collections:</span>
+              <span className="text-muted-foreground">వసూలు:</span>
               <span className="font-medium text-success">₹{todayStats.totalCollected.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Pending:</span>
+              <span className="text-muted-foreground">బాకీ:</span>
               <span className="font-medium text-warning">₹{todayStats.pendingBalance.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Active Loans:</span>
+              <span className="text-muted-foreground">క్రియాశీల లోన్‌లు:</span>
               <span className="font-medium text-primary">{todayStats.activeLoans}</span>
             </div>
           </div>
