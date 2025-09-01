@@ -17,20 +17,20 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Financial green theme */
-    --primary: 142 76% 36%;
+    /* Financial blue theme */
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 142 60% 45%;
-    --primary-dark: 142 85% 25%;
+    --primary-light: 217 91% 70%;
+    --primary-dark: 217 91% 50%;
 
-    --secondary: 142 20% 96%;
-    --secondary-foreground: 142 76% 20%;
+    --secondary: 217 20% 96%;
+    --secondary-foreground: 217 91% 25%;
 
-    --muted: 142 15% 96%;
-    --muted-foreground: 142 15% 45%;
+    --muted: 217 15% 96%;
+    --muted-foreground: 217 15% 45%;
 
-    --accent: 142 30% 92%;
-    --accent-foreground: 142 76% 25%;
+    --accent: 217 30% 92%;
+    --accent-foreground: 217 91% 25%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
@@ -41,18 +41,18 @@ All colors MUST be HSL.
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 142 15% 88%;
-    --input: 142 15% 92%;
-    --ring: 142 76% 36%;
+    --border: 217 15% 88%;
+    --input: 217 15% 92%;
+    --ring: 217 91% 60%;
 
     /* Money gradients */
     --gradient-money: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
     --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(142 60% 45%));
-    --gradient-card: linear-gradient(180deg, hsl(var(--card)), hsl(142 10% 98%));
+    --gradient-card: linear-gradient(180deg, hsl(var(--card)), hsl(217 10% 98%));
 
     /* Shadows */
     --shadow-money: 0 4px 20px hsl(var(--primary) / 0.15);
-    --shadow-card: 0 2px 8px hsl(142 20% 80% / 0.1);
+    --shadow-card: 0 2px 8px hsl(217 20% 80% / 0.1);
     --shadow-button: 0 2px 4px hsl(var(--primary) / 0.2);
 
     --radius: 0.5rem;
