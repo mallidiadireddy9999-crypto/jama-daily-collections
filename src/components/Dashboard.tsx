@@ -14,10 +14,13 @@ import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
 import AddLoanModal from "./AddLoanModal";
 import CollectionsList from "./CollectionsList";
+import PendingBalanceList from "./PendingBalanceList";
+import ActiveLoansList from "./ActiveLoansList";
+import NewLoansToday from "./NewLoansToday";
 import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'payment' | 'collections'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'payment' | 'collections' | 'pending' | 'activeLoans' | 'newLoans'>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [showAddLoanModal, setShowAddLoanModal] = useState(false);
   const { toast } = useToast();
@@ -53,6 +56,18 @@ const Dashboard = () => {
 
   const handleViewCollections = () => {
     setCurrentView('collections');
+  };
+
+  const handleViewPendingBalance = () => {
+    setCurrentView('pending');
+  };
+
+  const handleViewActiveLoans = () => {
+    setCurrentView('activeLoans');
+  };
+
+  const handleViewNewLoans = () => {
+    setCurrentView('newLoans');
   };
 
   const handleLoanSave = (loan: any) => {
@@ -122,6 +137,30 @@ const Dashboard = () => {
     );
   }
 
+  if (currentView === 'pending') {
+    return (
+      <PendingBalanceList
+        onBack={handleBackToDashboard}
+      />
+    );
+  }
+
+  if (currentView === 'activeLoans') {
+    return (
+      <ActiveLoansList
+        onBack={handleBackToDashboard}
+      />
+    );
+  }
+
+  if (currentView === 'newLoans') {
+    return (
+      <NewLoansToday
+        onBack={handleBackToDashboard}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-card p-4 space-y-6">
       {/* Header */}
@@ -161,7 +200,10 @@ const Dashboard = () => {
           </div>
         </Card>
 
-        <Card className="p-4 shadow-card">
+        <Card 
+          className="p-4 shadow-card cursor-pointer hover:scale-105 transition-transform"
+          onClick={handleViewPendingBalance}
+        >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Clock className="h-5 w-5 text-warning" />
@@ -176,7 +218,10 @@ const Dashboard = () => {
           </div>
         </Card>
 
-        <Card className="p-4 shadow-card">
+        <Card 
+          className="p-4 shadow-card cursor-pointer hover:scale-105 transition-transform"
+          onClick={handleViewActiveLoans}
+        >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Users className="h-5 w-5 text-primary" />
@@ -193,7 +238,10 @@ const Dashboard = () => {
           </div>
         </Card>
 
-        <Card className="p-4 shadow-card">
+        <Card 
+          className="p-4 shadow-card cursor-pointer hover:scale-105 transition-transform"
+          onClick={handleViewNewLoans}
+        >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <PlusCircle className="h-5 w-5 text-primary" />
