@@ -169,7 +169,7 @@ const Dashboard = () => {
           <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money flex items-center gap-3">
             <img src="/lovable-uploads/6931d901-421c-4070-833d-a383481866ec.png" alt="Wallet" className="h-8 w-8" />
             <h1 className="text-2xl font-bold text-primary-foreground">
-              JAMA <span className="text-lg">జమ</span>
+              JAMA <span className="text-lg">చేయి</span>
             </h1>
           </div>
         </div>
