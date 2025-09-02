@@ -202,17 +202,17 @@ const Dashboard = () => {
         </Card>
 
         <Card 
-          className="p-4 shadow-card cursor-pointer hover:scale-105 transition-transform"
+          className="p-4 shadow-card bg-gradient-success cursor-pointer hover:scale-105 transition-transform"
           onClick={handleViewPendingBalance}
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Clock className="h-5 w-5 text-warning" />
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <Clock className="h-5 w-5 text-success-foreground" />
+              <TrendingUp className="h-4 w-4 text-success-foreground" />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">బాకీ మొత్తం</p>
-              <p className="text-lg font-bold text-foreground">
+              <p className="text-xs text-success-foreground/80">బాకీ మొత్తం</p>
+              <p className="text-lg font-bold text-success-foreground">
                 ₹{todayStats.pendingBalance.toLocaleString()}
               </p>
             </div>
@@ -220,19 +220,19 @@ const Dashboard = () => {
         </Card>
 
         <Card 
-          className="p-4 shadow-card cursor-pointer hover:scale-105 transition-transform"
+          className="p-4 shadow-card bg-gradient-success cursor-pointer hover:scale-105 transition-transform"
           onClick={handleViewActiveLoans}
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Users className="h-5 w-5 text-primary" />
-              <span className="text-xs text-success bg-success/10 px-2 py-1 rounded-full">
+              <Users className="h-5 w-5 text-success-foreground" />
+              <span className="text-xs text-success-foreground bg-success-foreground/10 px-2 py-1 rounded-full">
                 క్రియాశీలం
               </span>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">క్రియాశీల లోన్‌లు</p>
-              <p className="text-lg font-bold text-foreground">
+              <p className="text-xs text-success-foreground/80">క్రియాశీల లోన్‌లు</p>
+              <p className="text-lg font-bold text-success-foreground">
                 {todayStats.activeLoans}
               </p>
             </div>
@@ -240,19 +240,19 @@ const Dashboard = () => {
         </Card>
 
         <Card 
-          className="p-4 shadow-card cursor-pointer hover:scale-105 transition-transform"
+          className="p-4 shadow-card bg-gradient-success cursor-pointer hover:scale-105 transition-transform"
           onClick={handleViewNewLoans}
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <PlusCircle className="h-5 w-5 text-primary" />
-              <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
+              <PlusCircle className="h-5 w-5 text-success-foreground" />
+              <span className="text-xs text-success-foreground bg-success-foreground/10 px-2 py-1 rounded-full">
                 కొత్తది
               </span>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">నేడు కొత్తవి</p>
-              <p className="text-lg font-bold text-foreground">
+              <p className="text-xs text-success-foreground/80">నేడు కొత్తవి</p>
+              <p className="text-lg font-bold text-success-foreground">
                 {todayStats.newLoansToday}
               </p>
             </div>
