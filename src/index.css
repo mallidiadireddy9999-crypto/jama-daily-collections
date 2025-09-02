@@ -17,38 +17,38 @@ All colors MUST be HSL.
     --popover: 217 100% 98%;
     --popover-foreground: 217 84% 12%;
 
-    /* Financial blue theme */
-    --primary: 217 91% 60%;
+    /* Green financial theme to match wallet logo */
+    --primary: 142 71% 45%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 217 91% 70%;
-    --primary-dark: 217 91% 50%;
+    --primary-light: 142 71% 55%;
+    --primary-dark: 142 71% 35%;
 
-    --secondary: 217 20% 96%;
-    --secondary-foreground: 217 91% 25%;
+    --secondary: 142 20% 96%;
+    --secondary-foreground: 142 71% 25%;
 
-    --muted: 217 15% 96%;
-    --muted-foreground: 217 15% 45%;
+    --muted: 142 15% 96%;
+    --muted-foreground: 142 15% 45%;
 
-    --accent: 217 30% 92%;
-    --accent-foreground: 217 91% 25%;
+    --accent: 142 30% 92%;
+    --accent-foreground: 142 71% 25%;
 
-    --success: 217 76% 45%;
+    --success: 142 76% 45%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 217 76% 65%;
-    --warning-foreground: 217 84% 12%;
+    --warning: 45 84% 60%;
+    --warning-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 217 15% 88%;
-    --input: 217 15% 92%;
-    --ring: 217 91% 60%;
+    --border: 142 15% 88%;
+    --input: 142 15% 92%;
+    --ring: 142 71% 45%;
 
-    /* Money gradients */
+    /* Money gradients with green theme */
     --gradient-money: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
-    --gradient-success: linear-gradient(135deg, hsl(217 76% 45%), hsl(217 76% 55%));
-    --gradient-card: linear-gradient(180deg, hsl(var(--card)), hsl(217 30% 98%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 45%), hsl(142 76% 55%));
+    --gradient-card: linear-gradient(180deg, hsl(var(--card)), hsl(142 30% 98%));
 
     /* Shadows */
     --shadow-money: 0 4px 20px hsl(var(--primary) / 0.15);
@@ -57,14 +57,14 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    --sidebar-background: 217 100% 98%;
-    --sidebar-foreground: 217 84% 12%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-background: 142 100% 98%;
+    --sidebar-foreground: 142 84% 12%;
+    --sidebar-primary: 142 71% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 30% 95%;
-    --sidebar-accent-foreground: 217 91% 25%;
-    --sidebar-border: 217 15% 88%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-accent: 142 30% 95%;
+    --sidebar-accent-foreground: 142 71% 25%;
+    --sidebar-border: 142 15% 88%;
+    --sidebar-ring: 142 71% 45%;
   }
 
   .dark {
@@ -77,32 +77,32 @@ All colors MUST be HSL.
     --popover: 217 84% 8%;
     --popover-foreground: 217 30% 95%;
 
-    --primary: 217 91% 65%;
-    --primary-foreground: 217 84% 8%;
+    --primary: 142 71% 55%;
+    --primary-foreground: 142 84% 8%;
 
-    --secondary: 217 32% 18%;
-    --secondary-foreground: 217 30% 95%;
+    --secondary: 142 32% 18%;
+    --secondary-foreground: 142 30% 95%;
 
-    --muted: 217 32% 18%;
-    --muted-foreground: 217 20% 65%;
+    --muted: 142 32% 18%;
+    --muted-foreground: 142 20% 65%;
 
-    --accent: 217 32% 20%;
-    --accent-foreground: 217 30% 95%;
+    --accent: 142 32% 20%;
+    --accent-foreground: 142 30% 95%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 217 30% 95%;
+    --destructive-foreground: 142 30% 95%;
 
-    --border: 217 32% 18%;
-    --input: 217 32% 18%;
-    --ring: 217 91% 65%;
-    --sidebar-background: 217 84% 8%;
-    --sidebar-foreground: 217 30% 95%;
-    --sidebar-primary: 217 91% 60%;
+    --border: 142 32% 18%;
+    --input: 142 32% 18%;
+    --ring: 142 71% 55%;
+    --sidebar-background: 142 84% 8%;
+    --sidebar-foreground: 142 30% 95%;
+    --sidebar-primary: 142 71% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 32% 20%;
-    --sidebar-accent-foreground: 217 30% 95%;
-    --sidebar-border: 217 32% 18%;
-    --sidebar-ring: 217 91% 65%;
+    --sidebar-accent: 142 32% 20%;
+    --sidebar-accent-foreground: 142 30% 95%;
+    --sidebar-border: 142 32% 18%;
+    --sidebar-ring: 142 71% 55%;
   }
 }
 
