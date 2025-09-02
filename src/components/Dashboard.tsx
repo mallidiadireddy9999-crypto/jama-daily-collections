@@ -166,7 +166,8 @@ const Dashboard = () => {
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money">
+          <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money flex items-center gap-3">
+            <img src="/lovable-uploads/6931d901-421c-4070-833d-a383481866ec.png" alt="Wallet" className="h-8 w-8" />
             <h1 className="text-2xl font-bold text-primary-foreground">
               JAMA <span className="text-lg">జమ</span>
             </h1>
