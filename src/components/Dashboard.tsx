@@ -186,15 +186,15 @@ const Dashboard = () => {
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <IndianRupee className="h-5 w-5 text-success-foreground" />
-              <TrendingUp className="h-4 w-4 text-success-foreground" />
+              <IndianRupee className="h-5 w-5 text-white" />
+              <TrendingUp className="h-4 w-4 text-white" />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-success-foreground/80">నేటి వసూలు</p>
-              <p className="text-lg font-bold text-success-foreground">
+              <p className="text-xs text-white/90 font-semibold">నేటి వసూలు</p>
+              <p className="text-lg font-bold text-white">
                 ₹{todayStats.totalCollected.toLocaleString()}
               </p>
-              <p className="text-xs text-success-foreground/60">
+              <p className="text-xs text-white/80 font-medium">
                 {todaysCollections.length} వసూలు
               </p>
             </div>
@@ -207,12 +207,12 @@ const Dashboard = () => {
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Clock className="h-5 w-5 text-success-foreground" />
-              <TrendingUp className="h-4 w-4 text-success-foreground" />
+              <Clock className="h-5 w-5 text-white" />
+              <TrendingUp className="h-4 w-4 text-white" />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-success-foreground/80">బాకీ మొత్తం</p>
-              <p className="text-lg font-bold text-success-foreground">
+              <p className="text-xs text-white/90 font-semibold">బాకీ మొత్తం</p>
+              <p className="text-lg font-bold text-white">
                 ₹{todayStats.pendingBalance.toLocaleString()}
               </p>
             </div>
@@ -225,14 +225,14 @@ const Dashboard = () => {
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Users className="h-5 w-5 text-success-foreground" />
-              <span className="text-xs text-success-foreground bg-success-foreground/10 px-2 py-1 rounded-full">
+              <Users className="h-5 w-5 text-white" />
+              <span className="text-xs text-white bg-white/20 px-2 py-1 rounded-full font-semibold">
                 క్రియాశీలం
               </span>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-success-foreground/80">క్రియాశీల లోన్‌లు</p>
-              <p className="text-lg font-bold text-success-foreground">
+              <p className="text-xs text-white/90 font-semibold">క్రియాశీల లోన్‌లు</p>
+              <p className="text-lg font-bold text-white">
                 {todayStats.activeLoans}
               </p>
             </div>
@@ -245,14 +245,14 @@ const Dashboard = () => {
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <PlusCircle className="h-5 w-5 text-success-foreground" />
-              <span className="text-xs text-success-foreground bg-success-foreground/10 px-2 py-1 rounded-full">
+              <PlusCircle className="h-5 w-5 text-white" />
+              <span className="text-xs text-white bg-white/20 px-2 py-1 rounded-full font-semibold">
                 కొత్తది
               </span>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-success-foreground/80">నేడు కొత్తవి</p>
-              <p className="text-lg font-bold text-success-foreground">
+              <p className="text-xs text-white/90 font-semibold">నేడు కొత్తవి</p>
+              <p className="text-lg font-bold text-white">
                 {todayStats.newLoansToday}
               </p>
             </div>
