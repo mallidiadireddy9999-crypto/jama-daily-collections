@@ -6,11 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Phone, Users } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+  const [referralId, setReferralId] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
@@ -33,20 +35,30 @@ const Login = () => {
 
     try {
       if (isSignUp) {
+        // For signup, use mobile number as the primary identifier
+        const userEmail = mobile.includes('@') ? mobile : `${mobile}@jama.app`;
         const { error } = await supabase.auth.signUp({
-          email,
+          email: userEmail,
           password,
+          options: {
+            data: {
+              mobile_number: mobile,
+              referral_id: referralId
+            }
+          }
         });
         
         if (error) throw error;
         
         toast({
           title: "అకౌంట్ సృష్టించబడింది!",
-          description: "మీ ఇమెయిల్‌ను వెరిఫై చేయండి",
+          description: `మోబైల్ ${mobile} తో అకౌంట్ సృష్టించబడింది`,
         });
       } else {
+        // For login, try with email first, then mobile
+        const loginEmail = email.includes('@') ? email : `${email}@jama.app`;
         const { error } = await supabase.auth.signInWithPassword({
-          email,
+          email: loginEmail,
           password,
         });
         
@@ -73,7 +85,17 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl border-border/50">
-        <CardHeader className="space-y-2 text-center">
+        <CardHeader className="space-y-4 text-center">
+          {/* Logo Section */}
+          <div className="flex justify-center">
+            <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money flex items-center gap-3">
+              <img src="/lovable-uploads/6931d901-421c-4070-833d-a383481866ec.png" alt="Wallet" className="h-10 w-10" />
+              <h1 className="text-xl font-bold text-primary-foreground">
+                JAMA <span className="text-lg">చేయి</span>
+              </h1>
+            </div>
+          </div>
+          
           <CardTitle className="text-2xl font-bold text-foreground">
             {isSignUp ? "అకౌంట్ సృష్టించండి" : "లాగిన్"}
           </CardTitle>
@@ -86,23 +108,64 @@ const Login = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleAuth} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">
-                ఇమెయిల్
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="మీ ఇమెయిల్ ఎంటర్ చేయండి"
-                  className="pl-10"
-                  required
-                />
+            {isSignUp ? (
+              /* Sign Up Form */
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="mobile" className="text-sm font-medium">
+                    మోబైల్ నంబర్
+                  </Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="mobile"
+                      type="tel"
+                      value={mobile}
+                      onChange={(e) => setMobile(e.target.value)}
+                      placeholder="మీ మోబైల్ నంబర్ ఎంటర్ చేయండి"
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="referralId" className="text-sm font-medium">
+                    రిఫరల్ ID (ఐచ్ఛికం)
+                  </Label>
+                  <div className="relative">
+                    <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="referralId"
+                      type="text"
+                      value={referralId}
+                      onChange={(e) => setReferralId(e.target.value)}
+                      placeholder="రిఫరల్ ID ఎంటర్ చేయండి"
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
+              /* Login Form */
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">
+                  ఇమెయిల్ / మోబైల్
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="text"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="మీ ఇమెయిల్ లేదా మోబైల్ ఎంటర్ చేయండి"
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
-            </div>
+            )}
             
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium">
