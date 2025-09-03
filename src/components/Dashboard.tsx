@@ -21,7 +21,7 @@ import PendingBalanceList from "./PendingBalanceList";
 import ActiveLoansList from "./ActiveLoansList";
 import NewLoansToday from "./NewLoansToday";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 const Dashboard = () => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'payment' | 'collections' | 'pending' | 'activeLoans' | 'newLoans'>('dashboard');
@@ -32,6 +32,12 @@ const Dashboard = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
+    // Only check auth if Supabase is configured
+    if (!isSupabaseConfigured()) {
+      console.log('Supabase not configured - running in demo mode');
+      return;
+    }
+
     // Check current user
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
@@ -46,6 +52,15 @@ const Dashboard = () => {
   }, []);
 
   const handleSignOut = async () => {
+    if (!isSupabaseConfigured()) {
+      toast({
+        title: "Supabase లేదు",
+        description: "ముందుగా Supabase సెటప్ చేయండి",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
