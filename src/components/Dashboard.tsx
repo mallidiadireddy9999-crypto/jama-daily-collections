@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -8,7 +9,9 @@ import {
   TrendingUp,
   Users,
   IndianRupee,
-  Clock
+  Clock,
+  LogOut,
+  User
 } from "lucide-react";
 import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
@@ -18,12 +21,50 @@ import PendingBalanceList from "./PendingBalanceList";
 import ActiveLoansList from "./ActiveLoansList";
 import NewLoansToday from "./NewLoansToday";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 
 const Dashboard = () => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'payment' | 'collections' | 'pending' | 'activeLoans' | 'newLoans'>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [showAddLoanModal, setShowAddLoanModal] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Check current user
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "లోపం",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "విజయవంతంగా లాగ్ అవుట్ అయ్యారు",
+        description: "వీడ్కోలు!",
+      });
+      navigate('/login');
+    }
+  };
+
+  const handleSignIn = () => {
+    navigate('/login');
+  };
   
   const [todayStats, setTodayStats] = useState({
     totalCollected: 15750,
@@ -165,12 +206,37 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gradient-card p-4 space-y-6">
       {/* Header */}
       <div className="text-center space-y-4">
-        <div className="flex justify-center">
+        <div className="flex justify-center items-center relative">
           <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money flex items-center gap-3">
             <img src="/lovable-uploads/6931d901-421c-4070-833d-a383481866ec.png" alt="Wallet" className="h-12 w-12" />
             <h1 className="text-2xl font-bold text-primary-foreground">
               JAMA <span className="text-lg">చేయి</span>
             </h1>
+          </div>
+          
+          {/* Auth Button - positioned in top right */}
+          <div className="absolute right-0 top-0">
+            {user ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignOut}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                లాగ్ అవుట్
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignIn}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              >
+                <User className="h-4 w-4 mr-2" />
+                లాగిన్
+              </Button>
+            )}
           </div>
         </div>
         <p className="text-sm text-muted-foreground">
