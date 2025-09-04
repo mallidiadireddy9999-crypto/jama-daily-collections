@@ -225,55 +225,53 @@ const Dashboard = () => {
       <div className="min-h-screen bg-gradient-card p-4 space-y-6">
         {/* Header */}
         <div className="text-center space-y-4">
-          <div className="flex justify-center items-center relative">
+          <div className="flex justify-between items-center w-full mb-4">
             {/* Menu Button - positioned in top left */}
-            <div className="absolute left-0 top-0">
-              <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-                <SheetTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                  >
-                    <Menu className="h-4 w-4" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="p-0 w-64">
-                  <AppSidebar onClose={() => setSidebarOpen(false)} />
-                </SheetContent>
-              </Sheet>
-            </div>
+            <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-primary border-primary text-white hover:bg-primary-dark"
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="p-0 w-64">
+                <AppSidebar onClose={() => setSidebarOpen(false)} />
+              </SheetContent>
+            </Sheet>
 
+            {/* Auth Button - positioned in top right */}
+            {user ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignOut}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                లాగ్ అవుట్
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignIn}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              >
+                <User className="h-4 w-4 mr-2" />
+                లాగిన్
+              </Button>
+            )}
+          </div>
+
+          <div className="flex justify-center">
             <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money flex items-center gap-3">
               <img src="/lovable-uploads/6931d901-421c-4070-833d-a383481866ec.png" alt="Wallet" className="h-12 w-12" />
               <h1 className="text-2xl font-bold text-primary-foreground">
                 JAMA <span className="text-lg">చేయి</span>
               </h1>
-            </div>
-            
-            {/* Auth Button - positioned in top right */}
-            <div className="absolute right-0 top-0">
-              {user ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  లాగ్ అవుట్
-                </Button>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSignIn}
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                >
-                  <User className="h-4 w-4 mr-2" />
-                  లాగిన్
-                </Button>
-              )}
             </div>
           </div>
           <p className="text-sm text-muted-foreground">
