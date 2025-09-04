@@ -14,7 +14,155 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      collections: {
+        Row: {
+          amount: number
+          collection_date: string
+          created_at: string
+          id: string
+          loan_id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          collection_date?: string
+          created_at?: string
+          id?: string
+          loan_id: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          collection_date?: string
+          created_at?: string
+          id?: string
+          loan_id?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collections_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loans: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_mobile: string | null
+          customer_name: string
+          duration_months: number | null
+          id: string
+          interest_rate: number | null
+          start_date: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          customer_mobile?: string | null
+          customer_name: string
+          duration_months?: number | null
+          id?: string
+          interest_rate?: number | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_mobile?: string | null
+          customer_name?: string
+          duration_months?: number | null
+          id?: string
+          interest_rate?: number | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          mobile_number: string | null
+          referral_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          mobile_number?: string | null
+          referral_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          mobile_number?: string | null
+          referral_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          end_date: string
+          generated_at: string
+          id: string
+          pending_amount: number | null
+          report_data: Json | null
+          report_type: string
+          start_date: string
+          total_collections: number | null
+          total_loans: number | null
+          user_id: string
+        }
+        Insert: {
+          end_date: string
+          generated_at?: string
+          id?: string
+          pending_amount?: number | null
+          report_data?: Json | null
+          report_type: string
+          start_date: string
+          total_collections?: number | null
+          total_loans?: number | null
+          user_id: string
+        }
+        Update: {
+          end_date?: string
+          generated_at?: string
+          id?: string
+          pending_amount?: number | null
+          report_data?: Json | null
+          report_type?: string
+          start_date?: string
+          total_collections?: number | null
+          total_loans?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { 
   PlusCircle, 
   HandCoins, 
@@ -11,7 +13,8 @@ import {
   IndianRupee,
   Clock,
   LogOut,
-  User
+  User,
+  Menu
 } from "lucide-react";
 import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
@@ -20,25 +23,28 @@ import CollectionsList from "./CollectionsList";
 import PendingBalanceList from "./PendingBalanceList";
 import ActiveLoansList from "./ActiveLoansList";
 import NewLoansToday from "./NewLoansToday";
+import ReportsPage from "./ReportsPage";
+import { AppSidebar } from "./AppSidebar";
 import { useToast } from "@/hooks/use-toast";
-import { auth, isSupabaseConfigured } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'payment' | 'collections' | 'pending' | 'activeLoans' | 'newLoans'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'payment' | 'collections' | 'pending' | 'activeLoans' | 'newLoans' | 'reports'>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [showAddLoanModal, setShowAddLoanModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   
   useEffect(() => {
     // Check current user
-    auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user || null);
     });
 
@@ -46,16 +52,7 @@ const Dashboard = () => {
   }, []);
 
   const handleSignOut = async () => {
-    if (!isSupabaseConfigured()) {
-      toast({
-        title: "Supabase లేదు",
-        description: "ముందుగా Supabase సెటప్ చేయండి",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const { error } = await auth.signOut();
+    const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
         title: "లోపం",
@@ -118,6 +115,10 @@ const Dashboard = () => {
 
   const handleViewNewLoans = () => {
     setCurrentView('newLoans');
+  };
+
+  const handleViewReports = () => {
+    setCurrentView('reports');
   };
 
   const handleLoanSave = (loan: any) => {
@@ -211,47 +212,74 @@ const Dashboard = () => {
     );
   }
 
+  if (currentView === 'reports') {
+    return (
+      <ReportsPage
+        onBack={handleBackToDashboard}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-card p-4 space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="flex justify-center items-center relative">
-          <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money flex items-center gap-3">
-            <img src="/lovable-uploads/6931d901-421c-4070-833d-a383481866ec.png" alt="Wallet" className="h-12 w-12" />
-            <h1 className="text-2xl font-bold text-primary-foreground">
-              JAMA <span className="text-lg">చేయి</span>
-            </h1>
+    <SidebarProvider>
+      <div className="min-h-screen bg-gradient-card p-4 space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <div className="flex justify-center items-center relative">
+            {/* Menu Button - positioned in top left */}
+            <div className="absolute left-0 top-0">
+              <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  >
+                    <Menu className="h-4 w-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-64">
+                  <AppSidebar onClose={() => setSidebarOpen(false)} />
+                </SheetContent>
+              </Sheet>
+            </div>
+
+            <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money flex items-center gap-3">
+              <img src="/lovable-uploads/6931d901-421c-4070-833d-a383481866ec.png" alt="Wallet" className="h-12 w-12" />
+              <h1 className="text-2xl font-bold text-primary-foreground">
+                JAMA <span className="text-lg">చేయి</span>
+              </h1>
+            </div>
+            
+            {/* Auth Button - positioned in top right */}
+            <div className="absolute right-0 top-0">
+              {user ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  లాగ్ అవుట్
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSignIn}
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  లాగిన్
+                </Button>
+              )}
+            </div>
           </div>
-          
-          {/* Auth Button - positioned in top right */}
-          <div className="absolute right-0 top-0">
-            {user ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSignOut}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                లాగ్ అవుట్
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSignIn}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-              >
-                <User className="h-4 w-4 mr-2" />
-                లాగిన్
-              </Button>
-            )}
-          </div>
+          <p className="text-sm text-muted-foreground">
+            ఇక పెన్ పేపర్ అవసరం లేదు
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground">
-          ఇక పెన్ పేపర్ అవసరం లేదు
-        </p>
-      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-4">
@@ -351,7 +379,7 @@ const Dashboard = () => {
           </div>
         </Button>
 
-        <Button variant="report" size="xl" className="w-full">
+        <Button variant="report" size="xl" className="w-full" onClick={handleViewReports}>
           <FileText className="h-6 w-6 mr-3" />
           <div className="text-left">
             <p className="font-semibold">రిపోర్ట్‌లు చూడండి</p>
@@ -386,7 +414,8 @@ const Dashboard = () => {
         onOpenChange={setShowAddLoanModal}
         onSave={handleLoanSave}
       />
-    </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
