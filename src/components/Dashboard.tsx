@@ -233,12 +233,19 @@ const Dashboard = () => {
                   variant="outline"
                   size="sm"
                   className="bg-primary border-primary text-white hover:bg-primary-dark"
+                  onClick={() => {
+                    console.log("Menu button clicked, current state:", sidebarOpen);
+                    setSidebarOpen(true);
+                  }}
                 >
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-64">
-                <AppSidebar onClose={() => setSidebarOpen(false)} />
+              <SheetContent side="left" className="p-0 w-64 bg-white">
+                <AppSidebar onClose={() => {
+                  console.log("Closing sidebar");
+                  setSidebarOpen(false);
+                }} />
               </SheetContent>
             </Sheet>
 
