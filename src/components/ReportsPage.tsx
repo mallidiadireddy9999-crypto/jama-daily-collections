@@ -127,6 +127,8 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
   };
 
   const downloadPDF = () => {
+    console.log("PDF download initiated, reportData:", reportData);
+    
     if (!reportData) {
       toast({
         title: "లోపం",
@@ -136,52 +138,73 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
       return;
     }
 
-    const doc = new jsPDF();
-    
-    // Add title
-    doc.setFontSize(20);
-    doc.text('JAMA చేయి - రిపోర్ట్', 105, 20, { align: 'center' });
-    
-    // Add report details
-    doc.setFontSize(12);
-    doc.text(`రిపోర్ట్ రకం: ${reportType}`, 20, 40);
-    doc.text(`తేదీ: ${startDate} నుండి ${endDate} వరకు`, 20, 50);
-    
-    // Add summary
-    doc.setFontSize(14);
-    doc.text('సారాంశం:', 20, 70);
-    doc.setFontSize(12);
-    doc.text(`మొత్తం లోన్లు: ₹${reportData.totalLoans.toLocaleString()}`, 20, 85);
-    doc.text(`మొత్తం వసూలు: ₹${reportData.totalCollections.toLocaleString()}`, 20, 95);
-    doc.text(`బాకీ మొత్తం: ₹${reportData.pendingAmount.toLocaleString()}`, 20, 105);
-    doc.text(`లోన్ల సంఖ్య: ${reportData.loansCount}`, 20, 115);
-    doc.text(`వసూల్ల సంఖ్య: ${reportData.collectionsCount}`, 20, 125);
+    try {
+      console.log("Creating PDF document...");
+      const doc = new jsPDF();
+      
+      // Add title
+      console.log("Adding title to PDF...");
+      doc.setFontSize(20);
+      doc.text('JAMA Report', 105, 20, { align: 'center' });
+      
+      // Add report details  
+      console.log("Adding report details...");
+      doc.setFontSize(12);
+      doc.text(`Report Type: ${reportType}`, 20, 40);
+      doc.text(`Date: ${startDate} to ${endDate}`, 20, 50);
+      
+      // Add summary
+      console.log("Adding summary...");
+      doc.setFontSize(14);
+      doc.text('Summary:', 20, 70);
+      doc.setFontSize(12);
+      doc.text(`Total Loans: Rs.${reportData.totalLoans.toLocaleString()}`, 20, 85);
+      doc.text(`Total Collections: Rs.${reportData.totalCollections.toLocaleString()}`, 20, 95);
+      doc.text(`Pending Amount: Rs.${reportData.pendingAmount.toLocaleString()}`, 20, 105);
+      doc.text(`Number of Loans: ${reportData.loansCount}`, 20, 115);
+      doc.text(`Number of Collections: ${reportData.collectionsCount}`, 20, 125);
 
-    // Add loans table if data exists
-    if (reportData.loans.length > 0) {
-      const loansData = reportData.loans.map((loan: any) => [
-        loan.customer_name,
-        loan.customer_mobile || '',
-        `₹${Number(loan.amount).toLocaleString()}`,
-        loan.status,
-        loan.start_date
-      ]);
+      // Add loans table if data exists
+      if (reportData.loans && reportData.loans.length > 0) {
+        console.log("Adding loans table...", reportData.loans.length, "loans");
+        const loansData = reportData.loans.map((loan: any) => [
+          loan.customer_name || 'N/A',
+          loan.customer_mobile || 'N/A',
+          `Rs.${Number(loan.amount).toLocaleString()}`,
+          loan.status || 'active',
+          loan.start_date || 'N/A'
+        ]);
 
-      autoTable(doc, {
-        startY: 140,
-        head: [['కస్టమర్ పేరు', 'మొబైల్', 'మొత్తం', 'స్థితి', 'తేదీ']],
-        body: loansData,
-        theme: 'grid',
+        autoTable(doc, {
+          startY: 140,
+          head: [['Customer Name', 'Mobile', 'Amount', 'Status', 'Date']],
+          body: loansData,
+          theme: 'grid',
+        });
+        console.log("Loans table added successfully");
+      } else {
+        console.log("No loans data to add to table");
+      }
+
+      // Save the PDF
+      console.log("Saving PDF...");
+      const filename = `jama-report-${reportType}-${startDate}-${endDate}.pdf`;
+      doc.save(filename);
+      console.log("PDF saved successfully as:", filename);
+      
+      toast({
+        title: "PDF Download Successful",
+        description: `Report PDF file ${filename} has been downloaded`,
+      });
+      
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "PDF Generation Error",
+        description: error instanceof Error ? error.message : "Failed to generate PDF",
+        variant: "destructive",
       });
     }
-
-    // Save the PDF
-    doc.save(`jama-report-${reportType}-${startDate}-${endDate}.pdf`);
-    
-    toast({
-      title: "PDF డౌన్‌లోడ్ విజయవంతంగా పూర్తయింది",
-      description: "రిపోర్ట్ PDF ఫైల్ డౌన్‌లోడ్ చేయబడింది",
-    });
   };
 
   return (
