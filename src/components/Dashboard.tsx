@@ -232,16 +232,16 @@ const Dashboard = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="bg-primary border-primary text-white hover:bg-primary-dark"
+                  className="bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700 font-bold shadow-lg"
                   onClick={() => {
                     console.log("Menu button clicked, current state:", sidebarOpen);
                     setSidebarOpen(true);
                   }}
                 >
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-64 bg-white">
+              <SheetContent side="left" className="p-0 w-64 bg-white border-r-2 border-gray-300">
                 <AppSidebar onClose={() => {
                   console.log("Closing sidebar");
                   setSidebarOpen(false);

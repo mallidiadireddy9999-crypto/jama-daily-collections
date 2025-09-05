@@ -175,15 +175,15 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   ];
 
   return (
-    <Sidebar className="w-64 bg-sidebar border-sidebar-border">
-      <SidebarContent className="bg-sidebar">
+    <Sidebar className="w-64 bg-white border-r border-gray-300 shadow-lg">
+      <SidebarContent className="bg-white">
         {/* Language Toggle */}
-        <div className="p-4 border-b border-sidebar-border">
+        <div className="p-4 border-b border-gray-200 bg-gray-50">
           <Button
             onClick={toggleLanguage}
             variant="outline"
             size="sm"
-            className="w-full bg-sidebar-accent hover:bg-sidebar-accent-foreground text-sidebar-foreground border-sidebar-border"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white border-blue-500 font-medium"
           >
             <Languages className="h-4 w-4 mr-2" />
             {language === 'te' ? 'English' : 'తెలుగు'}
@@ -192,16 +192,16 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
 
         {/* Main Menu */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground text-lg font-semibold mb-4">
+          <SidebarGroupLabel className="text-gray-800 text-lg font-semibold mb-4 px-4">
             {language === 'te' ? 'ప్రధాన మెనూ' : 'Main Menu'}
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2">
+            <SidebarMenu className="space-y-2 px-4">
               {mainMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     onClick={item.onClick}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-blue-100 text-gray-700 hover:text-blue-800 transition-colors font-medium"
                   >
                     <item.icon className="h-5 w-5" />
                     <span className="text-base">{item.title}</span>
@@ -212,20 +212,20 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarSeparator />
+        <hr className="mx-4 my-4 border-gray-200" />
 
         {/* Account Menu */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground text-lg font-semibold mb-4">
+          <SidebarGroupLabel className="text-gray-800 text-lg font-semibold mb-4 px-4">
             {language === 'te' ? 'ఖాతా' : 'Account'}
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2">
+            <SidebarMenu className="space-y-2 px-4">
               {accountMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     onClick={item.onClick}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-100 text-gray-700 hover:text-green-800 transition-colors font-medium"
                   >
                     <item.icon className="h-5 w-5" />
                     <span className="text-base">{item.title}</span>
@@ -236,15 +236,13 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarSeparator />
+        <hr className="mx-4 my-4 border-gray-200" />
 
         {/* Logout */}
         <div className="p-4">
           <Button
             onClick={handleSignOut}
-            variant="destructive"
-            size="sm"
-            className="w-full"
+            className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
             <LogOut className="h-4 w-4 mr-2" />
             {language === 'te' ? 'లాగ్ అవుట్' : 'Log Out'}
