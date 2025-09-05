@@ -1,5 +1,6 @@
-import { User, FileText, HelpCircle, LogOut } from "lucide-react";
+import { User, FileText, HelpCircle, LogOut, Home, CreditCard, Users, Settings, Languages, BarChart3, Calendar, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -9,7 +10,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -20,6 +23,7 @@ interface AppSidebarProps {
 export function AppSidebar({ onClose }: AppSidebarProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [language, setLanguage] = useState<'te' | 'en'>('te');
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -60,45 +64,140 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   const handleHelp = () => {
     // Navigate to help page (to be implemented)
     toast({
-      title: "సహాయం",
-      description: "సహాయం పేజీ త్వరలో వస్తుంది",
+      title: language === 'te' ? "సహాయం" : "Help",
+      description: language === 'te' ? "సహాయం పేజీ త్వరలో వస్తుంది" : "Help page coming soon",
     });
     onClose();
   };
 
-  const menuItems = [
+  const handleDashboard = () => {
+    navigate('/');
+    onClose();
+  };
+
+  const handleCustomers = () => {
+    toast({
+      title: language === 'te' ? "కస్టమర్లు" : "Customers",
+      description: language === 'te' ? "కస్టమర్ల పేజీ త్వరలో వస్తుంది" : "Customers page coming soon",
+    });
+    onClose();
+  };
+
+  const handleReports = () => {
+    toast({
+      title: language === 'te' ? "రిపోర్ట్‌లు" : "Reports",
+      description: language === 'te' ? "రిపోర్ట్‌ల పేజీ త్వరలో వస్తుంది" : "Reports page coming soon",
+    });
+    onClose();
+  };
+
+  const handleSettings = () => {
+    toast({
+      title: language === 'te' ? "సెట్టింగ్‌లు" : "Settings",
+      description: language === 'te' ? "సెట్టింగ్‌ల పేజీ త్వరలో వస్తుంది" : "Settings page coming soon",
+    });
+    onClose();
+  };
+
+  const handleNotifications = () => {
+    toast({
+      title: language === 'te' ? "నోటిఫికేషన్‌లు" : "Notifications",
+      description: language === 'te' ? "నోటిఫికేషన్‌ల పేజీ త్వరలో వస్తుంది" : "Notifications page coming soon",
+    });
+    onClose();
+  };
+
+  const handleCalendar = () => {
+    toast({
+      title: language === 'te' ? "క్యాలెండర్" : "Calendar",
+      description: language === 'te' ? "క్యాలెండర్ పేజీ త్వరలో వస్తుంది" : "Calendar page coming soon",
+    });
+    onClose();
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'te' ? 'en' : 'te');
+    toast({
+      title: language === 'te' ? "Language changed to English" : "భాష తెలుగుకు మార్చబడింది",
+      description: language === 'te' ? "App language switched to English" : "అప్లికేషన్ భాష తెలుగుకు మార్చబడింది",
+    });
+  };
+
+  const mainMenuItems = [
     {
-      title: "ప్రొఫైల్",
+      title: language === 'te' ? "డాష్‌బోర్డ్" : "Dashboard",
+      icon: Home,
+      onClick: handleDashboard,
+    },
+    {
+      title: language === 'te' ? "కస్టమర్లు" : "Customers", 
+      icon: Users,
+      onClick: handleCustomers,
+    },
+    {
+      title: language === 'te' ? "రిపోర్ట్‌లు" : "Reports",
+      icon: BarChart3,
+      onClick: handleReports,
+    },
+    {
+      title: language === 'te' ? "క్యాలెండర్" : "Calendar",
+      icon: Calendar,
+      onClick: handleCalendar,
+    },
+    {
+      title: language === 'te' ? "నోటిఫికేషన్‌లు" : "Notifications",
+      icon: Bell,
+      onClick: handleNotifications,
+    },
+  ];
+
+  const accountMenuItems = [
+    {
+      title: language === 'te' ? "ప్రొఫైల్" : "Profile",
       icon: User,
       onClick: handleProfile,
     },
     {
-      title: "కొనుగోలు చరిత్ర",
-      icon: FileText,
+      title: language === 'te' ? "కొనుగోలు చరిత్ర" : "Purchase History",
+      icon: CreditCard,
       onClick: handlePurchaseHistory,
     },
     {
-      title: "సహాయం",
-      icon: HelpCircle,
-      onClick: handleHelp,
+      title: language === 'te' ? "సెట్టింగ్‌లు" : "Settings",
+      icon: Settings,
+      onClick: handleSettings,
     },
     {
-      title: "లాగ్ అవుట్",
-      icon: LogOut,
-      onClick: handleSignOut,
+      title: language === 'te' ? "సహాయం" : "Help",
+      icon: HelpCircle,
+      onClick: handleHelp,
     },
   ];
 
   return (
     <Sidebar className="w-64 bg-sidebar border-sidebar-border">
       <SidebarContent className="bg-sidebar">
+        {/* Language Toggle */}
+        <div className="p-4 border-b border-sidebar-border">
+          <Button
+            onClick={toggleLanguage}
+            variant="outline"
+            size="sm"
+            className="w-full bg-sidebar-accent hover:bg-sidebar-accent-foreground text-sidebar-foreground border-sidebar-border"
+          >
+            <Languages className="h-4 w-4 mr-2" />
+            {language === 'te' ? 'English' : 'తెలుగు'}
+          </Button>
+        </div>
+
+        {/* Main Menu */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground text-lg font-semibold mb-4">
-            మెనూ
+            {language === 'te' ? 'ప్రధాన మెనూ' : 'Main Menu'}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
-              {menuItems.map((item) => (
+              {mainMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     onClick={item.onClick}
@@ -112,6 +211,45 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <SidebarSeparator />
+
+        {/* Account Menu */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-sidebar-foreground text-lg font-semibold mb-4">
+            {language === 'te' ? 'ఖాతా' : 'Account'}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-2">
+              {accountMenuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    onClick={item.onClick}
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span className="text-base">{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
+        {/* Logout */}
+        <div className="p-4">
+          <Button
+            onClick={handleSignOut}
+            variant="destructive"
+            size="sm"
+            className="w-full"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            {language === 'te' ? 'లాగ్ అవుట్' : 'Log Out'}
+          </Button>
+        </div>
       </SidebarContent>
     </Sidebar>
   );
