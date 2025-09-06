@@ -175,83 +175,81 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   ];
 
   return (
-    <div className="w-full h-full bg-sidebar text-sidebar-foreground">
-      <Sidebar className="w-64 bg-sidebar border-r border-sidebar-border shadow-lg">
-        <SidebarContent className="bg-sidebar">
-         {/* Language Toggle */}
-         <div className="p-4 border-b border-sidebar-border bg-sidebar-accent">
-           <Button
-             onClick={toggleLanguage}
-             variant="outline"
-             size="sm"
-             className="w-full bg-sidebar-primary hover:bg-sidebar-primary/90 text-sidebar-primary-foreground border-sidebar-primary font-medium"
-           >
-             <Languages className="h-4 w-4 mr-2" />
-             {language === 'te' ? 'English' : 'తెలుగు'}
-           </Button>
-         </div>
+    <Sidebar className="w-full bg-sidebar border-r border-sidebar-border shadow-lg">
+      <SidebarContent className="bg-sidebar">
+       {/* Language Toggle */}
+       <div className="p-4 border-b border-sidebar-border bg-sidebar-accent">
+         <Button
+           onClick={toggleLanguage}
+           variant="outline"
+           size="sm"
+           className="w-full bg-sidebar-primary hover:bg-sidebar-primary/90 text-sidebar-primary-foreground border-sidebar-primary font-medium"
+         >
+           <Languages className="h-4 w-4 mr-2" />
+           {language === 'te' ? 'English' : 'తెలుగు'}
+         </Button>
+       </div>
 
-        {/* Main Menu */}
-        <SidebarGroup>
-           <SidebarGroupLabel className="text-sidebar-foreground text-lg font-semibold mb-4 px-4">
-             {language === 'te' ? 'ప్రధాన మెనూ' : 'Main Menu'}
-           </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-2 px-4">
-              {mainMenuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    onClick={item.onClick}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground hover:text-sidebar-accent-foreground transition-colors font-medium"
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span className="text-base">{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      {/* Main Menu */}
+      <SidebarGroup>
+         <SidebarGroupLabel className="text-sidebar-foreground text-lg font-semibold mb-4 px-4">
+           {language === 'te' ? 'ప్రధాన మెనూ' : 'Main Menu'}
+         </SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu className="space-y-2 px-4">
+            {mainMenuItems.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  onClick={item.onClick}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground hover:text-sidebar-accent-foreground transition-colors font-medium"
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span className="text-base">{item.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
 
-         <hr className="mx-4 my-4 border-sidebar-border" />
+       <hr className="mx-4 my-4 border-sidebar-border" />
 
-        {/* Account Menu */}
-        <SidebarGroup>
-           <SidebarGroupLabel className="text-sidebar-foreground text-lg font-semibold mb-4 px-4">
-             {language === 'te' ? 'ఖాతా' : 'Account'}
-           </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-2 px-4">
-              {accountMenuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    onClick={item.onClick}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground hover:text-sidebar-accent-foreground transition-colors font-medium"
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span className="text-base">{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      {/* Account Menu */}
+      <SidebarGroup>
+         <SidebarGroupLabel className="text-sidebar-foreground text-lg font-semibold mb-4 px-4">
+           {language === 'te' ? 'ఖాతా' : 'Account'}
+         </SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu className="space-y-2 px-4">
+            {accountMenuItems.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  onClick={item.onClick}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground hover:text-sidebar-accent-foreground transition-colors font-medium"
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span className="text-base">{item.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
 
-        <hr className="mx-4 my-4 border-sidebar-border" />
+      <hr className="mx-4 my-4 border-sidebar-border" />
 
-        {/* Logout */}
-        <div className="p-4">
-          <Button
-            onClick={handleSignOut}
-            variant="destructive"
-            className="w-full font-medium py-2 px-4 rounded-lg transition-colors"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            {language === 'te' ? 'లాగ్ అవుట్' : 'Log Out'}
-          </Button>
-        </div>
-      </SidebarContent>
-    </Sidebar>
-    </div>
+      {/* Logout */}
+      <div className="p-4">
+        <Button
+          onClick={handleSignOut}
+          variant="destructive"
+          className="w-full font-medium py-2 px-4 rounded-lg transition-colors"
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          {language === 'te' ? 'లాగ్ అవుట్' : 'Log Out'}
+        </Button>
+      </div>
+    </SidebarContent>
+  </Sidebar>
   );
 }

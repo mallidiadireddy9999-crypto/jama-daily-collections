@@ -243,8 +243,7 @@ const Dashboard = () => {
               </SheetTrigger>
               <SheetContent 
                 side="left" 
-                className="p-0 w-64 bg-white border-r-2 border-gray-300 shadow-2xl z-50"
-                style={{ position: 'fixed', top: 0, left: 0, height: '100vh' }}
+                className="p-0 w-64"
               >
                 <div className="sr-only">
                   <h2>Navigation Menu</h2>
