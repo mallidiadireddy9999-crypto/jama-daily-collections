@@ -174,9 +174,15 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
     },
   ];
 
+  console.log("AppSidebar component rendering...");
+  
   return (
-    <Sidebar className="w-full bg-sidebar border-r border-sidebar-border shadow-lg">
-      <SidebarContent className="bg-sidebar">
+    <div className="w-full h-full bg-red-500 p-4">
+      <div className="bg-yellow-300 text-black p-4 font-bold text-xl mb-4">
+        SIDEBAR DEBUG - CAN YOU SEE THIS?
+      </div>
+      <Sidebar className="w-full bg-blue-500 border-r border-sidebar-border shadow-lg">
+        <SidebarContent className="bg-green-500 p-4">
        {/* Language Toggle */}
        <div className="p-4 border-b border-sidebar-border bg-sidebar-accent">
          <Button
@@ -249,7 +255,8 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
           {language === 'te' ? 'లాగ్ అవుట్' : 'Log Out'}
         </Button>
       </div>
-    </SidebarContent>
-  </Sidebar>
+      </SidebarContent>
+    </Sidebar>
+    </div>
   );
 }
