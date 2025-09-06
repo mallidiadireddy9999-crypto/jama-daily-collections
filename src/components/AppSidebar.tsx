@@ -174,9 +174,15 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
     },
   ];
 
+  console.log("AppSidebar rendering...");
+  
   return (
-    <Sidebar className="w-64 bg-white border-r border-gray-300 shadow-lg">
-      <SidebarContent className="bg-white">
+    <div className="w-full h-full bg-red-500 border-4 border-black">
+      <div className="p-4 bg-yellow-300 text-black font-bold text-xl">
+        SIDEBAR IS HERE - CAN YOU SEE ME?
+      </div>
+      <Sidebar className="w-64 bg-white border-r border-gray-300 shadow-lg">
+        <SidebarContent className="bg-white">
         {/* Language Toggle */}
         <div className="p-4 border-b border-gray-200 bg-gray-50">
           <Button
@@ -250,5 +256,6 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
         </div>
       </SidebarContent>
     </Sidebar>
+    </div>
   );
 }

@@ -241,7 +241,15 @@ const Dashboard = () => {
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-64 bg-white border-r-2 border-gray-300">
+              <SheetContent 
+                side="left" 
+                className="p-0 w-64 bg-white border-r-2 border-gray-300 shadow-2xl z-50"
+                style={{ position: 'fixed', top: 0, left: 0, height: '100vh' }}
+              >
+                <div className="sr-only">
+                  <h2>Navigation Menu</h2>
+                  <p>Main navigation sidebar for the application</p>
+                </div>
                 <AppSidebar onClose={() => {
                   console.log("Closing sidebar");
                   setSidebarOpen(false);
