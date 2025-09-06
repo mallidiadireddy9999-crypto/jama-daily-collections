@@ -175,25 +175,25 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   ];
 
   return (
-    <div className="w-full h-full bg-slate-800 text-white">
-      <Sidebar className="w-64 bg-slate-800 border-r border-slate-600 shadow-lg">
-        <SidebarContent className="bg-slate-800">
+    <div className="w-full h-full bg-sidebar text-sidebar-foreground">
+      <Sidebar className="w-64 bg-sidebar border-r border-sidebar-border shadow-lg">
+        <SidebarContent className="bg-sidebar">
          {/* Language Toggle */}
-         <div className="p-4 border-b border-slate-600 bg-slate-700">
+         <div className="p-4 border-b border-sidebar-border bg-sidebar-accent">
            <Button
              onClick={toggleLanguage}
              variant="outline"
              size="sm"
-             className="w-full bg-blue-600 hover:bg-blue-700 text-white border-blue-600 font-medium"
-          >
-            <Languages className="h-4 w-4 mr-2" />
-            {language === 'te' ? 'English' : 'తెలుగు'}
-          </Button>
-        </div>
+             className="w-full bg-sidebar-primary hover:bg-sidebar-primary/90 text-sidebar-primary-foreground border-sidebar-primary font-medium"
+           >
+             <Languages className="h-4 w-4 mr-2" />
+             {language === 'te' ? 'English' : 'తెలుగు'}
+           </Button>
+         </div>
 
         {/* Main Menu */}
         <SidebarGroup>
-           <SidebarGroupLabel className="text-white text-lg font-semibold mb-4 px-4">
+           <SidebarGroupLabel className="text-sidebar-foreground text-lg font-semibold mb-4 px-4">
              {language === 'te' ? 'ప్రధాన మెనూ' : 'Main Menu'}
            </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -202,7 +202,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     onClick={item.onClick}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-600 text-gray-200 hover:text-white transition-colors font-medium"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground hover:text-sidebar-accent-foreground transition-colors font-medium"
                   >
                     <item.icon className="h-5 w-5" />
                     <span className="text-base">{item.title}</span>
@@ -213,11 +213,11 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-         <hr className="mx-4 my-4 border-slate-600" />
+         <hr className="mx-4 my-4 border-sidebar-border" />
 
         {/* Account Menu */}
         <SidebarGroup>
-           <SidebarGroupLabel className="text-white text-lg font-semibold mb-4 px-4">
+           <SidebarGroupLabel className="text-sidebar-foreground text-lg font-semibold mb-4 px-4">
              {language === 'te' ? 'ఖాతా' : 'Account'}
            </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -226,7 +226,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     onClick={item.onClick}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-600 text-gray-200 hover:text-white transition-colors font-medium"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground hover:text-sidebar-accent-foreground transition-colors font-medium"
                   >
                     <item.icon className="h-5 w-5" />
                     <span className="text-base">{item.title}</span>
@@ -237,13 +237,14 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <hr className="mx-4 my-4 border-slate-600" />
+        <hr className="mx-4 my-4 border-sidebar-border" />
 
         {/* Logout */}
         <div className="p-4">
           <Button
             onClick={handleSignOut}
-            className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            variant="destructive"
+            className="w-full font-medium py-2 px-4 rounded-lg transition-colors"
           >
             <LogOut className="h-4 w-4 mr-2" />
             {language === 'te' ? 'లాగ్ అవుట్' : 'Log Out'}
