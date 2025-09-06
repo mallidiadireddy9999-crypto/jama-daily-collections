@@ -174,22 +174,17 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
     },
   ];
 
-  console.log("AppSidebar rendering...");
-  
   return (
-    <div className="w-full h-full bg-red-500 border-4 border-black">
-      <div className="p-4 bg-yellow-300 text-black font-bold text-xl">
-        SIDEBAR IS HERE - CAN YOU SEE ME?
-      </div>
-      <Sidebar className="w-64 bg-white border-r border-gray-300 shadow-lg">
-        <SidebarContent className="bg-white">
-        {/* Language Toggle */}
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
-          <Button
-            onClick={toggleLanguage}
-            variant="outline"
-            size="sm"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white border-blue-500 font-medium"
+    <div className="w-full h-full bg-slate-800 text-white">
+      <Sidebar className="w-64 bg-slate-800 border-r border-slate-600 shadow-lg">
+        <SidebarContent className="bg-slate-800">
+         {/* Language Toggle */}
+         <div className="p-4 border-b border-slate-600 bg-slate-700">
+           <Button
+             onClick={toggleLanguage}
+             variant="outline"
+             size="sm"
+             className="w-full bg-blue-600 hover:bg-blue-700 text-white border-blue-600 font-medium"
           >
             <Languages className="h-4 w-4 mr-2" />
             {language === 'te' ? 'English' : 'తెలుగు'}
@@ -198,16 +193,16 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
 
         {/* Main Menu */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-800 text-lg font-semibold mb-4 px-4">
-            {language === 'te' ? 'ప్రధాన మెనూ' : 'Main Menu'}
-          </SidebarGroupLabel>
+           <SidebarGroupLabel className="text-white text-lg font-semibold mb-4 px-4">
+             {language === 'te' ? 'ప్రధాన మెనూ' : 'Main Menu'}
+           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2 px-4">
               {mainMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     onClick={item.onClick}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-blue-100 text-gray-700 hover:text-blue-800 transition-colors font-medium"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-600 text-gray-200 hover:text-white transition-colors font-medium"
                   >
                     <item.icon className="h-5 w-5" />
                     <span className="text-base">{item.title}</span>
@@ -218,20 +213,20 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <hr className="mx-4 my-4 border-gray-200" />
+         <hr className="mx-4 my-4 border-slate-600" />
 
         {/* Account Menu */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-800 text-lg font-semibold mb-4 px-4">
-            {language === 'te' ? 'ఖాతా' : 'Account'}
-          </SidebarGroupLabel>
+           <SidebarGroupLabel className="text-white text-lg font-semibold mb-4 px-4">
+             {language === 'te' ? 'ఖాతా' : 'Account'}
+           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2 px-4">
               {accountMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     onClick={item.onClick}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-100 text-gray-700 hover:text-green-800 transition-colors font-medium"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-600 text-gray-200 hover:text-white transition-colors font-medium"
                   >
                     <item.icon className="h-5 w-5" />
                     <span className="text-base">{item.title}</span>
@@ -242,7 +237,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <hr className="mx-4 my-4 border-gray-200" />
+        <hr className="mx-4 my-4 border-slate-600" />
 
         {/* Logout */}
         <div className="p-4">
