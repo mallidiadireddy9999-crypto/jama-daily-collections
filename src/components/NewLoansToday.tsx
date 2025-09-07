@@ -25,7 +25,7 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
     {
       id: "L025",
       customerId: "C025",
-      customerName: "అనిల్ కుమార్",
+      customerName: "Anil Kumar",
       loanAmount: 35000,
       dailyAmount: 400,
       createdTime: "10:30 AM",
@@ -34,7 +34,7 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
     {
       id: "L026", 
       customerId: "C026",
-      customerName: "రమా దేవి",
+      customerName: "Rama Devi",
       loanAmount: 20000,
       dailyAmount: 250,
       createdTime: "02:15 PM",
@@ -43,7 +43,7 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
     {
       id: "L027",
       customerId: "C027", 
-      customerName: "విజయ్ కృష్ణ",
+      customerName: "Vijay Krishna",
       loanAmount: 15000,
       dailyAmount: 200,
       createdTime: "04:45 PM",
