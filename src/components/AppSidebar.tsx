@@ -79,11 +79,11 @@ export function AppSidebar({ onNavigate }: AppSidebarProps) {
     <Sidebar className="border-r border-border bg-card">
       <SidebarHeader className="border-b border-border p-4">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center">
             <img 
-              src="/src/assets/jama-logo.png" 
+              src="/lovable-uploads/ff3ffabf-f0ae-4db2-b9ae-0144863bfcf6.png" 
               alt="JAMA" 
-              className="w-6 h-6 object-contain"
+              className="w-8 h-8 object-contain"
             />
           </div>
           <div>

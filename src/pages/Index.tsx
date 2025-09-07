@@ -41,11 +41,11 @@ const Index = () => {
       <div className="min-h-screen bg-gradient-card flex items-center justify-center p-4">
         <Card className="p-8 text-center max-w-md w-full">
           <div className="space-y-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4">
               <img 
-                src="/src/assets/jama-logo.png" 
+                src="/lovable-uploads/ff3ffabf-f0ae-4db2-b9ae-0144863bfcf6.png" 
                 alt="JAMA" 
-                className="w-10 h-10 object-contain"
+                className="w-16 h-16 object-contain"
               />
             </div>
             <div>
