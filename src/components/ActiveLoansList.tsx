@@ -30,7 +30,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
   const { toast } = useToast();
   const [activeLoans, setActiveLoans] = useState<ActiveLoan[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingLoan, setEditingLoan] = useState<any>(null);
+  const [editingLoanId, setEditingLoanId] = useState<string | null>(null);
 
   // Fetch active loans from database
   const fetchActiveLoans = async () => {
@@ -196,7 +196,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setEditingLoan(loan)}
+                          onClick={() => setEditingLoanId(loan.id)}
                         >
                           <Edit2 className="h-3 w-3" />
                         </Button>
@@ -285,12 +285,12 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
       </div>
 
       <EditLoanModal
-        isOpen={!!editingLoan}
-        onClose={() => setEditingLoan(null)}
-        loan={editingLoan}
+        isOpen={!!editingLoanId}
+        onClose={() => setEditingLoanId(null)}
+        loanId={editingLoanId}
         onLoanUpdated={() => {
           fetchActiveLoans();
-          setEditingLoan(null);
+          setEditingLoanId(null);
         }}
       />
     </div>

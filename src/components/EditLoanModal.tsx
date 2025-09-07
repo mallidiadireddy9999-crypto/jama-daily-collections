@@ -26,11 +26,11 @@ interface Loan {
 interface EditLoanModalProps {
   isOpen: boolean;
   onClose: () => void;
-  loan: Loan | null;
+  loanId: string | null;
   onLoanUpdated: () => void;
 }
 
-const EditLoanModal = ({ isOpen, onClose, loan, onLoanUpdated }: EditLoanModalProps) => {
+const EditLoanModal = ({ isOpen, onClose, loanId, onLoanUpdated }: EditLoanModalProps) => {
   const { t } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -43,16 +43,51 @@ const EditLoanModal = ({ isOpen, onClose, loan, onLoanUpdated }: EditLoanModalPr
     durationMonths: "",
     startDate: new Date()
   });
+  const [loan, setLoan] = useState<Loan | null>(null);
   const [loading, setLoading] = useState(false);
+  const [fetchingLoan, setFetchingLoan] = useState(false);
+
+  // Fetch loan data when modal opens
+  useEffect(() => {
+    const fetchLoan = async () => {
+      if (!loanId || !user) return;
+
+      setFetchingLoan(true);
+      try {
+        const { data, error } = await supabase
+          .from('loans')
+          .select('*')
+          .eq('id', loanId)
+          .eq('user_id', user.id)
+          .single();
+
+        if (error) throw error;
+        setLoan(data);
+      } catch (error: any) {
+        console.error('Error fetching loan:', error);
+        toast({
+          title: t("లోపం", "Error"),
+          description: t("లోన్ డేటా లోడ్ చేయడంలో లోపం", "Error loading loan data"),
+          variant: "destructive",
+        });
+      } finally {
+        setFetchingLoan(false);
+      }
+    };
+
+    if (isOpen && loanId) {
+      fetchLoan();
+    }
+  }, [isOpen, loanId, user]);
 
   useEffect(() => {
     if (loan) {
       setFormData({
         customerName: loan.customer_name,
         customerMobile: loan.customer_mobile || "",
-        loanAmount: loan.amount.toString(),
-        interestRate: loan.interest_rate.toString(),
-        durationMonths: loan.duration_months.toString(),
+        loanAmount: loan.amount?.toString() || "",
+        interestRate: loan.interest_rate?.toString() || "",
+        durationMonths: loan.duration_months?.toString() || "",
         startDate: new Date(loan.start_date)
       });
     }
@@ -110,7 +145,13 @@ const EditLoanModal = ({ isOpen, onClose, loan, onLoanUpdated }: EditLoanModalPr
           <DialogTitle>{t("లోన్ వివరాలు సవరించండి", "Edit Loan Details")}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {fetchingLoan ? (
+          <div className="p-6 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+            <p className="text-muted-foreground">{t("లోడ్ అవుతోంది...", "Loading...")}</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="customerName">{t("కస్టమర్ పేరు", "Customer Name")}</Label>
             <Input
@@ -216,6 +257,7 @@ const EditLoanModal = ({ isOpen, onClose, loan, onLoanUpdated }: EditLoanModalPr
             </Button>
           </div>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );
