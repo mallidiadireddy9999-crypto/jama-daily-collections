@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, DollarSign, TrendingUp, Activity, UserCheck, UserX } from 'lucide-react';
+import { Users, DollarSign, TrendingUp, Activity, UserCheck, UserX, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface SuperAdminDashboardProps {
   onNavigate: (view: string) => void;
+  onBack?: () => void;
 }
 
 interface DashboardStats {
@@ -22,7 +23,7 @@ interface DashboardStats {
   totalCollections: number;
 }
 
-export const SuperAdminDashboard = ({ onNavigate }: SuperAdminDashboardProps) => {
+export const SuperAdminDashboard = ({ onNavigate, onBack }: SuperAdminDashboardProps) => {
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     activeUsers: 0,
@@ -139,7 +140,14 @@ export const SuperAdminDashboard = ({ onNavigate }: SuperAdminDashboardProps) =>
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Super Admin Dashboard</h1>
+        <div className="flex items-center gap-4">
+          {onBack && (
+            <Button variant="ghost" onClick={onBack} className="p-2">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          )}
+          <h1 className="text-3xl font-bold">Super Admin Dashboard</h1>
+        </div>
         <Badge variant="secondary">Company Level Access</Badge>
       </div>
 

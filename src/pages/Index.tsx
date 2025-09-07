@@ -14,7 +14,7 @@ import { UserManagement } from "@/components/UserManagement";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { LogIn } from "lucide-react";
+import { LogIn, ArrowLeft } from "lucide-react";
 
 const Index = () => {
   const { user, loading, userRole } = useAuth();
@@ -86,7 +86,17 @@ const Index = () => {
         case "user-reports":
           return <UserManagement onBack={() => setCurrentView("dashboard")} />;
         case "notifications":
-          return <div className="p-6 text-center">Notifications feature coming soon...</div>;
+          return (
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <Button variant="ghost" onClick={() => setCurrentView("dashboard")} className="p-2">
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <h1 className="text-3xl font-bold">Notifications</h1>
+              </div>
+              <div className="p-6 text-center">Notifications feature coming soon...</div>
+            </div>
+          );
         default:
           return <SuperAdminDashboard onNavigate={setCurrentView} />;
       }
