@@ -6,13 +6,19 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ArrowLeft, Save, User, Phone, IndianRupee, Calendar, Scissors, Calculator } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface AddLoanFormProps {
   onBack: () => void;
-  onSave: (loan: any) => void;
+  onSave?: (loan: any) => void;
 }
 
 const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     customerName: '',
     mobileNumber: '',
@@ -34,28 +40,76 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
   
   const profitInterest = totalCollection - disbursedAmount;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const loan = {
-      id: Date.now().toString(),
-      customerName: formData.customerName,
-      mobileNumber: formData.mobileNumber,
-      principalAmount: parseFloat(formData.principalAmount),
-      disbursementType: formData.disbursementType,
-      cuttingAmount: parseFloat(formData.cuttingAmount) || 0,
-      disbursedAmount,
-      repaymentType: formData.repaymentType,
-      installmentAmount: parseFloat(formData.installmentAmount),
-      duration: parseInt(formData.duration),
-      durationUnit: formData.durationUnit,
-      totalCollection,
-      profitInterest,
-      status: 'active' as const,
-      date: new Date().toISOString().split('T')[0]
-    };
-    
-    onSave(loan);
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to add a loan",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Save to Supabase database
+      const { data, error } = await supabase
+        .from('loans')
+        .insert([
+          {
+            user_id: user.id,
+            customer_name: formData.customerName,
+            customer_mobile: formData.mobileNumber,
+            amount: parseFloat(formData.principalAmount),
+            interest_rate: 10, // Default interest rate
+            duration_months: parseInt(formData.duration),
+            status: 'active'
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Loan added successfully",
+      });
+
+      // Call onSave callback if provided (for parent component to handle)
+      if (onSave) {
+        onSave(data);
+      }
+
+      // Reset form
+      setFormData({
+        customerName: '',
+        mobileNumber: '',
+        principalAmount: '',
+        disbursementType: 'full',
+        cuttingAmount: '',
+        repaymentType: 'daily',
+        installmentAmount: '',
+        duration: '',
+        durationUnit: 'days'
+      });
+
+      // Go back to previous screen
+      onBack();
+
+    } catch (error) {
+      console.error('Error adding loan:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add loan. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -265,9 +319,9 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
           )}
 
           {/* Submit Button */}
-          <Button type="submit" variant="money" size="xl" className="w-full">
+          <Button type="submit" variant="money" size="xl" className="w-full" disabled={loading}>
             <Save className="h-5 w-5 mr-2" />
-            Save Loan / లోన్ సేవ్ చేయండి
+            {loading ? "Saving..." : "Save Loan / లోన్ సేవ్ చేయండి"}
           </Button>
         </form>
       </Card>
