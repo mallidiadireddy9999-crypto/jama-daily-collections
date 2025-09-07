@@ -31,7 +31,7 @@ interface Ad {
 export const AdsManagement = ({ onBack }: AdsManagementProps) => {
   const [ads, setAds] = useState<Ad[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState<'list' | 'create' | 'edit' | 'analytics'>('list');
+  const [currentView, setCurrentView] = useState<'list' | 'create' | 'edit' | 'analytics' | 'notifications'>('list');
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const { toast } = useToast();
 
@@ -171,18 +171,98 @@ export const AdsManagement = ({ onBack }: AdsManagementProps) => {
           <Button variant="ghost" onClick={onBack} className="p-2">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-3xl font-bold">Ads Management</h1>
+          <h1 className="text-3xl font-bold">Ads Management for Super Admin</h1>
         </div>
         <div className="flex gap-2">
           <Button onClick={() => setCurrentView('analytics')}>
             <BarChart3 className="h-4 w-4 mr-2" />
-            Analytics
+            Analytics & Reports
           </Button>
           <Button onClick={() => setCurrentView('create')}>
             <Plus className="h-4 w-4 mr-2" />
-            Create Ad
+            Create & Publish Ad
           </Button>
         </div>
+      </div>
+
+      {/* Feature Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Card className="p-4">
+          <h3 className="font-semibold mb-2">A. Create & Publish Ads</h3>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• Ad title, description, image/video upload</li>
+            <li>• Target audience (villages, users, or all)</li>
+            <li>• Duration (start date, end date, expiry)</li>
+            <li>• Preview ad before publishing</li>
+          </ul>
+          <Button onClick={() => setCurrentView('create')} className="w-full mt-3" size="sm">
+            Create New Ad
+          </Button>
+        </Card>
+
+        <Card className="p-4">
+          <h3 className="font-semibold mb-2">B. Edit or Delete Ads</h3>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• Modify ad content or target audience</li>
+            <li>• Delete expired or unwanted ads</li>
+            <li>• Activate/Deactivate ads</li>
+            <li>• Bulk operations available</li>
+          </ul>
+          <div className="text-sm text-center mt-3 text-muted-foreground">
+            Use edit/delete buttons in ads list below
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <h3 className="font-semibold mb-2">C. Scheduling & Automation</h3>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• Schedule ads for future dates</li>
+            <li>• Set recurring ads (daily, weekly, monthly)</li>
+            <li>• Automatic start and expiry</li>
+            <li>• Campaign automation</li>
+          </ul>
+          <div className="text-sm text-center mt-3 text-muted-foreground">
+            Configure in ad creation form
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <h3 className="font-semibold mb-2">D. Analytics & Reports</h3>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• Track views, clicks, and engagement</li>
+            <li>• User-wise and village-wise reach</li>
+            <li>• Export reports in PDF</li>
+            <li>• Performance metrics</li>
+          </ul>
+          <Button onClick={() => setCurrentView('analytics')} className="w-full mt-3" size="sm" variant="outline">
+            View Analytics
+          </Button>
+        </Card>
+
+        <Card className="p-4">
+          <h3 className="font-semibold mb-2">E. Notifications</h3>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• Send notifications about new ads</li>
+            <li>• Highlight important ads at login</li>
+            <li>• Push notifications to users</li>
+            <li>• Notification targeting</li>
+          </ul>
+          <Button onClick={() => setCurrentView('notifications')} className="w-full mt-3" size="sm" variant="outline">
+            Manage Notifications
+          </Button>
+        </Card>
+
+        <Card className="p-4 border-primary">
+          <h3 className="font-semibold mb-2 text-primary">Quick Actions</h3>
+          <div className="space-y-2">
+            <Button onClick={() => setCurrentView('create')} className="w-full" size="sm">
+              + New Campaign
+            </Button>
+            <Button onClick={() => setCurrentView('analytics')} variant="outline" className="w-full" size="sm">
+              📊 View Reports
+            </Button>
+          </div>
+        </Card>
       </div>
 
       {/* Ad Stats */}

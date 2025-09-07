@@ -98,9 +98,30 @@ const Index = () => {
                 <Button variant="ghost" onClick={() => setCurrentView("dashboard")} className="p-2">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
-                <h1 className="text-3xl font-bold">Notifications</h1>
+                <h1 className="text-3xl font-bold">Ad Notifications Management</h1>
               </div>
-              <div className="p-6 text-center">Notifications feature coming soon...</div>
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Send Notifications About Ads</h2>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button className="h-20">
+                      📢 Notify All Users About New Ads
+                    </Button>
+                    <Button variant="outline" className="h-20">
+                      🎯 Send Targeted Ad Notifications
+                    </Button>
+                    <Button variant="outline" className="h-20">
+                      🔔 Highlight Important Ads at Login
+                    </Button>
+                    <Button variant="outline" className="h-20">
+                      📱 Push Notification Settings
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Notification system is integrated with the ads database. Use these tools to send notifications to users about new advertisements and highlight important campaigns.
+                  </p>
+                </div>
+              </Card>
             </div>
           );
         default:
