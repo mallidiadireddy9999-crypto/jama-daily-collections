@@ -56,7 +56,7 @@ const CollectionsList = ({ onBack, collections }: CollectionsListProps) => {
             </span>
           </div>
           <p className="text-sm text-success-foreground/80">
-            మొత్తం {collections.length} వసూలు
+            {t("మొత్తం", "Total")} {collections.length} {t("వసూలు", "collections")}
           </p>
         </div>
       </Card>
@@ -65,7 +65,7 @@ const CollectionsList = ({ onBack, collections }: CollectionsListProps) => {
       <div className="space-y-3">
         {collections.length === 0 ? (
           <Card className="p-6 text-center shadow-card">
-            <p className="text-muted-foreground">నేడు వసూలు లేవు</p>
+            <p className="text-muted-foreground">{t("నేడు వసూలు లేవు", "No collections today")}</p>
           </Card>
         ) : (
           collections.map((collection) => (
@@ -105,15 +105,15 @@ const CollectionsList = ({ onBack, collections }: CollectionsListProps) => {
         <Card className="p-4 shadow-card bg-muted">
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">మొత్తం వసూలు:</span>
+              <span className="text-muted-foreground">{t("మొత్తం వసూలు:", "Total Collections:")}</span>
               <span className="font-medium text-foreground">{collections.length}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">మొత్తం మొత్తం:</span>
+              <span className="text-muted-foreground">{t("మొత్తం మొత్తం:", "Total Amount:")}</span>
               <span className="font-medium text-success">₹{totalAmount.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">సగటు వసూలు:</span>
+              <span className="text-muted-foreground">{t("సగటు వసూలు:", "Average Collection:")}</span>
               <span className="font-medium text-primary">
                 ₹{Math.round(totalAmount / collections.length).toLocaleString()}
               </span>

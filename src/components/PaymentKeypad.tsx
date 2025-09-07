@@ -95,7 +95,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
       {/* Customer Info */}
       {customerId && selectedCustomerName && (
         <Card className="p-4 text-center shadow-card bg-muted">
-          <p className="text-sm text-muted-foreground">వసూలైన మొత్తం</p>
+          <p className="text-sm text-muted-foreground">{t("వసూలైన మొత్తం", "Collected Amount")}</p>
           <p className="text-lg font-semibold text-foreground">{selectedCustomerName} (ID: {customerId})</p>
         </Card>
       )}
@@ -110,7 +110,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
             </span>
           </div>
           <p className="text-sm text-success-foreground/80">
-            వసూలైన మొత్తం నమోదు చేయండి
+            {t("వసూలైన మొత్తం నమోదు చేయండి", "Enter the collected amount")}
           </p>
         </div>
       </Card>
@@ -194,7 +194,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
           className="w-full border-2 border-dashed border-muted-foreground/30 hover:border-primary"
         >
           <Mic className="h-5 w-5 mr-2" />
-          వాయిస్ ఇన్‌పుట్
+          {t("వాయిస్ ఇన్‌పుట్", "Voice Input")}
         </Button>
       </div>
 
@@ -202,7 +202,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
       {amount && parseInt(amount) > 0 && (
         <Card className="p-3 bg-muted">
           <p className="text-xs text-center text-muted-foreground">
-            మొత్తం: ₹{formatAmount(amount)}
+            {t("మొత్తం:", "Amount:")} ₹{formatAmount(amount)}
           </p>
         </Card>
       )}

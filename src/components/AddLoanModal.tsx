@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Save, User, Phone, IndianRupee, Calendar } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AddLoanModalProps {
   open: boolean;
@@ -14,6 +15,7 @@ interface AddLoanModalProps {
 }
 
 const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     customerName: '',
     phone: '',
@@ -54,7 +56,7 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
       <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-center">
-            కొత్త లోన్ జోడించండి
+            {t("కొత్త లోన్ జోడించండి", "Add New Loan")}
           </DialogTitle>
         </DialogHeader>
 
@@ -63,13 +65,13 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           <div className="space-y-2">
             <Label htmlFor="customerName" className="flex items-center gap-2">
               <User className="h-4 w-4" />
-              పేరు
+              {t("పేరు", "Name")}
             </Label>
             <Input
               id="customerName"
               value={formData.customerName}
               onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-              placeholder="కస్టమర్ పేరు"
+              placeholder={t("కస్టమర్ పేరు", "Customer Name")}
               required
               className="h-11"
             />
@@ -79,14 +81,14 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           <div className="space-y-2">
             <Label htmlFor="phone" className="flex items-center gap-2">
               <Phone className="h-4 w-4" />
-              మొబైల్ నంబర్
+              {t("మొబైల్ నంబర్", "Mobile Number")}
             </Label>
             <Input
               id="phone"
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              placeholder="మొబైల్ నంబర్"
+              placeholder={t("మొబైల్ నంబర్", "Mobile Number")}
               required
               className="h-11"
             />
@@ -96,14 +98,14 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           <div className="space-y-2">
             <Label htmlFor="amount" className="flex items-center gap-2">
               <IndianRupee className="h-4 w-4" />
-              ప్రధాన మొత్తం
+              {t("ప్రధాన మొత్తం", "Principal Amount")}
             </Label>
             <Input
               id="amount"
               type="number"
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-              placeholder="ప్రధాన మొత్తం"
+              placeholder={t("ప్రధాన మొత్తం", "Principal Amount")}
               required
               className="h-11"
             />
@@ -113,14 +115,14 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           <div className="space-y-2">
             <Label htmlFor="duration" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              వ్యవధి (రోజులు)
+              {t("వ్యవధి (రోజులు)", "Duration (Days)")}
             </Label>
             <Input
               id="duration"
               type="number"
               value={formData.duration}
               onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-              placeholder="వ్యవధి రోజులలో"
+              placeholder={t("వ్యవధి రోజులలో", "Duration in days")}
               required
               className="h-11"
             />
@@ -130,7 +132,7 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           {formData.amount && formData.duration && (
             <Card className="p-3 bg-gradient-success">
               <div className="text-center">
-                <p className="text-xs text-success-foreground/80">రోజువారీ చెల్లింపు</p>
+                <p className="text-xs text-success-foreground/80">{t("రోజువారీ చెల్లింపు", "Daily Payment")}</p>
                 <p className="text-lg font-bold text-success-foreground">
                   ₹{Math.ceil(parseInt(formData.amount) / parseInt(formData.duration)).toLocaleString()}
                 </p>
@@ -141,7 +143,7 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           {/* Submit Button */}
           <Button type="submit" variant="money" size="lg" className="w-full">
             <Save className="h-4 w-4 mr-2" />
-            లోన్ సేవ్ చేయండి
+            {t("లోన్ సేవ్ చేయండి", "Save Loan")}
           </Button>
         </form>
       </DialogContent>
