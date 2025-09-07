@@ -24,8 +24,11 @@ const Index = () => {
 
   useEffect(() => {
     if (!loading && !user) {
-      // Show login prompt instead of redirecting immediately
+      // Reset view to login prompt when user signs out or is not authenticated
       setCurrentView("login-prompt");
+    } else if (!loading && user) {
+      // Reset to dashboard when user signs in
+      setCurrentView("dashboard");
     }
   }, [user, loading]);
 
