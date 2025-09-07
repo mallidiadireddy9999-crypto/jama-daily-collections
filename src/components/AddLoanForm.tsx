@@ -55,7 +55,7 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
     setLoading(true);
 
     try {
-      // Save to Supabase database
+      // Save to Supabase database with all the new fields
       const { data, error } = await supabase
         .from('loans')
         .insert([
@@ -64,8 +64,16 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
             customer_name: formData.customerName,
             customer_mobile: formData.mobileNumber,
             amount: parseFloat(formData.principalAmount),
-            interest_rate: 10, // Default interest rate
+            disbursement_type: formData.disbursementType,
+            cutting_amount: parseFloat(formData.cuttingAmount) || 0,
+            disbursed_amount: disbursedAmount,
+            repayment_type: formData.repaymentType,
+            installment_amount: parseFloat(formData.installmentAmount),
             duration_months: parseInt(formData.duration),
+            duration_unit: formData.durationUnit,
+            total_collection: totalCollection,
+            profit_interest: profitInterest,
+            interest_rate: 10, // Default interest rate
             status: 'active'
           }
         ])

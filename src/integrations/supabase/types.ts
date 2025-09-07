@@ -179,11 +179,19 @@ export type Database = {
           created_at: string
           customer_mobile: string | null
           customer_name: string
+          cutting_amount: number | null
+          disbursed_amount: number | null
+          disbursement_type: string | null
           duration_months: number | null
+          duration_unit: string | null
           id: string
+          installment_amount: number | null
           interest_rate: number | null
+          profit_interest: number | null
+          repayment_type: string | null
           start_date: string
           status: string
+          total_collection: number | null
           updated_at: string
           user_id: string
         }
@@ -192,11 +200,19 @@ export type Database = {
           created_at?: string
           customer_mobile?: string | null
           customer_name: string
+          cutting_amount?: number | null
+          disbursed_amount?: number | null
+          disbursement_type?: string | null
           duration_months?: number | null
+          duration_unit?: string | null
           id?: string
+          installment_amount?: number | null
           interest_rate?: number | null
+          profit_interest?: number | null
+          repayment_type?: string | null
           start_date?: string
           status?: string
+          total_collection?: number | null
           updated_at?: string
           user_id: string
         }
@@ -205,11 +221,19 @@ export type Database = {
           created_at?: string
           customer_mobile?: string | null
           customer_name?: string
+          cutting_amount?: number | null
+          disbursed_amount?: number | null
+          disbursement_type?: string | null
           duration_months?: number | null
+          duration_unit?: string | null
           id?: string
+          installment_amount?: number | null
           interest_rate?: number | null
+          profit_interest?: number | null
+          repayment_type?: string | null
           start_date?: string
           status?: string
+          total_collection?: number | null
           updated_at?: string
           user_id?: string
         }
