@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -36,6 +37,7 @@ const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   
   useEffect(() => {
     // Check current user
@@ -71,14 +73,14 @@ const Dashboard = () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
-        title: "లోపం",
+        title: t("లోపం", "Error"),
         description: error.message,
         variant: "destructive",
       });
     } else {
       toast({
-        title: "విజయవంతంగా లాగ్ అవుట్ అయ్యారు",
-        description: "వీడ్కోలు!",
+        title: t("విజయవంతంగా లాగ్ అవుట్ అయ్యారు", "Successfully logged out"),
+        description: t("వీడ్కోలు!", "Goodbye!"),
       });
       navigate('/login');
     }
@@ -283,7 +285,7 @@ const Dashboard = () => {
                 className="bg-white/10 border-white/20 text-white hover:bg-white/20"
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                లాగ్ అవుట్
+                {t("లాగ్ అవుట్", "Log Out")}
               </Button>
             ) : (
               <Button
@@ -293,7 +295,7 @@ const Dashboard = () => {
                 className="bg-white/10 border-white/20 text-white hover:bg-white/20"
               >
                 <User className="h-4 w-4 mr-2" />
-                లాగిన్
+                {t("లాగిన్", "Login")}
               </Button>
             )}
           </div>
@@ -302,12 +304,12 @@ const Dashboard = () => {
             <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money flex items-center gap-3">
               <img src="/lovable-uploads/6931d901-421c-4070-833d-a383481866ec.png" alt="Wallet" className="h-12 w-12" />
               <h1 className="text-2xl font-bold text-primary-foreground">
-                JAMA <span className="text-lg">చేయి</span>
+                JAMA <span className="text-lg">{t("చేయి", "App")}</span>
               </h1>
             </div>
           </div>
           <p className="text-sm text-muted-foreground">
-            ఇక పెన్ పేపర్ అవసరం లేదు
+            {t("ఇక పెన్ పేపర్ అవసరం లేదు", "No more pen and paper needed")}
           </p>
         </div>
 
@@ -323,12 +325,12 @@ const Dashboard = () => {
               <TrendingUp className="h-4 w-4 text-white" />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-white/90 font-semibold">నేటి వసూలు</p>
+              <p className="text-xs text-white/90 font-semibold">{t("నేటి వసూలు", "Today's Collections")}</p>
               <p className="text-lg font-bold text-white">
                 ₹{todayStats.totalCollected.toLocaleString()}
               </p>
               <p className="text-xs text-white/80 font-medium">
-                {todaysCollections.length} వసూలు
+                {todaysCollections.length} {t("వసూలు", "collections")}
               </p>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { User, FileText, HelpCircle, LogOut, Home, CreditCard, Users, Settings, Languages, BarChart3, Calendar, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Sidebar,
   SidebarContent,
@@ -23,7 +24,7 @@ interface AppSidebarProps {
 export function AppSidebar({ onClose }: AppSidebarProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [language, setLanguage] = useState<'te' | 'en'>('te');
+  const { language, toggleLanguage, t } = useLanguage();
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -116,51 +117,44 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
 
   const handleNotifications = () => {
     toast({
-      title: language === 'te' ? "నోటిఫికేషన్‌లు" : "Notifications",
-      description: language === 'te' ? "నోటిఫికేషన్‌ల పేజీ త్వరలో వస్తుంది" : "Notifications page coming soon",
+      title: t("నోటిఫికేషన్‌లు", "Notifications"),
+      description: t("నోటిఫికేషన్‌ల పేజీ త్వరలో వస్తుంది", "Notifications page coming soon"),
     });
     onClose();
   };
 
   const handleCalendar = () => {
     toast({
-      title: language === 'te' ? "క్యాలెండర్" : "Calendar",
-      description: language === 'te' ? "క్యాలెండర్ పేజీ త్వరలో వస్తుంది" : "Calendar page coming soon",
+      title: t("క్యాలెండర్", "Calendar"),
+      description: t("క్యాలెండర్ పేజీ త్వరలో వస్తుంది", "Calendar page coming soon"),
     });
     onClose();
   };
 
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === 'te' ? 'en' : 'te');
-    toast({
-      title: language === 'te' ? "Language changed to English" : "భాష తెలుగుకు మార్చబడింది",
-      description: language === 'te' ? "App language switched to English" : "అప్లికేషన్ భాష తెలుగుకు మార్చబడింది",
-    });
-  };
 
   const mainMenuItems = [
     {
-      title: language === 'te' ? "డాష్‌బోర్డ్" : "Dashboard",
+      title: t("డాష్‌బోర్డ్", "Dashboard"),
       icon: Home,
       onClick: handleDashboard,
     },
     {
-      title: language === 'te' ? "కస్టమర్లు" : "Customers", 
+      title: t("కస్టమర్లు", "Customers"), 
       icon: Users,
       onClick: handleCustomers,
     },
     {
-      title: language === 'te' ? "రిపోర్ట్‌లు" : "Reports",
+      title: t("రిపోర్ట్‌లు", "Reports"),
       icon: BarChart3,
       onClick: handleReports,
     },
     {
-      title: language === 'te' ? "క్యాలెండర్" : "Calendar",
+      title: t("క్యాలెండర్", "Calendar"),
       icon: Calendar,
       onClick: handleCalendar,
     },
     {
-      title: language === 'te' ? "నోటిఫికేషన్‌లు" : "Notifications",
+      title: t("నోటిఫికేషన్‌లు", "Notifications"),
       icon: Bell,
       onClick: handleNotifications,
     },
@@ -168,22 +162,22 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
 
   const accountMenuItems = [
     {
-      title: language === 'te' ? "ప్రొఫైల్" : "Profile",
+      title: t("ప్రొఫైల్", "Profile"),
       icon: User,
       onClick: handleProfile,
     },
     {
-      title: language === 'te' ? "కొనుగోలు చరిత్ర" : "Purchase History",
+      title: t("కొనుగోలు చరిత్ర", "Purchase History"),
       icon: CreditCard,
       onClick: handlePurchaseHistory,
     },
     {
-      title: language === 'te' ? "సెట్టింగ్‌లు" : "Settings",
+      title: t("సెట్టింగ్‌లు", "Settings"),
       icon: Settings,
       onClick: handleSettings,
     },
     {
-      title: language === 'te' ? "సహాయం" : "Help",
+      title: t("సహాయం", "Help"),
       icon: HelpCircle,
       onClick: handleHelp,
     },
@@ -203,9 +197,9 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
               <p className="font-medium truncate text-foreground">
                 {user.email || 'User'}
               </p>
-              <p className="text-muted-foreground text-xs">
-                {language === 'te' ? 'లాగిన్ అయ్యారు' : 'Logged in'}
-              </p>
+               <p className="text-muted-foreground text-xs">
+                 {t('లాగిన్ అయ్యారు', 'Logged in')}
+               </p>
             </div>
           </div>
         </div>
@@ -228,7 +222,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
       <div className="flex-1 overflow-y-auto">
         <div className="p-4">
           <h3 className="text-sm font-semibold text-foreground mb-3">
-            {language === 'te' ? 'ప్రధాన మెనూ' : 'Main Menu'}
+            {t('ప్రధాన మెనూ', 'Main Menu')}
           </h3>
           <div className="space-y-1">
             {mainMenuItems.map((item) => (
@@ -249,7 +243,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
         {/* Account Menu */}
         <div className="p-4">
           <h3 className="text-sm font-semibold text-foreground mb-3">
-            {language === 'te' ? 'ఖాతా' : 'Account'}
+            {t('ఖాతా', 'Account')}
           </h3>
           <div className="space-y-1">
             {accountMenuItems.map((item) => (
@@ -274,7 +268,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
           className="w-full font-medium"
         >
           <LogOut className="h-4 w-4 mr-2" />
-          {language === 'te' ? 'లాగ్ అవుట్' : 'Log Out'}
+          {t('లాగ్ అవుట్', 'Log Out')}
         </Button>
       </div>
     </div>
