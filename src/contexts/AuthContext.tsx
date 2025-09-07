@@ -6,6 +6,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  userRole: string | null;
+  userProfile: any | null;
   signOut: () => Promise<void>;
 }
 
@@ -13,6 +15,8 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   loading: true,
+  userRole: null,
+  userProfile: null,
   signOut: async () => {},
 });
 
@@ -28,6 +32,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -39,7 +45,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.log('Auth state changed:', event, session);
           setSession(session);
           setUser(session?.user ?? null);
-          setLoading(false);
+          
+          // Fetch user profile and role when user logs in
+          if (session?.user) {
+            setTimeout(() => {
+              fetchUserProfile(session.user.id);
+            }, 0);
+          } else {
+            setUserRole(null);
+            setUserProfile(null);
+            setLoading(false);
+          }
         }
       }
     );
@@ -56,7 +72,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.log('Existing session:', session);
           setSession(session);
           setUser(session?.user ?? null);
-          setLoading(false);
+          
+          if (session?.user) {
+            fetchUserProfile(session.user.id);
+          } else {
+            setLoading(false);
+          }
         }
       } catch (error) {
         console.error('Session check failed:', error);
@@ -73,6 +94,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setLoading(false);
       }
     }, 5000);
+
+    // Fetch user profile and role
+    const fetchUserProfile = async (userId: string) => {
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
+        
+        if (error) {
+          console.error('Error fetching user profile:', error);
+        } else {
+          setUserRole(profile?.role || null);
+          setUserProfile(profile);
+        }
+      } catch (error) {
+        console.error('Profile fetch failed:', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
 
     checkSession();
 
@@ -91,6 +136,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     user,
     session,
     loading,
+    userRole,
+    userProfile,
     signOut,
   };
 

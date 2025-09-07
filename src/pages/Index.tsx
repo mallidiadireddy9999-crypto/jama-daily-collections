@@ -9,13 +9,15 @@ import NewLoansToday from "@/components/NewLoansToday";
 import CollectionsList from "@/components/CollectionsList";
 import RecentCollectionsList from "@/components/RecentCollectionsList";
 import ReportsPage from "@/components/ReportsPage";
+import { SuperAdminDashboard } from "@/components/SuperAdminDashboard";
+import { UserManagement } from "@/components/UserManagement";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { LogIn } from "lucide-react";
 
 const Index = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, userRole } = useAuth();
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<string>("dashboard");
 
@@ -74,6 +76,23 @@ const Index = () => {
   }
 
   const renderCurrentView = () => {
+    // Super Admin Views
+    if (userRole === 'super_admin') {
+      switch (currentView) {
+        case "dashboard":
+          return <SuperAdminDashboard onNavigate={setCurrentView} />;
+        case "user-management":
+          return <UserManagement onBack={() => setCurrentView("dashboard")} />;
+        case "user-reports":
+          return <UserManagement onBack={() => setCurrentView("dashboard")} />;
+        case "notifications":
+          return <div className="p-6 text-center">Notifications feature coming soon...</div>;
+        default:
+          return <SuperAdminDashboard onNavigate={setCurrentView} />;
+      }
+    }
+
+    // Jama User Views (existing functionality)
     switch (currentView) {
       case "active-loans":
         return <ActiveLoansList onBack={() => setCurrentView("dashboard")} />;
@@ -95,7 +114,7 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
-        <AppSidebar onNavigate={setCurrentView} />
+        <AppSidebar onNavigate={setCurrentView} userRole={userRole} />
         <div className="flex-1 overflow-auto">
           {renderCurrentView()}
         </div>

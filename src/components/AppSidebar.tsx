@@ -1,4 +1,4 @@
-import { Home, Users, DollarSign, Calendar, FileText, PlusCircle, TrendingUp, LogOut, User } from "lucide-react";
+import { Home, Users, DollarSign, Calendar, FileText, PlusCircle, TrendingUp, LogOut, User, Settings, Bell, Shield } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,9 +15,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface AppSidebarProps {
   onNavigate: (view: string) => void;
+  userRole: string | null;
 }
 
-export function AppSidebar({ onNavigate }: AppSidebarProps) {
+export function AppSidebar({ onNavigate, userRole }: AppSidebarProps) {
   const { t, language, setLanguage } = useLanguage();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
@@ -38,7 +39,32 @@ export function AppSidebar({ onNavigate }: AppSidebarProps) {
     }
   };
 
-  const menuItems = [
+  // Super Admin menu items
+  const superAdminMenuItems = [
+    {
+      title: t("డాష్‌బోర్డ్", "Dashboard"),
+      icon: Home,
+      view: "dashboard"
+    },
+    {
+      title: t("యూజర్ మేనేజ్‌మెంట్", "User Management"),
+      icon: Users,
+      view: "user-management"
+    },
+    {
+      title: t("రిపోర్ట్‌లు", "Reports"),
+      icon: FileText,
+      view: "user-reports"
+    },
+    {
+      title: t("నోటిఫికేషన్‌లు", "Notifications"),
+      icon: Bell,
+      view: "notifications"
+    }
+  ];
+
+  // Jama User menu items (existing functionality)
+  const jamaUserMenuItems = [
     {
       title: t("డాష్‌బోర్డ్", "Dashboard"),
       icon: Home,
@@ -71,6 +97,8 @@ export function AppSidebar({ onNavigate }: AppSidebarProps) {
     }
   ];
 
+  const menuItems = userRole === 'super_admin' ? superAdminMenuItems : jamaUserMenuItems;
+
   const toggleLanguage = () => {
     setLanguage(language === 'te' ? 'en' : 'te');
   };
@@ -89,7 +117,10 @@ export function AppSidebar({ onNavigate }: AppSidebarProps) {
           <div>
             <h1 className="text-lg font-bold text-foreground">JAMA</h1>
             <p className="text-xs text-muted-foreground">
-              {t("రోజువారీ వసూలు", "Daily Collection")}
+              {userRole === 'super_admin' 
+                ? t("సూపర్ అడ్మిన్", "Super Admin")
+                : t("రోజువారీ వసూలు", "Daily Collection")
+              }
             </p>
           </div>
         </div>
@@ -128,8 +159,13 @@ export function AppSidebar({ onNavigate }: AppSidebarProps) {
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex items-center space-x-2 px-2 py-1 text-sm text-muted-foreground">
-              <User className="h-4 w-4" />
-              <span className="truncate">{user?.email}</span>
+              {userRole === 'super_admin' ? <Shield className="h-4 w-4" /> : <User className="h-4 w-4" />}
+              <div className="flex-1 truncate">
+                <div className="truncate">{user?.email}</div>
+                {userRole === 'super_admin' && (
+                  <div className="text-xs text-amber-600 font-medium">Super Admin</div>
+                )}
+              </div>
             </div>
           </SidebarMenuItem>
           <SidebarMenuItem>
