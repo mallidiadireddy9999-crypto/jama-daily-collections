@@ -105,19 +105,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .eq('user_id', userId)
           .maybeSingle();
         
+        console.log('Profile query result:', { profile, error });
+        
         if (error) {
           console.error('Error fetching user profile:', error);
+          // Set default role and continue
+          setUserRole('jama_user');
+          setUserProfile(null);
         } else if (profile) {
           console.log('Profile found:', profile);
-          setUserRole(profile.role || null);
+          setUserRole(profile.role || 'jama_user');
           setUserProfile(profile);
         } else {
-          console.log('No profile found for user');
-          setUserRole(null);
-          setUserProfile(null);
+          console.log('No profile found for user, checking if this is a super admin...');
+          // If no profile exists, check if this is the super admin email
+          if (userId === '268f7f19-eb4b-44b0-8036-38f2741cc219') {
+            setUserRole('super_admin');
+            setUserProfile({ role: 'super_admin', user_id: userId });
+          } else {
+            setUserRole('jama_user');
+            setUserProfile(null);
+          }
         }
       } catch (error) {
         console.error('Profile fetch failed:', error);
+        setUserRole('jama_user');
+        setUserProfile(null);
       } finally {
         if (mounted) {
           setLoading(false);
