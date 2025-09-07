@@ -44,8 +44,8 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
   const generateReport = async () => {
     if (!startDate || !endDate) {
       toast({
-        title: "లోపం",
-        description: "దయచేసి తేదీలను ఎంచుకోండి",
+        title: t("లోపం", "Error"),
+        description: t("దయచేసి తేదీలను ఎంచుకోండి", "Please select dates"),
         variant: "destructive",
       });
       return;
@@ -56,8 +56,8 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) {
         toast({
-          title: "లోపం",
-          description: "దయచేసి లాగిన్ చేయండి",
+          title: t("లోపం", "Error"),
+          description: t("దయచేసి లాగిన్ చేయండి", "Please login"),
           variant: "destructive",
         });
         return;
@@ -113,14 +113,14 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
       });
 
       toast({
-        title: "రిపోర్ట్ విజయవంతంగా రూపొందించబడింది",
-        description: "రిపోర్ట్ డేటా లోడ్ చేయబడింది",
+        title: t("రిపోర్ట్ విజయవంతంగా రూపొందించబడింది", "Report generated successfully"),
+        description: t("రిపోర్ట్ డేటా లోడ్ చేయబడింది", "Report data loaded"),
       });
 
     } catch (error: any) {
       toast({
-        title: "లోపం",
-        description: error.message || "రిపోర్ట్ రూపొందించడంలో లోపం",
+        title: t("లోపం", "Error"),
+        description: error.message || t("రిపోర్ట్ రూపొందించడంలో లోపం", "Error generating report"),
         variant: "destructive",
       });
     } finally {
@@ -133,8 +133,8 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
     
     if (!reportData) {
       toast({
-        title: "లోపం",
-        description: "ముందుగా రిపోర్ట్ రూపొందించండి",
+        title: t("లోపం", "Error"),
+        description: t("ముందుగా రిపోర్ట్ రూపొందించండి", "Please generate report first"),
         variant: "destructive",
       });
       return;
@@ -220,33 +220,33 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          వెనుకకు
+          {t("వెనుకకు", "Back")}
         </Button>
-        <h1 className="text-2xl font-bold text-foreground">రిపోర్ట్‌లు</h1>
+        <h1 className="text-2xl font-bold text-foreground">{t("రిపోర్ట్‌లు", "Reports")}</h1>
       </div>
 
       {/* Report Configuration */}
       <Card className="p-6 shadow-card bg-card">
-        <h3 className="text-lg font-semibold text-foreground mb-4">రిపోర్ట్ కాన్ఫిగరేషన్</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">{t("రిపోర్ట్ కాన్ఫిగరేషన్", "Report Configuration")}</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div>
-            <Label htmlFor="reportType" className="text-foreground">రిపోర్ట్ రకం</Label>
+            <Label htmlFor="reportType" className="text-foreground">{t("రిపోర్ట్ రకం", "Report Type")}</Label>
             <Select value={reportType} onValueChange={setReportType}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="daily">రోజువారీ</SelectItem>
-                <SelectItem value="monthly">నెలవారీ</SelectItem>
-                <SelectItem value="annual">వార్షిక</SelectItem>
-                <SelectItem value="custom">కస్టమ్</SelectItem>
+                <SelectItem value="daily">{t("రోజువారీ", "Daily")}</SelectItem>
+                <SelectItem value="monthly">{t("నెలవారీ", "Monthly")}</SelectItem>
+                <SelectItem value="annual">{t("వార్షిక", "Annual")}</SelectItem>
+                <SelectItem value="custom">{t("కస్టమ్", "Custom")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div>
-            <Label htmlFor="startDate" className="text-foreground">ప్రారంభ తేదీ</Label>
+            <Label htmlFor="startDate" className="text-foreground">{t("ప్రారంభ తేదీ", "Start Date")}</Label>
             <Input
               type="date"
               value={startDate}
@@ -255,7 +255,7 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
           </div>
 
           <div>
-            <Label htmlFor="endDate" className="text-foreground">ముగింపు తేదీ</Label>
+            <Label htmlFor="endDate" className="text-foreground">{t("ముగింపు తేదీ", "End Date")}</Label>
             <Input
               type="date"
               value={endDate}
@@ -271,7 +271,7 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
             className="flex items-center gap-2"
           >
             <TrendingUp className="h-4 w-4" />
-            {loading ? "రూపొందిస్తోంది..." : "రిపోర్ట్ రూపొందించండి"}
+            {loading ? t("రూపొందిస్తోంది...", "Generating...") : t("రిపోర్ట్ రూపొందించండి", "Generate Report")}
           </Button>
 
           {reportData && (
@@ -281,7 +281,7 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
               className="flex items-center gap-2"
             >
               <Download className="h-4 w-4" />
-              PDF డౌన్‌లోడ్
+              {t("PDF డౌన్‌లోడ్", "Download PDF")}
             </Button>
           )}
         </div>
@@ -297,12 +297,12 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
                 <TrendingUp className="h-4 w-4 text-white" />
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-white/90 font-semibold">మొత్తం వసూలు</p>
+                <p className="text-xs text-white/90 font-semibold">{t("మొత్తం వసూలు", "Total Collections")}</p>
                 <p className="text-lg font-bold text-white">
                   ₹{reportData.totalCollections.toLocaleString()}
                 </p>
                 <p className="text-xs text-white/80 font-medium">
-                  {reportData.collectionsCount} వసూలు
+                  {reportData.collectionsCount} {t("వసూలు", "collections")}
                 </p>
               </div>
             </div>
@@ -315,12 +315,12 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
                 <TrendingUp className="h-4 w-4 text-white" />
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-white/90 font-semibold">మొత్తం లోన్లు</p>
+                <p className="text-xs text-white/90 font-semibold">{t("మొత్తం లోన్లు", "Total Loans")}</p>
                 <p className="text-lg font-bold text-white">
                   ₹{reportData.totalLoans.toLocaleString()}
                 </p>
                 <p className="text-xs text-white/80 font-medium">
-                  {reportData.loansCount} లోన్లు
+                  {reportData.loansCount} {t("లోన్లు", "loans")}
                 </p>
               </div>
             </div>
@@ -333,7 +333,7 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
                 <TrendingUp className="h-4 w-4 text-white" />
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-white/90 font-semibold">బాకీ మొత్తం</p>
+                <p className="text-xs text-white/90 font-semibold">{t("బాకీ మొత్తం", "Pending Amount")}</p>
                 <p className="text-lg font-bold text-white">
                   ₹{reportData.pendingAmount.toLocaleString()}
                 </p>
