@@ -159,8 +159,8 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
         doc.text(`Number of Collections: ${dailyCollections.length}`, 20, 70);
         
         // Add collections table with customer ID and outstanding amount
-        const collectionsData = dailyCollections.map((collection: any) => [
-          collection.loans?.id?.substring(0, 8) || 'N/A',
+        const collectionsData = dailyCollections.map((collection: any, index: number) => [
+          `C${String(index + 1).padStart(3, '0')}`,
           collection.loans?.customer_name || 'N/A',
           collection.loans?.customer_mobile || 'N/A',
           `Rs.${Number(collection.amount).toLocaleString()}`,
@@ -241,8 +241,8 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
         doc.text(`Total Amount: Rs.${totalAmount.toLocaleString()}`, 20, 80);
         
         // Add loans table with customer ID
-        const loansData = allLoans.map((loan: any) => [
-          loan.id?.substring(0, 8) || 'N/A',
+        const loansData = allLoans.map((loan: any, index: number) => [
+          `L${String(index + 1).padStart(3, '0')}`,
           loan.customer_name || 'N/A',
           loan.customer_mobile || 'N/A',
           `Rs.${Number(loan.amount).toLocaleString()}`,
