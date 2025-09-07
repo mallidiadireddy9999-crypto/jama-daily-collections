@@ -346,7 +346,7 @@ const Dashboard = () => {
               <TrendingUp className="h-4 w-4 text-white" />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-white/90 font-semibold">బాకీ మొత్తం</p>
+              <p className="text-xs text-white/90 font-semibold">{t("బాకీ మొత్తం", "Pending Amount")}</p>
               <p className="text-lg font-bold text-white">
                 ₹{todayStats.pendingBalance.toLocaleString()}
               </p>
@@ -362,11 +362,11 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <Users className="h-5 w-5 text-white" />
               <span className="text-xs text-white bg-white/20 px-2 py-1 rounded-full font-semibold">
-                క్రియాశీలం
+                {t("క్రియాశీలం", "Active")}
               </span>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-white/90 font-semibold">క్రియాశీల లోన్‌లు</p>
+              <p className="text-xs text-white/90 font-semibold">{t("క్రియాశీల లోన్‌లు", "Active Loans")}</p>
               <p className="text-lg font-bold text-white">
                 {todayStats.activeLoans}
               </p>
@@ -382,11 +382,11 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <PlusCircle className="h-5 w-5 text-white" />
               <span className="text-xs text-white bg-white/20 px-2 py-1 rounded-full font-semibold">
-                కొత్తది
+                {t("కొత్తది", "New")}
               </span>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-white/90 font-semibold">నేడు కొత్తవి</p>
+              <p className="text-xs text-white/90 font-semibold">{t("నేడు కొత్తవి", "New Today")}</p>
               <p className="text-lg font-bold text-white">
                 {todayStats.newLoansToday}
               </p>
@@ -400,21 +400,21 @@ const Dashboard = () => {
         <Button variant="money" size="xl" className="w-full" onClick={handleAddNewLoan}>
           <PlusCircle className="h-6 w-6 mr-3" />
           <div className="text-left">
-            <p className="font-semibold">కొత్త లోన్ జోడించండి</p>
+            <p className="font-semibold">{t("కొత్త లోన్ జోడించండి", "Add New Loan")}</p>
           </div>
         </Button>
 
         <Button variant="collect" size="xl" className="w-full" onClick={handleCollectPayment}>
           <HandCoins className="h-6 w-6 mr-3" />
           <div className="text-left">
-            <p className="font-semibold">వసూలు నమోదు చేయండి</p>
+            <p className="font-semibold">{t("వసూలు నమోదు చేయండి", "Record Collection")}</p>
           </div>
         </Button>
 
         <Button variant="report" size="xl" className="w-full" onClick={handleViewReports}>
           <FileText className="h-6 w-6 mr-3" />
           <div className="text-left">
-            <p className="font-semibold">రిపోర్ట్‌లు చూడండి</p>
+            <p className="font-semibold">{t("రిపోర్ట్‌లు చూడండి", "View Reports")}</p>
           </div>
         </Button>
       </div>
@@ -422,18 +422,18 @@ const Dashboard = () => {
       {/* Quick Summary */}
       <Card className="p-4 shadow-card bg-gradient-card">
         <div className="space-y-3">
-          <h3 className="font-semibold text-foreground">నేటి సారాంశం</h3>
+          <h3 className="font-semibold text-foreground">{t("నేటి సారాంశం", "Today's Summary")}</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">వసూలు:</span>
+              <span className="text-muted-foreground">{t("వసూలు:", "Collections:")}</span>
               <span className="font-medium text-success">₹{todayStats.totalCollected.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">బాకీ:</span>
+              <span className="text-muted-foreground">{t("బాకీ:", "Pending:")}</span>
               <span className="font-medium text-warning">₹{todayStats.pendingBalance.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">క్రియాశీల లోన్‌లు:</span>
+              <span className="text-muted-foreground">{t("క్రియాశీల లోన్‌లు:", "Active Loans:")}</span>
               <span className="font-medium text-primary">{todayStats.activeLoans}</span>
             </div>
           </div>
