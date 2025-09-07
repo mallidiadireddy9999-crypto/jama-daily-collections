@@ -73,6 +73,44 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
 
   useEffect(() => {
     fetchNewLoansToday();
+
+    // Set up real-time subscription for new loans
+    const channel = supabase
+      .channel('new-loans-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'loans',
+          filter: `user_id=eq.${user?.id}`
+        },
+        (payload) => {
+          console.log('New loan added:', payload);
+          // Refresh the loans list when a new loan is inserted
+          fetchNewLoansToday();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'loans',
+          filter: `user_id=eq.${user?.id}`
+        },
+        (payload) => {
+          console.log('Loan updated:', payload);
+          // Refresh the loans list when a loan is updated
+          fetchNewLoansToday();
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const totalNewLoansAmount = newLoansToday.reduce((sum, loan) => sum + loan.loanAmount, 0);

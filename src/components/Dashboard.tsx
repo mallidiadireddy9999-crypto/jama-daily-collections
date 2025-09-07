@@ -93,6 +93,46 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
   // Load data on component mount and when user changes
   useEffect(() => {
     fetchDashboardStats();
+
+    // Set up real-time subscription for loans
+    if (user) {
+      const channel = supabase
+        .channel('dashboard-loans-realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+            schema: 'public',
+            table: 'loans',
+            filter: `user_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('Loan changed:', payload);
+            // Refresh dashboard stats when any loan is modified
+            fetchDashboardStats();
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'collections',
+            filter: `user_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('Collection changed:', payload);
+            // Refresh dashboard stats when any collection is modified
+            fetchDashboardStats();
+          }
+        )
+        .subscribe();
+
+      // Cleanup subscription on unmount
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
   }, [user]);
 
   // Refresh data when returning from other views
