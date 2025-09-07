@@ -48,11 +48,17 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) return;
 
+      // Fetch collections with loan details and calculate outstanding amounts
       const { data: collections, error } = await supabase
         .from('collections')
         .select(`
           *,
-          loans!inner(customer_name, customer_mobile)
+          loans!inner(
+            id,
+            customer_name, 
+            customer_mobile,
+            amount
+          )
         `)
         .eq('user_id', user.user.id)
         .eq('collection_date', selectedDate)
@@ -60,8 +66,29 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
 
       if (error) throw error;
 
-      setDailyCollections(collections || []);
-      const total = collections?.reduce((sum, collection) => sum + Number(collection.amount), 0) || 0;
+      // Calculate outstanding amounts for each loan
+      const enrichedCollections = await Promise.all(
+        (collections || []).map(async (collection) => {
+          const { data: allCollections, error: collError } = await supabase
+            .from('collections')
+            .select('amount')
+            .eq('loan_id', collection.loans.id)
+            .eq('user_id', user.user.id);
+
+          if (collError) throw collError;
+
+          const totalCollected = allCollections?.reduce((sum, coll) => sum + Number(coll.amount), 0) || 0;
+          const outstanding = Number(collection.loans.amount) - totalCollected;
+
+          return {
+            ...collection,
+            outstanding_amount: outstanding
+          };
+        })
+      );
+
+      setDailyCollections(enrichedCollections);
+      const total = enrichedCollections.reduce((sum, collection) => sum + Number(collection.amount), 0);
       setDailyTotal(total);
 
     } catch (error: any) {
@@ -115,38 +142,59 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
     try {
       const doc = new jsPDF();
       
-      // Add title
-      doc.setFontSize(20);
-      doc.text('Daily Collections Report', 105, 20, { align: 'center' });
-      
-      // Add date and summary
-      doc.setFontSize(12);
-      doc.text(`Date: ${selectedDate}`, 20, 40);
-      doc.text(`Total Collections: Rs.${dailyTotal.toLocaleString()}`, 20, 50);
-      doc.text(`Number of Collections: ${dailyCollections.length}`, 20, 60);
-      
-      // Add collections table
-      const collectionsData = dailyCollections.map((collection: any) => [
-        collection.loans?.customer_name || 'N/A',
-        collection.loans?.customer_mobile || 'N/A',
-        `Rs.${Number(collection.amount).toLocaleString()}`,
-        collection.notes || '-'
-      ]);
+      // Add logo
+      const logoImg = new Image();
+      logoImg.onload = () => {
+        // Add logo to top left
+        doc.addImage(logoImg, 'PNG', 20, 10, 30, 30);
+        
+        // Add title
+        doc.setFontSize(20);
+        doc.text('JAMA - Daily Collections Report', 105, 25, { align: 'center' });
+        
+        // Add date and summary
+        doc.setFontSize(12);
+        doc.text(`Date: ${selectedDate}`, 20, 50);
+        doc.text(`Total Collections: Rs.${dailyTotal.toLocaleString()}`, 20, 60);
+        doc.text(`Number of Collections: ${dailyCollections.length}`, 20, 70);
+        
+        // Add collections table with customer ID and outstanding amount
+        const collectionsData = dailyCollections.map((collection: any) => [
+          collection.loans?.id?.substring(0, 8) || 'N/A',
+          collection.loans?.customer_name || 'N/A',
+          collection.loans?.customer_mobile || 'N/A',
+          `Rs.${Number(collection.amount).toLocaleString()}`,
+          `Rs.${Number(collection.outstanding_amount || 0).toLocaleString()}`,
+          collection.notes || '-'
+        ]);
 
-      autoTable(doc, {
-        startY: 80,
-        head: [['Customer Name', 'Mobile', 'Amount', 'Notes']],
-        body: collectionsData,
-        theme: 'grid',
-      });
+        autoTable(doc, {
+          startY: 85,
+          head: [['Customer ID', 'Customer Name', 'Mobile', 'Collected', 'Outstanding', 'Notes']],
+          body: collectionsData,
+          theme: 'grid',
+          styles: { fontSize: 9 },
+          headStyles: { fontSize: 10, fillColor: [34, 197, 94] },
+          columnStyles: {
+            0: { cellWidth: 25 },
+            1: { cellWidth: 30 },
+            2: { cellWidth: 25 },
+            3: { cellWidth: 25 },
+            4: { cellWidth: 25 },
+            5: { cellWidth: 40 }
+          }
+        });
 
-      const filename = `daily-collections-${selectedDate}.pdf`;
-      doc.save(filename);
+        const filename = `jama-daily-collections-${selectedDate}.pdf`;
+        doc.save(filename);
+        
+        toast({
+          title: "PDF Downloaded",
+          description: `Report saved as ${filename}`,
+        });
+      };
       
-      toast({
-        title: "PDF Downloaded",
-        description: `Report saved as ${filename}`,
-      });
+      logoImg.src = "/lovable-uploads/ff3ffabf-f0ae-4db2-b9ae-0144863bfcf6.png";
       
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -171,48 +219,68 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
     try {
       const doc = new jsPDF();
       
-      // Add title
-      doc.setFontSize(20);
-      doc.text('Complete Loan Database', 105, 20, { align: 'center' });
-      
-      // Calculate totals
-      const totalAmount = allLoans.reduce((sum, loan) => sum + Number(loan.amount), 0);
-      const activeLoans = allLoans.filter(loan => loan.status === 'active').length;
-      
-      // Add summary
-      doc.setFontSize(12);
-      doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 40);
-      doc.text(`Total Loans: ${allLoans.length}`, 20, 50);
-      doc.text(`Active Loans: ${activeLoans}`, 20, 60);
-      doc.text(`Total Amount: Rs.${totalAmount.toLocaleString()}`, 20, 70);
-      
-      // Add loans table
-      const loansData = allLoans.map((loan: any) => [
-        loan.customer_name || 'N/A',
-        loan.customer_mobile || 'N/A',
-        `Rs.${Number(loan.amount).toLocaleString()}`,
-        `${loan.interest_rate || 0}%`,
-        `${loan.duration_months || 0} months`,
-        loan.status || 'active',
-        loan.start_date || 'N/A'
-      ]);
+      // Add logo
+      const logoImg = new Image();
+      logoImg.onload = () => {
+        // Add logo to top left
+        doc.addImage(logoImg, 'PNG', 20, 10, 30, 30);
+        
+        // Add title
+        doc.setFontSize(20);
+        doc.text('JAMA - Complete Loan Database', 105, 25, { align: 'center' });
+        
+        // Calculate totals
+        const totalAmount = allLoans.reduce((sum, loan) => sum + Number(loan.amount), 0);
+        const activeLoans = allLoans.filter(loan => loan.status === 'active').length;
+        
+        // Add summary
+        doc.setFontSize(12);
+        doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 50);
+        doc.text(`Total Loans: ${allLoans.length}`, 20, 60);
+        doc.text(`Active Loans: ${activeLoans}`, 20, 70);
+        doc.text(`Total Amount: Rs.${totalAmount.toLocaleString()}`, 20, 80);
+        
+        // Add loans table with customer ID
+        const loansData = allLoans.map((loan: any) => [
+          loan.id?.substring(0, 8) || 'N/A',
+          loan.customer_name || 'N/A',
+          loan.customer_mobile || 'N/A',
+          `Rs.${Number(loan.amount).toLocaleString()}`,
+          `${loan.interest_rate || 0}%`,
+          `${loan.duration_months || 0}m`,
+          loan.status || 'active',
+          loan.start_date || 'N/A'
+        ]);
 
-      autoTable(doc, {
-        startY: 90,
-        head: [['Customer', 'Mobile', 'Amount', 'Rate', 'Duration', 'Status', 'Start Date']],
-        body: loansData,
-        theme: 'grid',
-        styles: { fontSize: 8 },
-        headStyles: { fontSize: 9 }
-      });
+        autoTable(doc, {
+          startY: 95,
+          head: [['ID', 'Customer', 'Mobile', 'Amount', 'Rate', 'Duration', 'Status', 'Start Date']],
+          body: loansData,
+          theme: 'grid',
+          styles: { fontSize: 8 },
+          headStyles: { fontSize: 9, fillColor: [34, 197, 94] },
+          columnStyles: {
+            0: { cellWidth: 20 },
+            1: { cellWidth: 25 },
+            2: { cellWidth: 20 },
+            3: { cellWidth: 25 },
+            4: { cellWidth: 15 },
+            5: { cellWidth: 18 },
+            6: { cellWidth: 18 },
+            7: { cellWidth: 25 }
+          }
+        });
 
-      const filename = `loan-database-${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(filename);
+        const filename = `jama-loan-database-${new Date().toISOString().split('T')[0]}.pdf`;
+        doc.save(filename);
+        
+        toast({
+          title: "PDF Downloaded",
+          description: `Database saved as ${filename}`,
+        });
+      };
       
-      toast({
-        title: "PDF Downloaded",
-        description: `Database saved as ${filename}`,
-      });
+      logoImg.src = "/lovable-uploads/ff3ffabf-f0ae-4db2-b9ae-0144863bfcf6.png";
       
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -317,9 +385,11 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>{t("కస్టమర్ ID", "Customer ID")}</TableHead>
                       <TableHead>{t("కస్టమర్ పేరు", "Customer Name")}</TableHead>
                       <TableHead>{t("మొబైల్", "Mobile")}</TableHead>
-                      <TableHead>{t("మొత్తం", "Amount")}</TableHead>
+                      <TableHead>{t("వసూలు", "Collected")}</TableHead>
+                      <TableHead>{t("బకాయి", "Outstanding")}</TableHead>
                       <TableHead>{t("గమనికలు", "Notes")}</TableHead>
                       <TableHead>{t("సమయం", "Time")}</TableHead>
                     </TableRow>
@@ -327,9 +397,11 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
                   <TableBody>
                     {dailyCollections.map((collection) => (
                       <TableRow key={collection.id}>
+                        <TableCell className="font-mono text-sm">{collection.loans?.id?.substring(0, 8) || 'N/A'}</TableCell>
                         <TableCell className="font-medium">{collection.loans?.customer_name || 'N/A'}</TableCell>
                         <TableCell>{collection.loans?.customer_mobile || 'N/A'}</TableCell>
                         <TableCell>₹{Number(collection.amount).toLocaleString()}</TableCell>
+                        <TableCell>₹{Number(collection.outstanding_amount || 0).toLocaleString()}</TableCell>
                         <TableCell>{collection.notes || '-'}</TableCell>
                         <TableCell>{new Date(collection.created_at).toLocaleTimeString()}</TableCell>
                       </TableRow>
@@ -418,6 +490,7 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>{t("లోన్ ID", "Loan ID")}</TableHead>
                       <TableHead>{t("కస్టమర్ పేరు", "Customer Name")}</TableHead>
                       <TableHead>{t("మొబైల్", "Mobile")}</TableHead>
                       <TableHead>{t("మొత్తం", "Amount")}</TableHead>
@@ -430,6 +503,7 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
                   <TableBody>
                     {allLoans.map((loan) => (
                       <TableRow key={loan.id}>
+                        <TableCell className="font-mono text-sm">{loan.id?.substring(0, 8) || 'N/A'}</TableCell>
                         <TableCell className="font-medium">{loan.customer_name}</TableCell>
                         <TableCell>{loan.customer_mobile || 'N/A'}</TableCell>
                         <TableCell>₹{Number(loan.amount).toLocaleString()}</TableCell>
