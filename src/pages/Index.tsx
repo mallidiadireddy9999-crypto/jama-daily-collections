@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { LogIn, ArrowLeft } from "lucide-react";
+import { AdsManagement } from "@/components/AdsManagement";
 
 const Index = () => {
   const { user, loading, userRole } = useAuth();
@@ -85,6 +86,8 @@ const Index = () => {
           return <UserManagement onBack={() => setCurrentView("dashboard")} />;
         case "user-reports":
           return <UserManagement onBack={() => setCurrentView("dashboard")} />;
+        case "ads-management":
+          return <AdsManagement onBack={() => setCurrentView("dashboard")} />;
         case "notifications":
           return (
             <div className="space-y-6">

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, DollarSign, TrendingUp, Activity, UserCheck, UserX, ArrowLeft } from 'lucide-react';
+import { Users, DollarSign, TrendingUp, Activity, UserCheck, UserX, ArrowLeft, Megaphone } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -273,12 +273,20 @@ export const SuperAdminDashboard = ({ onNavigate, onBack }: SuperAdminDashboardP
       </Card>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Button 
           onClick={() => onNavigate('user-reports')}
           className="h-20 text-lg"
         >
           View Detailed Reports
+        </Button>
+        <Button 
+          onClick={() => onNavigate('ads-management')}
+          variant="outline"
+          className="h-20 text-lg"
+        >
+          <Megaphone className="h-6 w-6 mr-2" />
+          Ads Management
         </Button>
         <Button 
           onClick={() => onNavigate('notifications')}
