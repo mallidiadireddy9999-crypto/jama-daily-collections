@@ -47,7 +47,7 @@ const Index = () => {
           <div className="space-y-6">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4">
               <img 
-                src="/lovable-uploads/ff3ffabf-f0ae-4db2-b9ae-0144863bfcf6.png" 
+                src="/lovable-uploads/5687e4de-9f9a-4de1-8c5c-92952cc9cd45.png" 
                 alt="JAMA" 
                 className="w-16 h-16 object-contain"
               />
