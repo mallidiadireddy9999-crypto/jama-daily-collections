@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { 
   PlusCircle, 
   HandCoins, 
@@ -13,86 +11,24 @@ import {
   Users,
   IndianRupee,
   Clock,
-  LogOut,
-  User,
-  Menu
 } from "lucide-react";
 import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
 import AddLoanModal from "./AddLoanModal";
-import CollectionsList from "./CollectionsList";
-import PendingBalanceList from "./PendingBalanceList";
-import ActiveLoansList from "./ActiveLoansList";
-import NewLoansToday from "./NewLoansToday";
-import ReportsPage from "./ReportsPage";
-import { AppSidebar } from "./AppSidebar";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardProps {
   onNavigate: (view: string) => void;
 }
 
 const Dashboard = ({ onNavigate }: DashboardProps) => {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'payment' | 'collections' | 'pending' | 'activeLoans' | 'newLoans' | 'reports'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'payment'>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [showAddLoanModal, setShowAddLoanModal] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const { user } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const { t } = useLanguage();
-  
-  useEffect(() => {
-    // Check current user
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
-    });
-
-    // Listen for sidebar navigation events
-    const handleSidebarNavigate = (event: any) => {
-      console.log("Received sidebarNavigate event:", event.detail);
-      const view = event.detail;
-      if (view === 'reports') {
-        console.log("Setting current view to reports");
-        setCurrentView('reports');
-        setSidebarOpen(false);
-      }
-    };
-
-    window.addEventListener('sidebarNavigate', handleSidebarNavigate);
-
-    return () => {
-      subscription.unsubscribe();
-      window.removeEventListener('sidebarNavigate', handleSidebarNavigate);
-    };
-  }, []);
-
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: t("లోపం", "Error"),
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: t("విజయవంతంగా లాగ్ అవుట్ అయ్యారు", "Successfully logged out"),
-        description: t("వీడ్కోలు!", "Goodbye!"),
-      });
-      navigate('/login');
-    }
-  };
-
-  const handleSignIn = () => {
-    navigate('/login');
-  };
   
   const [todayStats, setTodayStats] = useState({
     totalCollected: 15750,
@@ -100,15 +36,6 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
     activeLoans: 12,
     newLoansToday: 3
   });
-
-  const [todaysCollections, setTodaysCollections] = useState<Array<{
-    id: string;
-    customerId: string;
-    customerName: string;
-    amount: number;
-    timestamp: string;
-    time: string;
-  }>>([]);
 
   const handleCollectPayment = () => {
     setCurrentView('payment');
@@ -123,335 +50,201 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
     setCurrentView('dashboard');
   };
 
-  const handleViewCollections = () => {
-    setCurrentView('collections');
+  const handleViewActiveLoans = () => {
+    onNavigate('active-loans');
   };
 
   const handleViewPendingBalance = () => {
-    setCurrentView('pending');
-  };
-
-  const handleViewActiveLoans = () => {
-    setCurrentView('activeLoans');
+    onNavigate('pending-balance');
   };
 
   const handleViewNewLoans = () => {
-    setCurrentView('newLoans');
+    onNavigate('new-loans');
+  };
+
+  const handleViewCollections = () => {
+    onNavigate('collections');
   };
 
   const handleViewReports = () => {
-    setCurrentView('reports');
-  };
-
-  const handleLoanSave = (loan: any) => {
-    // Update stats
-    setTodayStats(prev => ({
-      ...prev,
-      activeLoans: prev.activeLoans + 1,
-      newLoansToday: prev.newLoansToday + 1,
-      pendingBalance: prev.pendingBalance + loan.amount
-    }));
-
-    // Show success toast
-    toast({
-      title: t("లోన్ విజయవంతంగా జోడించబడింది! ✅", "Loan added successfully! ✅"),
-      description: t(`${loan.customerName} కోసం ₹${loan.amount.toLocaleString()} లోన్ సృష్టించబడింది`, `₹${loan.amount.toLocaleString()} loan created for ${loan.customerName}`),
-      duration: 3000,
-    });
-  };
-
-  const handlePaymentConfirm = (amount: number, customerId: string, customerName: string) => {
-    setSelectedCustomer(customerName);
-    const newCollection = {
-      id: Date.now().toString(),
-      customerId,
-      customerName,
-      amount,
-      timestamp: new Date().toISOString(),
-      time: new Date().toLocaleTimeString('te-IN', { hour: '2-digit', minute: '2-digit', hour12: true })
-    };
-
-    // Add to today's collections
-    setTodaysCollections(prev => [newCollection, ...prev]);
-
-    // Update stats with received amount
-    setTodayStats(prev => ({
-      ...prev,
-      totalCollected: prev.totalCollected + amount,
-      pendingBalance: Math.max(0, prev.pendingBalance - amount)
-    }));
-
-    // Show success toast
-    toast({
-      title: t("వసూలు విజయవంతంగా నమోదు చేయబడింది! ✅", "Collection recorded successfully! ✅"),
-      description: t(`${customerName} (ID: ${customerId}) నుండి ₹${amount.toLocaleString()} వసూలైంది`, `₹${amount.toLocaleString()} collected from ${customerName} (ID: ${customerId})`),
-      duration: 3000,
-    });
-
-    setCurrentView('dashboard');
+    onNavigate('reports');
   };
 
   if (currentView === 'payment') {
     return (
       <PaymentKeypad
-        onBack={handleBackToDashboard}
-        onConfirm={handlePaymentConfirm}
         customerName={selectedCustomer}
-      />
-    );
-  }
-
-  if (currentView === 'collections') {
-    return (
-      <CollectionsList
         onBack={handleBackToDashboard}
-        collections={todaysCollections}
-      />
-    );
-  }
-
-  if (currentView === 'pending') {
-    return (
-      <PendingBalanceList
-        onBack={handleBackToDashboard}
-      />
-    );
-  }
-
-  if (currentView === 'activeLoans') {
-    return (
-      <ActiveLoansList
-        onBack={handleBackToDashboard}
-      />
-    );
-  }
-
-  if (currentView === 'newLoans') {
-    return (
-      <NewLoansToday
-        onBack={handleBackToDashboard}
-      />
-    );
-  }
-
-  if (currentView === 'reports') {
-    return (
-      <ReportsPage
-        onBack={handleBackToDashboard}
+        onConfirm={(amount, customerId, customerName) => {
+          // Handle payment confirmation
+          toast({
+            title: t("చెల్లింపు విజయవంతం", "Payment Successful"),
+            description: t(`₹${amount} ${customerName} నుండి వసూలు చేయబడింది`, `₹${amount} collected from ${customerName}`),
+          });
+          setCurrentView('dashboard');
+        }}
       />
     );
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen bg-gradient-card p-4 space-y-6">
+    <div className="min-h-screen bg-gradient-card">
+      <div className="p-4 space-y-6">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex justify-between items-center w-full mb-4">
-            {/* Menu Button - positioned in top left */}
-            <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700 font-bold shadow-lg"
-                  onClick={() => {
-                    console.log("Menu button clicked, current state:", sidebarOpen);
-                    console.log("Setting sidebar to open");
-                    setSidebarOpen(true);
-                  }}
-                >
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent 
-                side="left" 
-                className="p-0 w-64"
-                aria-describedby="sidebar-description"
-              >
-                <div className="sr-only">
-                  <h2 id="sidebar-title">Navigation Menu</h2>
-                  <p id="sidebar-description">Main navigation sidebar for the application</p>
-                </div>
-                <AppSidebar onNavigate={(view) => {
-                  onNavigate(view);
-                  setSidebarOpen(false);
-                }} />
-              </SheetContent>
-            </Sheet>
-
-            {/* Auth Button - positioned in top right */}
-            {user ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSignOut}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                {t("లాగ్ అవుట్", "Log Out")}
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSignIn}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-              >
-                <User className="h-4 w-4 mr-2" />
-                {t("లాగిన్", "Login")}
-              </Button>
-            )}
-          </div>
-
-          <div className="flex justify-center">
-            <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money flex items-center gap-3">
-              <img src="/lovable-uploads/6931d901-421c-4070-833d-a383481866ec.png" alt="Wallet" className="h-12 w-12" />
-              <h1 className="text-2xl font-bold text-primary-foreground">
-                JAMA <span className="text-lg">{t("చేయి", "App")}</span>
-              </h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <SidebarTrigger className="lg:hidden" />
+            <div className="flex items-center space-x-3">
+              <img src={jamaLogo} alt="JAMA Logo" className="h-8 w-8" />
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">JAMA</h1>
+                <p className="text-sm text-muted-foreground">
+                  {t("రోజువారీ వసూలు నిర్వహణ", "Daily Collection Management")}
+                </p>
+              </div>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            {t("ఇక పెన్ పేపర్ అవసరం లేదు", "No more pen and paper needed")}
-          </p>
-        </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-4">
-        <Card 
-          className="p-4 shadow-card bg-gradient-success cursor-pointer hover:scale-105 transition-transform"
-          onClick={handleViewCollections}
-        >
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <IndianRupee className="h-5 w-5 text-white" />
-              <TrendingUp className="h-4 w-4 text-white" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-white/90 font-semibold">{t("నేటి వసూలు", "Today's Collections")}</p>
-              <p className="text-lg font-bold text-white">
-                ₹{todayStats.totalCollected.toLocaleString()}
-              </p>
-              <p className="text-xs text-white/80 font-medium">
-                {todaysCollections.length} {t("వసూలు", "collections")}
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        <Card 
-          className="p-4 shadow-card bg-gradient-success cursor-pointer hover:scale-105 transition-transform"
-          onClick={handleViewPendingBalance}
-        >
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Clock className="h-5 w-5 text-white" />
-              <TrendingUp className="h-4 w-4 text-white" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-white/90 font-semibold">{t("బాకీ మొత్తం", "Pending Amount")}</p>
-              <p className="text-lg font-bold text-white">
-                ₹{todayStats.pendingBalance.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        <Card 
-          className="p-4 shadow-card bg-gradient-success cursor-pointer hover:scale-105 transition-transform"
-          onClick={handleViewActiveLoans}
-        >
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Users className="h-5 w-5 text-white" />
-              <span className="text-xs text-white bg-white/20 px-2 py-1 rounded-full font-semibold">
-                {t("క్రియాశీలం", "Active")}
-              </span>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-white/90 font-semibold">{t("క్రియాశీల లోన్‌లు", "Active Loans")}</p>
-              <p className="text-lg font-bold text-white">
-                {todayStats.activeLoans}
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        <Card 
-          className="p-4 shadow-card bg-gradient-success cursor-pointer hover:scale-105 transition-transform"
-          onClick={handleViewNewLoans}
-        >
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <PlusCircle className="h-5 w-5 text-white" />
-              <span className="text-xs text-white bg-white/20 px-2 py-1 rounded-full font-semibold">
-                {t("కొత్తది", "New")}
-              </span>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-white/90 font-semibold">{t("నేడు కొత్తవి", "New Today")}</p>
-              <p className="text-lg font-bold text-white">
-                {todayStats.newLoansToday}
-              </p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="space-y-4">
-        <Button variant="money" size="xl" className="w-full" onClick={handleAddNewLoan}>
-          <PlusCircle className="h-6 w-6 mr-3" />
-          <div className="text-left">
-            <p className="font-semibold">{t("కొత్త లోన్ జోడించండి", "Add New Loan")}</p>
-          </div>
-        </Button>
-
-        <Button variant="collect" size="xl" className="w-full" onClick={handleCollectPayment}>
-          <HandCoins className="h-6 w-6 mr-3" />
-          <div className="text-left">
-            <p className="font-semibold">{t("వసూలు నమోదు చేయండి", "Record Collection")}</p>
-          </div>
-        </Button>
-
-        <Button variant="report" size="xl" className="w-full" onClick={handleViewReports}>
-          <FileText className="h-6 w-6 mr-3" />
-          <div className="text-left">
-            <p className="font-semibold">{t("రిపోర్ట్‌లు చూడండి", "View Reports")}</p>
-          </div>
-        </Button>
-      </div>
-
-      {/* Quick Summary */}
-      <Card className="p-4 shadow-card bg-gradient-card">
-        <div className="space-y-3">
-          <h3 className="font-semibold text-foreground">{t("నేటి సారాంశం", "Today's Summary")}</h3>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t("వసూలు:", "Collections:")}</span>
-              <span className="font-medium text-success">₹{todayStats.totalCollected.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t("బాకీ:", "Pending:")}</span>
-              <span className="font-medium text-warning">₹{todayStats.pendingBalance.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t("క్రియాశీల లోన్‌లు:", "Active Loans:")}</span>
-              <span className="font-medium text-primary">{todayStats.activeLoans}</span>
-            </div>
+          
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">
+              {t("స్వాగతం", "Welcome")}, {user?.email}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </p>
           </div>
         </div>
-      </Card>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card 
+            className="p-4 cursor-pointer hover:shadow-lg transition-shadow bg-gradient-money text-primary-foreground"
+            onClick={handleViewActiveLoans}
+          >
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Users className="h-5 w-5" />
+                <TrendingUp className="h-4 w-4" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold opacity-90">{t("క్రియాశీల లోన్‌లు", "Active Loans")}</p>
+                <p className="text-2xl font-bold">{todayStats.activeLoans}</p>
+                <p className="text-xs opacity-75">{t("మొత్తం లోన్‌లు", "Total loans")}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card 
+            className="p-4 cursor-pointer hover:shadow-lg transition-shadow bg-gradient-success text-white"
+            onClick={handleViewCollections}
+          >
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <IndianRupee className="h-5 w-5" />
+                <TrendingUp className="h-4 w-4" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold opacity-90">{t("ఈ రోజు వసూలు", "Today's Collection")}</p>
+                <p className="text-xl font-bold">₹{todayStats.totalCollected.toLocaleString()}</p>
+                <p className="text-xs opacity-75">{t("మొత్తం వసూలైనది", "Total collected")}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card 
+            className="p-4 cursor-pointer hover:shadow-lg transition-shadow bg-gradient-warning text-white"
+            onClick={handleViewPendingBalance}
+          >
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Clock className="h-5 w-5" />
+                <TrendingUp className="h-4 w-4" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold opacity-90">{t("బాకీ మొత్తం", "Pending Amount")}</p>
+                <p className="text-xl font-bold">₹{todayStats.pendingBalance.toLocaleString()}</p>
+                <p className="text-xs opacity-75">{t("చెల్లించాల్సినది", "To be collected")}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card 
+            className="p-4 cursor-pointer hover:shadow-lg transition-shadow bg-gradient-primary text-white"
+            onClick={handleViewNewLoans}
+          >
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <PlusCircle className="h-5 w-5" />
+                <TrendingUp className="h-4 w-4" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold opacity-90">{t("ఈ రోజు కొత్త లోన్‌లు", "New Loans Today")}</p>
+                <p className="text-2xl font-bold">{todayStats.newLoansToday}</p>
+                <p className="text-xs opacity-75">{t("నేడు జోడించబడినవి", "Added today")}</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={handleCollectPayment}>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-success/10 rounded-full flex items-center justify-center">
+                <HandCoins className="h-6 w-6 text-success" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">{t("చెల్లింపు వసూలు", "Collect Payment")}</h3>
+                <p className="text-sm text-muted-foreground">{t("నగదు వసూలు చేయండి", "Collect cash payments")}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={handleAddNewLoan}>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                <PlusCircle className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">{t("కొత్త లోన్", "New Loan")}</h3>
+                <p className="text-sm text-muted-foreground">{t("కొత్త లోన్ జోడించండి", "Add a new loan")}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={handleViewReports}>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-info/10 rounded-full flex items-center justify-center">
+                <FileText className="h-6 w-6 text-info" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">{t("రిపోర్ట్‌లు", "Reports")}</h3>
+                <p className="text-sm text-muted-foreground">{t("వ్యాపార రిపోర్ట్‌లు చూడండి", "View business reports")}</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
 
       {/* Add Loan Modal */}
-      <AddLoanModal
-        open={showAddLoanModal}
+      <AddLoanModal 
+        open={showAddLoanModal} 
         onOpenChange={setShowAddLoanModal}
-        onSave={handleLoanSave}
+        onSave={(loanData) => {
+          // Handle loan save
+          toast({
+            title: t("లోన్ జోడించబడింది", "Loan Added"),
+            description: t("కొత్త లోన్ విజయవంతంగా జోడించబడింది", "New loan added successfully"),
+          });
+          setShowAddLoanModal(false);
+        }}
       />
-      </div>
-    </SidebarProvider>
+    </div>
   );
 };
 
