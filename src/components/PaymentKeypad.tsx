@@ -23,9 +23,9 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
   const { t } = useLanguage();
   const { toast } = useToast();
 
-  // Function to fetch customer data by ID
-  const fetchCustomerData = async (searchId: string) => {
-    if (!searchId.trim()) {
+  // Function to fetch customer data by ID or Name
+  const fetchCustomerData = async (searchTerm: string) => {
+    if (!searchTerm.trim()) {
       setSelectedCustomerName('');
       setCustomerNotFound(false);
       return;
@@ -35,12 +35,12 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
     setCustomerNotFound(false);
 
     try {
-      // First try to find by customer_mobile (assuming customer ID might be mobile number)
+      // Search by customer_mobile, customer_name, or loan id
       let { data: loans, error } = await supabase
         .from('loans')
-        .select('customer_name, customer_mobile')
-        .or(`customer_mobile.eq.${searchId},id.eq.${searchId}`)
-        .limit(1);
+        .select('customer_name, customer_mobile, id')
+        .or(`customer_mobile.eq.${searchTerm},customer_name.ilike.%${searchTerm}%,id.eq.${searchTerm}`)
+        .limit(5); // Get up to 5 results for name matches
 
       if (error) {
         console.error('Error fetching customer:', error);
@@ -53,7 +53,21 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
       }
 
       if (loans && loans.length > 0) {
-        setSelectedCustomerName(loans[0].customer_name);
+        // If exact match found (by ID or mobile), use first result
+        const exactMatch = loans.find(loan => 
+          loan.customer_mobile === searchTerm || 
+          loan.id === searchTerm
+        );
+        
+        if (exactMatch) {
+          setSelectedCustomerName(exactMatch.customer_name);
+          setCustomerId(exactMatch.customer_mobile || exactMatch.id);
+        } else {
+          // For name search, use first result
+          setSelectedCustomerName(loans[0].customer_name);
+          setCustomerId(loans[0].customer_mobile || loans[0].id);
+        }
+        
         setCustomerNotFound(false);
         toast({
           title: t("కస్టమర్ దొరికాడు", "Customer Found"),
@@ -64,7 +78,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
         setCustomerNotFound(true);
         toast({
           title: t("కస్టమర్ దొరకలేదు", "Customer Not Found"),
-          description: t("ఈ ID తో కస్టమర్ దొరకలేదు", "No customer found with this ID"),
+          description: t("ఈ పేరు లేదా ID తో కస్టమర్ దొరకలేదు", "No customer found with this name or ID"),
           variant: "destructive",
         });
       }
@@ -77,10 +91,10 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
     }
   };
 
-  // Auto-fetch when customer ID changes
+  // Auto-fetch when search term changes
   useEffect(() => {
     const delayedFetch = setTimeout(() => {
-      if (customerId.length >= 3) { // Only search when at least 3 characters
+      if (customerId.length >= 2) { // Search when at least 2 characters for names
         fetchCustomerData(customerId);
       } else {
         setSelectedCustomerName('');
@@ -141,14 +155,14 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
         <div className="space-y-3">
           <Label htmlFor="customerId" className="flex items-center gap-2 text-sm font-medium">
             <User className="h-4 w-4" />
-            {t("కస్టమర్ ID", "Customer ID")}
+            {t("కస్టమర్ ID లేదా పేరు", "Customer ID or Name")}
           </Label>
           <div className="relative">
             <Input
               id="customerId"
               value={customerId}
               onChange={(e) => setCustomerId(e.target.value)}
-              placeholder={t("కస్టమర్ ID లేదా మొబైల్ నంబర్", "Enter Customer ID or Mobile Number")}
+              placeholder={t("కస్టమర్ పేరు లేదా ID లేదా మొబైల్", "Customer Name, ID or Mobile Number")}
               className="h-11 pr-10"
             />
             {isLoadingCustomer && (
@@ -172,7 +186,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
           )}
 
           {/* Customer Not Found */}
-          {customerNotFound && customerId.length >= 3 && (
+          {customerNotFound && customerId.length >= 2 && (
             <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-destructive" />
