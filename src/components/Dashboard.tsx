@@ -95,7 +95,9 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
           <div className="flex items-center space-x-4">
             <SidebarTrigger className="lg:hidden" />
             <div className="flex items-center space-x-3">
-              <img src={jamaLogo} alt="JAMA Logo" className="h-8 w-8" />
+              <div className="w-10 h-10 bg-white rounded-lg p-1 shadow-lg flex items-center justify-center">
+                <img src={jamaLogo} alt="JAMA Logo" className="w-8 h-8 object-contain" />
+              </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">JAMA</h1>
                 <p className="text-sm text-muted-foreground">

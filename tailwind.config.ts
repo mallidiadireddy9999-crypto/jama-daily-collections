@@ -65,6 +65,10 @@ export default {
 					DEFAULT: 'hsl(var(--warning))',
 					foreground: 'hsl(var(--warning-foreground))'
 				},
+				info: {
+					DEFAULT: 'hsl(var(--info))',
+					foreground: 'hsl(var(--info-foreground))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -108,7 +112,9 @@ export default {
 			backgroundImage: {
 				'gradient-money': 'var(--gradient-money)',
 				'gradient-success': 'var(--gradient-success)',
-				'gradient-card': 'var(--gradient-card)'
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-warning': 'var(--gradient-warning)'
 			},
 			boxShadow: {
 				'money': 'var(--shadow-money)',

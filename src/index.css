@@ -49,6 +49,12 @@ All colors MUST be HSL.
     --gradient-money: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
     --gradient-success: linear-gradient(135deg, hsl(142 76% 45%), hsl(142 76% 55%));
     --gradient-card: linear-gradient(180deg, hsl(var(--card)), hsl(142 30% 98%));
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-dark)));
+    --gradient-warning: linear-gradient(135deg, hsl(var(--warning)), hsl(45 84% 70%));
+
+    /* Info color for reports */
+    --info: 200 70% 50%;
+    --info-foreground: 0 0% 100%;
 
     /* Shadows */
     --shadow-money: 0 4px 20px hsl(var(--primary) / 0.15);
