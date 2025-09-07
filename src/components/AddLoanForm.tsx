@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save, User, Phone, IndianRupee, Calendar } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ArrowLeft, Save, User, Phone, IndianRupee, Calendar, Scissors, Calculator } from "lucide-react";
 
 interface AddLoanFormProps {
   onBack: () => void;
@@ -14,11 +15,24 @@ interface AddLoanFormProps {
 const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
   const [formData, setFormData] = useState({
     customerName: '',
-    phone: '',
-    amount: '',
-    repaymentPlan: 'daily',
-    duration: '30'
+    mobileNumber: '',
+    principalAmount: '',
+    disbursementType: 'full', // 'full' or 'cutting'
+    cuttingAmount: '',
+    repaymentType: 'daily',
+    installmentAmount: '',
+    duration: '',
+    durationUnit: 'days' // 'days', 'weeks', 'months'
   });
+
+  // Auto-calculated values
+  const disbursedAmount = formData.disbursementType === 'full' 
+    ? parseFloat(formData.principalAmount) || 0
+    : (parseFloat(formData.principalAmount) || 0) - (parseFloat(formData.cuttingAmount) || 0);
+
+  const totalCollection = (parseFloat(formData.installmentAmount) || 0) * (parseFloat(formData.duration) || 0);
+  
+  const profitInterest = totalCollection - disbursedAmount;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,14 +40,18 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
     const loan = {
       id: Date.now().toString(),
       customerName: formData.customerName,
-      phone: formData.phone,
-      amount: parseInt(formData.amount),
-      repaymentPlan: formData.repaymentPlan,
+      mobileNumber: formData.mobileNumber,
+      principalAmount: parseFloat(formData.principalAmount),
+      disbursementType: formData.disbursementType,
+      cuttingAmount: parseFloat(formData.cuttingAmount) || 0,
+      disbursedAmount,
+      repaymentType: formData.repaymentType,
+      installmentAmount: parseFloat(formData.installmentAmount),
       duration: parseInt(formData.duration),
-      dailyPayment: Math.ceil(parseInt(formData.amount) / parseInt(formData.duration)),
-      daysRemaining: parseInt(formData.duration),
+      durationUnit: formData.durationUnit,
+      totalCollection,
+      profitInterest,
       status: 'active' as const,
-      lastPayment: 'Not yet',
       date: new Date().toISOString().split('T')[0]
     };
     
@@ -72,49 +90,102 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
             />
           </div>
 
-          {/* Phone */}
+          {/* Mobile Number */}
           <div className="space-y-2">
-            <Label htmlFor="phone" className="flex items-center gap-2">
+            <Label htmlFor="mobileNumber" className="flex items-center gap-2">
               <Phone className="h-4 w-4" />
-              Phone Number / ఫోన్ నంబర్
+              Mobile Number / మొబైల్ నంబర్
             </Label>
             <Input
-              id="phone"
+              id="mobileNumber"
               type="tel"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              placeholder="Enter phone number"
+              value={formData.mobileNumber}
+              onChange={(e) => setFormData({ ...formData, mobileNumber: e.target.value })}
+              placeholder="Enter mobile number"
               required
               className="h-12 text-lg"
             />
           </div>
 
-          {/* Loan Amount */}
+          {/* Principal Amount */}
           <div className="space-y-2">
-            <Label htmlFor="amount" className="flex items-center gap-2">
+            <Label htmlFor="principalAmount" className="flex items-center gap-2">
               <IndianRupee className="h-4 w-4" />
-              Loan Amount / లోన్ మొత్తం
+              Principal Amount (Sanctioned) / ప్రిన్సిపల్ మొత్తం
             </Label>
             <Input
-              id="amount"
+              id="principalAmount"
               type="number"
-              value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-              placeholder="Enter loan amount"
+              value={formData.principalAmount}
+              onChange={(e) => setFormData({ ...formData, principalAmount: e.target.value })}
+              placeholder="Enter principal amount"
               required
               className="h-12 text-lg"
             />
           </div>
 
-          {/* Repayment Plan */}
+          {/* Disbursement Type */}
+          <div className="space-y-3">
+            <Label className="flex items-center gap-2">
+              <Scissors className="h-4 w-4" />
+              Disbursement Type / డిస్బర్స్మెంట్ రకం
+            </Label>
+            <RadioGroup
+              value={formData.disbursementType}
+              onValueChange={(value) => setFormData({ ...formData, disbursementType: value })}
+              className="flex gap-6"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="full" id="full" />
+                <Label htmlFor="full">Full (No Cutting) / పూర్తి</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="cutting" id="cutting" />
+                <Label htmlFor="cutting">With Cutting / కటింగ్ తో</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {/* Cutting Amount (conditional) */}
+          {formData.disbursementType === 'cutting' && (
+            <div className="space-y-2">
+              <Label htmlFor="cuttingAmount" className="flex items-center gap-2">
+                <Scissors className="h-4 w-4" />
+                Cutting Amount / కటింగ్ మొత్తం
+              </Label>
+              <Input
+                id="cuttingAmount"
+                type="number"
+                value={formData.cuttingAmount}
+                onChange={(e) => setFormData({ ...formData, cuttingAmount: e.target.value })}
+                placeholder="Enter cutting amount"
+                required
+                className="h-12 text-lg"
+              />
+            </div>
+          )}
+
+          {/* Disbursed Amount (auto-calculated) */}
+          {formData.principalAmount && (
+            <Card className="p-4 bg-gradient-success">
+              <div className="text-center">
+                <p className="text-sm text-success-foreground/80">Disbursed Amount / డిస్బర్స్డ్ మొత్తం</p>
+                <p className="text-xl font-bold text-success-foreground">
+                  ₹{disbursedAmount.toLocaleString()}
+                </p>
+              </div>
+            </Card>
+          )}
+
+          {/* Repayment Type */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Repayment Plan / తిరిగి చెల్లింపు ప్రణాళిక
+              Repayment Type / తిరిగి చెల్లింపు రకం
             </Label>
-            <Select value={formData.repaymentPlan} onValueChange={(value) => setFormData({ ...formData, repaymentPlan: value })}>
+            <Select value={formData.repaymentType} onValueChange={(value) => setFormData({ ...formData, repaymentType: value })}>
               <SelectTrigger className="h-12 text-lg">
-                <SelectValue placeholder="Select repayment plan" />
+                <SelectValue placeholder="Select repayment type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="daily">Daily / రోజువారీ</SelectItem>
@@ -124,30 +195,70 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
             </Select>
           </div>
 
-          {/* Duration */}
+          {/* Installment Amount */}
           <div className="space-y-2">
-            <Label htmlFor="duration" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Duration (Days) / వ్యవధి (రోజులు)
+            <Label htmlFor="installmentAmount" className="flex items-center gap-2">
+              <IndianRupee className="h-4 w-4" />
+              Installment Amount / కిస్తు మొత్తం
             </Label>
             <Input
-              id="duration"
+              id="installmentAmount"
               type="number"
-              value={formData.duration}
-              onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-              placeholder="Enter duration in days"
+              value={formData.installmentAmount}
+              onChange={(e) => setFormData({ ...formData, installmentAmount: e.target.value })}
+              placeholder="Enter installment amount"
               required
               className="h-12 text-lg"
             />
           </div>
 
-          {/* Calculated Daily Payment */}
-          {formData.amount && formData.duration && (
-            <Card className="p-4 bg-gradient-success">
+          {/* Duration */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Duration / వ్యవధి
+            </Label>
+            <div className="flex gap-3">
+              <Input
+                type="number"
+                value={formData.duration}
+                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                placeholder="Enter duration"
+                required
+                className="h-12 text-lg flex-1"
+              />
+              <Select value={formData.durationUnit} onValueChange={(value) => setFormData({ ...formData, durationUnit: value })}>
+                <SelectTrigger className="h-12 w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="days">Days</SelectItem>
+                  <SelectItem value="weeks">Weeks</SelectItem>
+                  <SelectItem value="months">Months</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Total Collection (auto-calculated) */}
+          {formData.installmentAmount && formData.duration && (
+            <Card className="p-4 bg-gradient-warning">
               <div className="text-center">
-                <p className="text-sm text-success-foreground/80">Daily Payment Amount</p>
-                <p className="text-xl font-bold text-success-foreground">
-                  ₹{Math.ceil(parseInt(formData.amount) / parseInt(formData.duration)).toLocaleString()}
+                <p className="text-sm text-warning-foreground/80">Total Collection / మొత్తం సేకరణ</p>
+                <p className="text-xl font-bold text-warning-foreground">
+                  ₹{totalCollection.toLocaleString()}
+                </p>
+              </div>
+            </Card>
+          )}
+
+          {/* Profit/Interest (auto-calculated) */}
+          {totalCollection > 0 && disbursedAmount > 0 && (
+            <Card className="p-4 bg-gradient-primary">
+              <div className="text-center">
+                <p className="text-sm text-primary-foreground/80">Profit / Interest / లాభం</p>
+                <p className="text-xl font-bold text-primary-foreground">
+                  ₹{profitInterest.toLocaleString()}
                 </p>
               </div>
             </Card>
