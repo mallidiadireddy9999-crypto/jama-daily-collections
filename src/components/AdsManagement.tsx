@@ -171,7 +171,12 @@ export const AdsManagement = ({ onBack }: AdsManagementProps) => {
           <Button variant="ghost" onClick={onBack} className="p-2">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-3xl font-bold">Ads Management</h1>
+          <div>
+            <h1 className="text-3xl font-bold">Ads Management</h1>
+            <p className="text-muted-foreground mt-2 max-w-4xl">
+              You are responsible for managing advertisements in the Jama app. You can create, edit, schedule, and delete ads targeted to specific users or villages. Monitor ad performance with analytics and generate reports. Ensure ads reach the right audience without disturbing existing collections or app operations.
+            </p>
+          </div>
         </div>
         <div className="flex gap-2">
           <Button onClick={() => setCurrentView('analytics')}>
