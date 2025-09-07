@@ -1,6 +1,6 @@
 import { User, FileText, HelpCircle, LogOut, Home, CreditCard, Users, Settings, Languages, BarChart3, Calendar, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -24,6 +24,21 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [language, setLanguage] = useState<'te' | 'en'>('te');
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // Get current user
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -84,10 +99,8 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   };
 
   const handleReports = () => {
-    toast({
-      title: language === 'te' ? "రిపోర్ట్‌లు" : "Reports",
-      description: language === 'te' ? "రిపోర్ట్‌ల పేజీ త్వరలో వస్తుంది" : "Reports page coming soon",
-    });
+    // This will be handled by the dashboard component's handleViewReports
+    window.dispatchEvent(new CustomEvent('sidebarNavigate', { detail: 'reports' }));
     onClose();
   };
 
@@ -179,6 +192,24 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   return (
     <Sidebar className="w-64 bg-background border-r border-border">
       <SidebarContent className="p-0">
+       {/* User Info Header */}
+       {user && (
+         <div className="p-4 border-b border-sidebar-border bg-sidebar-accent">
+           <div className="flex items-center gap-3">
+             <div className="w-10 h-10 bg-sidebar-primary rounded-full flex items-center justify-center">
+               <User className="h-5 w-5 text-sidebar-primary-foreground" />
+             </div>
+             <div className="flex-1 min-w-0">
+               <p className="text-sidebar-foreground font-medium truncate">
+                 {user.email || 'User'}
+               </p>
+               <p className="text-sidebar-muted-foreground text-xs">
+                 {language === 'te' ? 'లాగిన్ అయ్యారు' : 'Logged in'}
+               </p>
+             </div>
+           </div>
+         </div>
+       )}
        {/* Language Toggle */}
        <div className="p-4 border-b border-sidebar-border bg-sidebar-accent">
          <Button

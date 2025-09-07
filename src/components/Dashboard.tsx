@@ -48,7 +48,21 @@ const Dashboard = () => {
       setUser(session?.user || null);
     });
 
-    return () => subscription.unsubscribe();
+    // Listen for sidebar navigation events
+    const handleSidebarNavigate = (event: any) => {
+      const view = event.detail;
+      if (view === 'reports') {
+        setCurrentView('reports');
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('sidebarNavigate', handleSidebarNavigate);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('sidebarNavigate', handleSidebarNavigate);
+    };
   }, []);
 
   const handleSignOut = async () => {
