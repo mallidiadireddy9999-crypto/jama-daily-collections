@@ -25,7 +25,7 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
     {
       id: "1",
       customerId: "C001",
-      customerName: "రాజేష్ కుమార్",
+      customerName: "Rajesh Kumar",
       pendingAmount: 15000,
       totalLoan: 50000,
       lastPayment: "2024-01-10",
@@ -34,7 +34,7 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
     {
       id: "2",
       customerId: "C007",
-      customerName: "సుధా రాణి",
+      customerName: "Sudha Rani",
       pendingAmount: 8500,
       totalLoan: 25000,
       lastPayment: "2024-01-12",
@@ -43,7 +43,7 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
     {
       id: "3",
       customerId: "C015",
-      customerName: "వేంకట రావు",
+      customerName: "Venkat Rao",
       pendingAmount: 12200,
       totalLoan: 40000,
       lastPayment: "2024-01-08",
@@ -52,7 +52,7 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
     {
       id: "4",
       customerId: "C022",
-      customerName: "లక్ష్మీ దేవి",
+      customerName: "Lakshmi Devi",
       pendingAmount: 6800,
       totalLoan: 30000,
       lastPayment: "2024-01-11",
@@ -61,7 +61,7 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
     {
       id: "5",
       customerId: "C009",
-      customerName: "కృష్ణ మూర్తి",
+      customerName: "Krishna Murthy",
       pendingAmount: 5700,
       totalLoan: 20000,
       lastPayment: "2024-01-09",

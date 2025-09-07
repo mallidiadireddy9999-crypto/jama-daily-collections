@@ -27,7 +27,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
     {
       id: "L001",
       customerId: "C001",
-      customerName: "రాజేష్ కుమార్",
+      customerName: "Rajesh Kumar",
       loanAmount: 50000,
       paidAmount: 35000,
       pendingAmount: 15000,
@@ -38,7 +38,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
     {
       id: "L007",
       customerId: "C007",
-      customerName: "సుధా రాణి",
+      customerName: "Sudha Rani",
       loanAmount: 25000,
       paidAmount: 16500,
       pendingAmount: 8500,
@@ -49,7 +49,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
     {
       id: "L015",
       customerId: "C015",
-      customerName: "వేంకట రావు",
+      customerName: "Venkat Rao",
       loanAmount: 40000,
       paidAmount: 27800,
       pendingAmount: 12200,
@@ -60,7 +60,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
     {
       id: "L022",
       customerId: "C022",
-      customerName: "లక్ష్మీ దేవి",
+      customerName: "Lakshmi Devi",
       loanAmount: 30000,
       paidAmount: 23200,
       pendingAmount: 6800,
