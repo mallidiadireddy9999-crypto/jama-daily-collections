@@ -150,8 +150,8 @@ const Dashboard = () => {
 
     // Show success toast
     toast({
-      title: "లోన్ విజయవంతంగా జోడించబడింది! ✅",
-      description: `${loan.customerName} కోసం ₹${loan.amount.toLocaleString()} లోన్ సృష్టించబడింది`,
+      title: t("లోన్ విజయవంతంగా జోడించబడింది! ✅", "Loan added successfully! ✅"),
+      description: t(`${loan.customerName} కోసం ₹${loan.amount.toLocaleString()} లోన్ సృష్టించబడింది`, `₹${loan.amount.toLocaleString()} loan created for ${loan.customerName}`),
       duration: 3000,
     });
   };
@@ -179,8 +179,8 @@ const Dashboard = () => {
 
     // Show success toast
     toast({
-      title: "వసూలు విజయవంతంగా నమోదు చేయబడింది! ✅",
-      description: `${customerName} (ID: ${customerId}) నుండి ₹${amount.toLocaleString()} వసూలైంది`,
+      title: t("వసూలు విజయవంతంగా నమోదు చేయబడింది! ✅", "Collection recorded successfully! ✅"),
+      description: t(`${customerName} (ID: ${customerId}) నుండి ₹${amount.toLocaleString()} వసూలైంది`, `₹${amount.toLocaleString()} collected from ${customerName} (ID: ${customerId})`),
       duration: 3000,
     });
 

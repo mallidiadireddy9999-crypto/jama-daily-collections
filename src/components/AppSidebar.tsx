@@ -71,8 +71,8 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   const handlePurchaseHistory = () => {
     // Navigate to purchase history (to be implemented)
     toast({
-      title: "కొనుగోలు చరిత్ర",
-      description: "కొనుగోలు చరిత్ర త్వరలో వస్తుంది",
+      title: t("కొనుగోలు చరిత్ర", "Purchase History"),
+      description: t("కొనుగోలు చరిత్ర త్వరలో వస్తుంది", "Purchase history coming soon"),
     });
     onClose();
   };
@@ -80,8 +80,8 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   const handleHelp = () => {
     // Navigate to help page (to be implemented)
     toast({
-      title: language === 'te' ? "సహాయం" : "Help",
-      description: language === 'te' ? "సహాయం పేజీ త్వరలో వస్తుంది" : "Help page coming soon",
+      title: t("సహాయం", "Help"),
+      description: t("సహాయం పేజీ త్వరలో వస్తుంది", "Help page coming soon"),
     });
     onClose();
   };
@@ -93,8 +93,8 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
 
   const handleCustomers = () => {
     toast({
-      title: language === 'te' ? "కస్టమర్లు" : "Customers",
-      description: language === 'te' ? "కస్టమర్ల పేజీ త్వరలో వస్తుంది" : "Customers page coming soon",
+      title: t("కస్టమర్లు", "Customers"),
+      description: t("కస్టమర్ల పేజీ త్వరలో వస్తుంది", "Customers page coming soon"),
     });
     onClose();
   };
@@ -109,8 +109,8 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
 
   const handleSettings = () => {
     toast({
-      title: language === 'te' ? "సెట్టింగ్‌లు" : "Settings",
-      description: language === 'te' ? "సెట్టింగ్‌ల పేజీ త్వరలో వస్తుంది" : "Settings page coming soon",
+      title: t("సెట్టింగ్‌లు", "Settings"),
+      description: t("సెట్టింగ్‌ల పేజీ త్వరలో వస్తుంది", "Settings page coming soon"),
     });
     onClose();
   };
