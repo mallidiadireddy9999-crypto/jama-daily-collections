@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,6 +58,9 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           <DialogTitle className="text-xl font-bold text-center">
             {t("కొత్త లోన్ జోడించండి", "Add New Loan")}
           </DialogTitle>
+          <DialogDescription className="text-center text-muted-foreground">
+            {t("కొత్త కస్టమర్ కోసం లోన్ వివరాలను నమోదు చేయండి", "Enter loan details for a new customer")}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
