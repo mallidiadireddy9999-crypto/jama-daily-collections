@@ -29,7 +29,11 @@ import { AppSidebar } from "./AppSidebar";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-const Dashboard = () => {
+interface DashboardProps {
+  onNavigate: (view: string) => void;
+}
+
+const Dashboard = ({ onNavigate }: DashboardProps) => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'payment' | 'collections' | 'pending' | 'activeLoans' | 'newLoans' | 'reports'>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [showAddLoanModal, setShowAddLoanModal] = useState(false);
@@ -269,8 +273,8 @@ const Dashboard = () => {
                   <h2 id="sidebar-title">Navigation Menu</h2>
                   <p id="sidebar-description">Main navigation sidebar for the application</p>
                 </div>
-                <AppSidebar onClose={() => {
-                  console.log("Closing sidebar");
+                <AppSidebar onNavigate={(view) => {
+                  onNavigate(view);
                   setSidebarOpen(false);
                 }} />
               </SheetContent>

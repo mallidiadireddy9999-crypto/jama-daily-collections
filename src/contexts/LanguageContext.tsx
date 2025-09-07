@@ -4,6 +4,7 @@ type Language = 'te' | 'en';
 
 interface LanguageContextType {
   language: Language;
+  setLanguage: (language: Language) => void;
   toggleLanguage: () => void;
   t: (teText: string, enText: string) => string;
 }
@@ -34,7 +35,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   };
 
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, toggleLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
