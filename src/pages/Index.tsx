@@ -28,13 +28,9 @@ const Index = () => {
     if (!loading && !user) {
       console.log('Setting currentView to login-prompt');
       setCurrentView("login-prompt");
-    } else if (!loading && user) {
-      console.log('User exists, setting currentView to dashboard');
-      if (currentView === "login-prompt") {
-        setCurrentView("dashboard");
-      }
     }
-  }, [user, loading, userRole]);
+    // Don't reset currentView when user exists - let navigation handle it
+  }, [user, loading]);
 
   if (loading) {
     return (
