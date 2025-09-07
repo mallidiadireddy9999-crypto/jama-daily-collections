@@ -16,6 +16,7 @@ interface ReportsPageProps {
 }
 
 export default function ReportsPage({ onBack }: ReportsPageProps) {
+  const { t } = useLanguage();
   const [reportType, setReportType] = useState<string>("daily");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");

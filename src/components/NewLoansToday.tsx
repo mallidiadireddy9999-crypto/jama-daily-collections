@@ -1,6 +1,7 @@
 import { ArrowLeft, PlusCircle, IndianRupee, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NewLoan {
   id: string;
@@ -17,6 +18,8 @@ interface NewLoansTodayProps {
 }
 
 const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
+  const { t } = useLanguage();
+  
   // Mock data - this would come from your database
   const newLoansToday: NewLoan[] = [
     {
@@ -59,9 +62,9 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-foreground">నేడు కొత్త లోన్‌లు</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t("నేడు కొత్త లోన్‌లు", "New Loans Today")}</h1>
           <p className="text-sm text-muted-foreground">
-            ఈ రోజు {newLoansToday.length} కొత్త లోన్‌లు జోడించబడ్డాయి
+            {t(`ఈ రోజు ${newLoansToday.length} కొత్త లోన్‌లు జోడించబడ్డాయి`, `${newLoansToday.length} new loans added today`)}
           </p>
         </div>
       </div>
@@ -72,7 +75,7 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <IndianRupee className="h-5 w-5 text-primary" />
-              <span className="text-sm text-muted-foreground">మొత్తం రాశి</span>
+              <span className="text-sm text-muted-foreground">{t("మొత్తం రాశి", "Total Amount")}</span>
             </div>
             <p className="text-xl font-bold text-primary">
               ₹{totalNewLoansAmount.toLocaleString()}
@@ -84,7 +87,7 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <PlusCircle className="h-5 w-5 text-success" />
-              <span className="text-sm text-muted-foreground">రోజువారీ వసూలు</span>
+              <span className="text-sm text-muted-foreground">{t("రోజువారీ వసూలు", "Daily Collections")}</span>
             </div>
             <p className="text-xl font-bold text-success">
               ₹{totalDailyCollection.toLocaleString()}
@@ -95,14 +98,14 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
 
       {/* New Loans List */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground">కొత్త లోన్‌ల వివరాలు</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t("కొత్త లోన్‌ల వివరాలు", "New Loan Details")}</h2>
         
         {newLoansToday.length === 0 ? (
           <Card className="p-6 text-center">
             <PlusCircle className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">ఈ రోజు కొత్త లోన్‌లు లేవు</p>
+            <p className="text-muted-foreground">{t("ఈ రోజు కొత్త లోన్‌లు లేవు", "No new loans today")}</p>
             <Button variant="outline" className="mt-3">
-              కొత్త లోన్ జోడించండి
+              {t("కొత్త లోన్ జోడించండి", "Add New Loan")}
             </Button>
           </Card>
         ) : (
@@ -119,7 +122,7 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
                         </h3>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        కస్టమర్ ID: {loan.customerId} • లోన్ ID: {loan.id}
+                        {t("కస్టమర్", "Customer")} ID: {loan.customerId} • {t("లోన్", "Loan")} ID: {loan.id}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         📞 {loan.phoneNumber}
@@ -127,7 +130,7 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
                     </div>
                     <div className="text-right">
                       <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                        కొత్తది
+                        {t("కొత్తది", "New")}
                       </span>
                       <p className="text-xs text-muted-foreground mt-1">
                         {loan.createdTime}
@@ -137,7 +140,7 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">లోన్ మొత్తం</p>
+                      <p className="text-xs text-muted-foreground">{t("లోన్ మొత్తం", "Loan Amount")}</p>
                       <div className="flex items-center space-x-1">
                         <IndianRupee className="h-4 w-4 text-primary" />
                         <p className="text-lg font-bold text-primary">
@@ -147,7 +150,7 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
                     </div>
                     
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">రోజువారీ చెల్లింపు</p>
+                      <p className="text-xs text-muted-foreground">{t("రోజువారీ చెల్లింపు", "Daily Payment")}</p>
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4 text-success" />
                         <p className="text-lg font-bold text-success">
@@ -160,13 +163,13 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
                   <div className="bg-muted/50 rounded-lg p-3">
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
-                        <span className="text-muted-foreground">వ్యవధి:</span>
+                        <span className="text-muted-foreground">{t("వ్యవధి:", "Duration:")}</span>
                         <span className="ml-2 font-medium text-foreground">
-                          {Math.ceil(loan.loanAmount / loan.dailyAmount)} రోజులు
+                          {Math.ceil(loan.loanAmount / loan.dailyAmount)} {t("రోజులు", "days")}
                         </span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">రేట్:</span>
+                        <span className="text-muted-foreground">{t("రేట్:", "Rate:")}</span>
                         <span className="ml-2 font-medium text-foreground">
                           {Math.round(((loan.dailyAmount * Math.ceil(loan.loanAmount / loan.dailyAmount)) / loan.loanAmount - 1) * 100)}%
                         </span>
@@ -185,17 +188,17 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
         <Card className="p-4 bg-gradient-money text-primary-foreground">
           <div className="text-center space-y-2">
             <p className="text-sm opacity-90">
-              ఈ రోజు మొత్తం కొత్త వ్యాపారం
+              {t("ఈ రోజు మొత్తం కొత్త వ్యాపారం", "Today's Total New Business")}
             </p>
             <div className="flex justify-around">
               <div>
-                <p className="text-xs opacity-75">{newLoansToday.length} లోన్‌లు</p>
+                <p className="text-xs opacity-75">{newLoansToday.length} {t("లోన్‌లు", "loans")}</p>
                 <p className="text-xl font-bold">
                   ₹{totalNewLoansAmount.toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className="text-xs opacity-75">రోజువారీ వసూలు</p>
+                <p className="text-xs opacity-75">{t("రోజువారీ వసూలు", "Daily Collections")}</p>
                 <p className="text-xl font-bold">
                   ₹{totalDailyCollection.toLocaleString()}
                 </p>

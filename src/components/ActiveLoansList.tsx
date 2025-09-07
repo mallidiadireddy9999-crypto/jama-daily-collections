@@ -1,6 +1,7 @@
 import { ArrowLeft, Users, IndianRupee, Calendar, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ActiveLoan {
   id: string;
@@ -19,6 +20,8 @@ interface ActiveLoansListProps {
 }
 
 const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
+  const { t } = useLanguage();
+  
   // Mock data - this would come from your database
   const activeLoans: ActiveLoan[] = [
     {
@@ -82,10 +85,10 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'active': return "క్రియాశీలం";
-      case 'overdue': return "మించిపోయింది";
-      case 'completed': return "పూర్తైంది";
-      default: return "తెలియదు";
+      case 'active': return t("క్రియాశీలం", "Active");
+      case 'overdue': return t("మించిపోయింది", "Overdue");
+      case 'completed': return t("పూర్తైంది", "Completed");
+      default: return t("తెలియదు", "Unknown");
     }
   };
 
@@ -101,9 +104,9 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-foreground">క్రియాశీల లోన్‌లు</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t("క్రియాశీల లోన్‌లు", "Active Loans")}</h1>
           <p className="text-sm text-muted-foreground">
-            మొత్తం {activeLoans.length} లోన్‌లు క్రియాశీలంగా ఉన్నాయి
+            {t(`మొత్తం ${activeLoans.length} లోన్‌లు క్రియాశీలంగా ఉన్నాయి`, `Total ${activeLoans.length} loans are active`)}
           </p>
         </div>
       </div>
@@ -112,7 +115,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
       <div className="grid grid-cols-3 gap-3">
         <Card className="p-3 text-center">
           <IndianRupee className="h-5 w-5 text-primary mx-auto mb-1" />
-          <p className="text-xs text-muted-foreground">మొత్తం రాశి</p>
+          <p className="text-xs text-muted-foreground">{t("మొత్తం రాశి", "Total Amount")}</p>
           <p className="text-sm font-bold text-foreground">
             ₹{totalActiveAmount.toLocaleString()}
           </p>
@@ -120,7 +123,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
         
         <Card className="p-3 text-center bg-success/10">
           <TrendingUp className="h-5 w-5 text-success mx-auto mb-1" />
-          <p className="text-xs text-muted-foreground">వసూలైనది</p>
+          <p className="text-xs text-muted-foreground">{t("వసూలైనది", "Collected")}</p>
           <p className="text-sm font-bold text-success">
             ₹{totalCollected.toLocaleString()}
           </p>
@@ -128,7 +131,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
         
         <Card className="p-3 text-center bg-warning/10">
           <Users className="h-5 w-5 text-warning mx-auto mb-1" />
-          <p className="text-xs text-muted-foreground">బాకీ</p>
+          <p className="text-xs text-muted-foreground">{t("బాకీ", "Pending")}</p>
           <p className="text-sm font-bold text-warning">
             ₹{totalPending.toLocaleString()}
           </p>
@@ -137,12 +140,12 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
 
       {/* Active Loans List */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground">లోన్ వివరాలు</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t("లోన్ వివరాలు", "Loan Details")}</h2>
         
         {activeLoans.length === 0 ? (
           <Card className="p-6 text-center">
             <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">క్రియాశీల లోన్‌లు లేవు</p>
+            <p className="text-muted-foreground">{t("క్రియాశీల లోన్‌లు లేవు", "No active loans")}</p>
           </Card>
         ) : (
           <div className="space-y-3">
@@ -158,7 +161,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
                           {loan.customerName}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          ID: {loan.customerId} • లోన్ ID: {loan.id}
+                          ID: {loan.customerId} • {t("లోన్", "Loan")} ID: {loan.id}
                         </p>
                       </div>
                       <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(loan.status)}`}>
@@ -168,25 +171,25 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
 
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <p className="text-muted-foreground">మొత్తం రాశి</p>
+                        <p className="text-muted-foreground">{t("మొత్తం రాశి", "Total Amount")}</p>
                         <p className="font-bold text-foreground">
                           ₹{loan.loanAmount.toLocaleString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">రోజువారీ</p>
+                        <p className="text-muted-foreground">{t("రోజువారీ", "Daily")}</p>
                         <p className="font-bold text-primary">
                           ₹{loan.dailyAmount.toLocaleString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">వసూలైనది</p>
+                        <p className="text-muted-foreground">{t("వసూలైనది", "Collected")}</p>
                         <p className="font-bold text-success">
                           ₹{loan.paidAmount.toLocaleString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">బాకీ</p>
+                        <p className="text-muted-foreground">{t("బాకీ", "Pending")}</p>
                         <p className="font-bold text-warning">
                           ₹{loan.pendingAmount.toLocaleString()}
                         </p>
@@ -196,7 +199,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
                     {/* Progress Bar */}
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">పురోగతి</span>
+                        <span className="text-muted-foreground">{t("పురోగతి", "Progress")}</span>
                         <span className="font-medium text-foreground">{progress}%</span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2">
@@ -210,7 +213,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
                     <div className="flex items-center space-x-4 text-sm">
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-muted-foreground">ప్రారంభ తేదీ:</span>
+                        <span className="text-muted-foreground">{t("ప్రారంభ తేదీ:", "Start Date:")}</span>
                         <span className="text-foreground">{loan.startDate}</span>
                       </div>
                     </div>
@@ -227,17 +230,17 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
         <Card className="p-4 bg-primary/5 border-primary/20">
           <div className="text-center">
             <p className="text-sm text-muted-foreground mb-1">
-              {activeLoans.length} క్రియాశీల లోన్‌లు
+              {activeLoans.length} {t("క్రియాశీల లోన్‌లు", "active loans")}
             </p>
             <div className="flex justify-around">
               <div>
-                <p className="text-xs text-muted-foreground">వసూలు రేట్</p>
+                <p className="text-xs text-muted-foreground">{t("వసూలు రేట్", "Collection Rate")}</p>
                 <p className="text-lg font-bold text-success">
                   {Math.round((totalCollected / totalActiveAmount) * 100)}%
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">బాకీ మొత్తం</p>
+                <p className="text-xs text-muted-foreground">{t("బాకీ మొత్తం", "Pending Amount")}</p>
                 <p className="text-lg font-bold text-warning">
                   ₹{totalPending.toLocaleString()}
                 </p>

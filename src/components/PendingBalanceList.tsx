@@ -1,6 +1,7 @@
 import { ArrowLeft, Clock, IndianRupee, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PendingBalance {
   id: string;
@@ -17,6 +18,8 @@ interface PendingBalanceListProps {
 }
 
 const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
+  const { t } = useLanguage();
+  
   // Mock data - this would come from your database
   const pendingBalances: PendingBalance[] = [
     {
@@ -82,9 +85,9 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-foreground">బాకీ మొత్తాలు</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t("బాకీ మొత్తాలు", "Pending Balances")}</h1>
           <p className="text-sm text-muted-foreground">
-            మొత్తం బాకీ: ₹{totalPending.toLocaleString()}
+            {t("మొత్తం బాకీ:", "Total Pending:")} ₹{totalPending.toLocaleString()}
           </p>
         </div>
       </div>
@@ -94,9 +97,9 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
         <div className="flex items-center space-x-3">
           <Clock className="h-6 w-6 text-warning" />
           <div>
-            <p className="font-semibold text-foreground">చెల్లింపు బకాయిలు</p>
+            <p className="font-semibold text-foreground">{t("చెల్లింపు బకాయిలు", "Payment Dues")}</p>
             <p className="text-sm text-muted-foreground">
-              {pendingBalances.length} కస్టమర్లకు బాకీలు ఉన్నాయి
+              {pendingBalances.length} {t("కస్టమర్లకు బాకీలు ఉన్నాయి", "customers have pending dues")}
             </p>
           </div>
         </div>
@@ -104,12 +107,12 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
 
       {/* Pending Balance List */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground">బాకీ వివరాలు</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t("బాకీ వివరాలు", "Pending Details")}</h2>
         
         {pendingBalances.length === 0 ? (
           <Card className="p-6 text-center">
             <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">ఈ రోజు బాకీలు లేవు</p>
+            <p className="text-muted-foreground">{t("ఈ రోజు బాకీలు లేవు", "No pending dues today")}</p>
           </Card>
         ) : (
           <div className="space-y-3">
@@ -130,13 +133,13 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex items-center space-x-1">
                         <IndianRupee className="h-3 w-3 text-warning" />
-                        <span className="text-muted-foreground">బాకీ:</span>
+                        <span className="text-muted-foreground">{t("బాకీ:", "Pending:")}</span>
                         <span className="font-bold text-warning">
                           ₹{balance.pendingAmount.toLocaleString()}
                         </span>
                       </div>
                       <div className="flex items-center space-x-1">
-                        <span className="text-muted-foreground">మొత్తం:</span>
+                        <span className="text-muted-foreground">{t("మొత్తం:", "Total:")}</span>
                         <span className="text-foreground">
                           ₹{balance.totalLoan.toLocaleString()}
                         </span>
@@ -146,11 +149,11 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-muted-foreground">చివరి చెల్లింపు:</span>
+                        <span className="text-muted-foreground">{t("చివరి చెల్లింపు:", "Last Payment:")}</span>
                         <span className="text-foreground">{balance.lastPayment}</span>
                       </div>
                       <span className={`font-medium ${getPriorityColor(balance.daysOverdue)}`}>
-                        {balance.daysOverdue} రోజులు మించిపోయింది
+                        {balance.daysOverdue} {t("రోజులు మించిపోయింది", "days overdue")}
                       </span>
                     </div>
                   </div>
@@ -166,7 +169,7 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
         <Card className="p-4 bg-primary/5 border-primary/20">
           <div className="text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              మొత్తం బాకీ మొత్తం
+              {t("మొత్తం బాకీ మొత్తం", "Total Pending Amount")}
             </p>
             <p className="text-2xl font-bold text-warning">
               ₹{totalPending.toLocaleString()}
