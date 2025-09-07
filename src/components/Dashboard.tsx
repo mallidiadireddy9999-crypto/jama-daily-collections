@@ -11,6 +11,7 @@ import {
   Users,
   IndianRupee,
   Clock,
+  Edit,
 } from "lucide-react";
 import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
@@ -134,6 +135,10 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
     onNavigate('reports');
   };
 
+  const handleViewRecentCollections = () => {
+    onNavigate('recent-collections');
+  };
+
   if (currentView === 'payment') {
     return (
       <PaymentKeypad
@@ -253,7 +258,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={handleCollectPayment}>
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-success/10 rounded-full flex items-center justify-center">
@@ -274,6 +279,18 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
               <div>
                 <h3 className="font-semibold text-foreground">{t("కొత్త లోన్", "New Loan")}</h3>
                 <p className="text-sm text-muted-foreground">{t("కొత్త లోన్ జోడించండి", "Add a new loan")}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={handleViewRecentCollections}>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-warning/10 rounded-full flex items-center justify-center">
+                <Edit className="h-6 w-6 text-warning" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">{t("ఇటీవలి వసూలు", "Recent Collections")}</h3>
+                <p className="text-sm text-muted-foreground">{t("చెల్లింపులు సవరించండి", "Edit payments")}</p>
               </div>
             </div>
           </Card>

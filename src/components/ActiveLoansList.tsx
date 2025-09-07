@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Users, IndianRupee, Calendar, TrendingUp } from "lucide-react";
+import { ArrowLeft, Users, IndianRupee, Calendar, TrendingUp, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import EditLoanModal from "./EditLoanModal";
 
 interface ActiveLoan {
   id: string;
@@ -29,6 +30,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
   const { toast } = useToast();
   const [activeLoans, setActiveLoans] = useState<ActiveLoan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingLoan, setEditingLoan] = useState<any>(null);
 
   // Fetch active loans from database
   const fetchActiveLoans = async () => {
@@ -187,9 +189,18 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
                           ID: {loan.customerId} • {t("లోన్", "Loan")} ID: {loan.id.slice(0, 8)}...
                         </p>
                       </div>
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(loan.status)}`}>
-                        {getStatusText(loan.status)}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(loan.status)}`}>
+                          {getStatusText(loan.status)}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingLoan(loan)}
+                        >
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 text-sm">
@@ -272,6 +283,16 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
           </div>
         </Card>
       </div>
+
+      <EditLoanModal
+        isOpen={!!editingLoan}
+        onClose={() => setEditingLoan(null)}
+        loan={editingLoan}
+        onLoanUpdated={() => {
+          fetchActiveLoans();
+          setEditingLoan(null);
+        }}
+      />
     </div>
   );
 };
