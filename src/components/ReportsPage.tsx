@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Download, Calendar, TrendingUp, Users, IndianRupee } from "lucide-react";
+import { ArrowLeft, Download, Calendar, TrendingUp, Users, IndianRupee, FileText, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
@@ -17,110 +18,56 @@ interface ReportsPageProps {
 
 export default function ReportsPage({ onBack }: ReportsPageProps) {
   const { t } = useLanguage();
-  const [reportType, setReportType] = useState<string>("daily");
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const [reportData, setReportData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<string>("daily-collections");
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [dailyCollections, setDailyCollections] = useState<any[]>([]);
+  const [allLoans, setAllLoans] = useState<any[]>([]);
+  const [dailyTotal, setDailyTotal] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Set default dates
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
-    setEndDate(todayStr);
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    setSelectedDate(today);
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === "daily-collections" && selectedDate) {
+      fetchDailyCollections();
+    } else if (activeTab === "loan-database") {
+      fetchAllLoans();
+    }
+  }, [activeTab, selectedDate]);
+
+  const fetchDailyCollections = async () => {
+    if (!selectedDate) return;
     
-    if (reportType === 'daily') {
-      setStartDate(todayStr);
-    } else if (reportType === 'monthly') {
-      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-      setStartDate(firstDay.toISOString().split('T')[0]);
-    } else if (reportType === 'annual') {
-      const firstDay = new Date(today.getFullYear(), 0, 1);
-      setStartDate(firstDay.toISOString().split('T')[0]);
-    }
-  }, [reportType]);
-
-  const generateReport = async () => {
-    if (!startDate || !endDate) {
-      toast({
-        title: t("లోపం", "Error"),
-        description: t("దయచేసి తేదీలను ఎంచుకోండి", "Please select dates"),
-        variant: "destructive",
-      });
-      return;
-    }
-
     setLoading(true);
     try {
       const { data: user } = await supabase.auth.getUser();
-      if (!user.user) {
-        toast({
-          title: t("లోపం", "Error"),
-          description: t("దయచేసి లాగిన్ చేయండి", "Please login"),
-          variant: "destructive",
-        });
-        return;
-      }
+      if (!user.user) return;
 
-      // Fetch loans data
-      const { data: loans, error: loansError } = await supabase
-        .from('loans')
-        .select('*')
-        .eq('user_id', user.user.id)
-        .gte('start_date', startDate)
-        .lte('start_date', endDate);
-
-      if (loansError) throw loansError;
-
-      // Fetch collections data
-      const { data: collections, error: collectionsError } = await supabase
+      const { data: collections, error } = await supabase
         .from('collections')
-        .select('*, loans(*)')
+        .select(`
+          *,
+          loans!inner(customer_name, customer_mobile)
+        `)
         .eq('user_id', user.user.id)
-        .gte('collection_date', startDate)
-        .lte('collection_date', endDate);
+        .eq('collection_date', selectedDate)
+        .order('created_at', { ascending: false });
 
-      if (collectionsError) throw collectionsError;
+      if (error) throw error;
 
-      // Calculate summary
-      const totalLoans = loans?.reduce((sum, loan) => sum + Number(loan.amount), 0) || 0;
-      const totalCollections = collections?.reduce((sum, collection) => sum + Number(collection.amount), 0) || 0;
-      const pendingAmount = totalLoans - totalCollections;
-
-      const summary = {
-        totalLoans,
-        totalCollections,
-        pendingAmount,
-        loansCount: loans?.length || 0,
-        collectionsCount: collections?.length || 0,
-        loans: loans || [],
-        collections: collections || [],
-      };
-
-      setReportData(summary);
-
-      // Save report to database
-      await supabase.from('reports').insert({
-        user_id: user.user.id,
-        report_type: reportType,
-        start_date: startDate,
-        end_date: endDate,
-        total_collections: totalCollections,
-        total_loans: totalLoans,
-        pending_amount: pendingAmount,
-        report_data: summary,
-      });
-
-      toast({
-        title: t("రిపోర్ట్ విజయవంతంగా రూపొందించబడింది", "Report generated successfully"),
-        description: t("రిపోర్ట్ డేటా లోడ్ చేయబడింది", "Report data loaded"),
-      });
+      setDailyCollections(collections || []);
+      const total = collections?.reduce((sum, collection) => sum + Number(collection.amount), 0) || 0;
+      setDailyTotal(total);
 
     } catch (error: any) {
       toast({
         title: t("లోపం", "Error"),
-        description: error.message || t("రిపోర్ట్ రూపొందించడంలో లోపం", "Error generating report"),
+        description: error.message,
         variant: "destructive",
       });
     } finally {
@@ -128,82 +75,150 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
     }
   };
 
-  const downloadPDF = () => {
-    console.log("PDF download initiated, reportData:", reportData);
-    
-    if (!reportData) {
+  const fetchAllLoans = async () => {
+    setLoading(true);
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) return;
+
+      const { data: loans, error } = await supabase
+        .from('loans')
+        .select('*')
+        .eq('user_id', user.user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setAllLoans(loans || []);
+
+    } catch (error: any) {
       toast({
         title: t("లోపం", "Error"),
-        description: t("ముందుగా రిపోర్ట్ రూపొందించండి", "Please generate report first"),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const downloadDailyCollectionsPDF = () => {
+    if (!dailyCollections.length) {
+      toast({
+        title: t("లోపం", "Error"),
+        description: t("డేటా లేదు", "No data available"),
         variant: "destructive",
       });
       return;
     }
 
     try {
-      console.log("Creating PDF document...");
       const doc = new jsPDF();
       
       // Add title
-      console.log("Adding title to PDF...");
       doc.setFontSize(20);
-      doc.text('JAMA Report', 105, 20, { align: 'center' });
+      doc.text('Daily Collections Report', 105, 20, { align: 'center' });
       
-      // Add report details  
-      console.log("Adding report details...");
+      // Add date and summary
       doc.setFontSize(12);
-      doc.text(`Report Type: ${reportType}`, 20, 40);
-      doc.text(`Date: ${startDate} to ${endDate}`, 20, 50);
+      doc.text(`Date: ${selectedDate}`, 20, 40);
+      doc.text(`Total Collections: Rs.${dailyTotal.toLocaleString()}`, 20, 50);
+      doc.text(`Number of Collections: ${dailyCollections.length}`, 20, 60);
       
-      // Add summary
-      console.log("Adding summary...");
-      doc.setFontSize(14);
-      doc.text('Summary:', 20, 70);
-      doc.setFontSize(12);
-      doc.text(`Total Loans: Rs.${reportData.totalLoans.toLocaleString()}`, 20, 85);
-      doc.text(`Total Collections: Rs.${reportData.totalCollections.toLocaleString()}`, 20, 95);
-      doc.text(`Pending Amount: Rs.${reportData.pendingAmount.toLocaleString()}`, 20, 105);
-      doc.text(`Number of Loans: ${reportData.loansCount}`, 20, 115);
-      doc.text(`Number of Collections: ${reportData.collectionsCount}`, 20, 125);
+      // Add collections table
+      const collectionsData = dailyCollections.map((collection: any) => [
+        collection.loans?.customer_name || 'N/A',
+        collection.loans?.customer_mobile || 'N/A',
+        `Rs.${Number(collection.amount).toLocaleString()}`,
+        collection.notes || '-'
+      ]);
 
-      // Add loans table if data exists
-      if (reportData.loans && reportData.loans.length > 0) {
-        console.log("Adding loans table...", reportData.loans.length, "loans");
-        const loansData = reportData.loans.map((loan: any) => [
-          loan.customer_name || 'N/A',
-          loan.customer_mobile || 'N/A',
-          `Rs.${Number(loan.amount).toLocaleString()}`,
-          loan.status || 'active',
-          loan.start_date || 'N/A'
-        ]);
+      autoTable(doc, {
+        startY: 80,
+        head: [['Customer Name', 'Mobile', 'Amount', 'Notes']],
+        body: collectionsData,
+        theme: 'grid',
+      });
 
-        autoTable(doc, {
-          startY: 140,
-          head: [['Customer Name', 'Mobile', 'Amount', 'Status', 'Date']],
-          body: loansData,
-          theme: 'grid',
-        });
-        console.log("Loans table added successfully");
-      } else {
-        console.log("No loans data to add to table");
-      }
-
-      // Save the PDF
-      console.log("Saving PDF...");
-      const filename = `jama-report-${reportType}-${startDate}-${endDate}.pdf`;
+      const filename = `daily-collections-${selectedDate}.pdf`;
       doc.save(filename);
-      console.log("PDF saved successfully as:", filename);
       
       toast({
-        title: "PDF Download Successful",
-        description: `Report PDF file ${filename} has been downloaded`,
+        title: "PDF Downloaded",
+        description: `Report saved as ${filename}`,
       });
       
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast({
         title: "PDF Generation Error",
-        description: error instanceof Error ? error.message : "Failed to generate PDF",
+        description: "Failed to generate PDF",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const downloadLoanDatabasePDF = () => {
+    if (!allLoans.length) {
+      toast({
+        title: t("లోపం", "Error"),
+        description: t("డేటా లేదు", "No data available"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const doc = new jsPDF();
+      
+      // Add title
+      doc.setFontSize(20);
+      doc.text('Complete Loan Database', 105, 20, { align: 'center' });
+      
+      // Calculate totals
+      const totalAmount = allLoans.reduce((sum, loan) => sum + Number(loan.amount), 0);
+      const activeLoans = allLoans.filter(loan => loan.status === 'active').length;
+      
+      // Add summary
+      doc.setFontSize(12);
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 40);
+      doc.text(`Total Loans: ${allLoans.length}`, 20, 50);
+      doc.text(`Active Loans: ${activeLoans}`, 20, 60);
+      doc.text(`Total Amount: Rs.${totalAmount.toLocaleString()}`, 20, 70);
+      
+      // Add loans table
+      const loansData = allLoans.map((loan: any) => [
+        loan.customer_name || 'N/A',
+        loan.customer_mobile || 'N/A',
+        `Rs.${Number(loan.amount).toLocaleString()}`,
+        `${loan.interest_rate || 0}%`,
+        `${loan.duration_months || 0} months`,
+        loan.status || 'active',
+        loan.start_date || 'N/A'
+      ]);
+
+      autoTable(doc, {
+        startY: 90,
+        head: [['Customer', 'Mobile', 'Amount', 'Rate', 'Duration', 'Status', 'Start Date']],
+        body: loansData,
+        theme: 'grid',
+        styles: { fontSize: 8 },
+        headStyles: { fontSize: 9 }
+      });
+
+      const filename = `loan-database-${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(filename);
+      
+      toast({
+        title: "PDF Downloaded",
+        description: `Database saved as ${filename}`,
+      });
+      
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "PDF Generation Error",
+        description: "Failed to generate PDF",
         variant: "destructive",
       });
     }
@@ -225,123 +240,225 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
         <h1 className="text-2xl font-bold text-foreground">{t("రిపోర్ట్‌లు", "Reports")}</h1>
       </div>
 
-      {/* Report Configuration */}
+      {/* Reports Tabs */}
       <Card className="p-6 shadow-card bg-card">
-        <h3 className="text-lg font-semibold text-foreground mb-4">{t("రిపోర్ట్ కాన్ఫిగరేషన్", "Report Configuration")}</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div>
-            <Label htmlFor="reportType" className="text-foreground">{t("రిపోర్ట్ రకం", "Report Type")}</Label>
-            <Select value={reportType} onValueChange={setReportType}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">{t("రోజువారీ", "Daily")}</SelectItem>
-                <SelectItem value="monthly">{t("నెలవారీ", "Monthly")}</SelectItem>
-                <SelectItem value="annual">{t("వార్షిక", "Annual")}</SelectItem>
-                <SelectItem value="custom">{t("కస్టమ్", "Custom")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="daily-collections" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              {t("రోజువారీ వసూలు", "Daily Collections")}
+            </TabsTrigger>
+            <TabsTrigger value="loan-database" className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              {t("లోన్ డేటాబేస్", "Loan Database")}
+            </TabsTrigger>
+          </TabsList>
 
-          <div>
-            <Label htmlFor="startDate" className="text-foreground">{t("ప్రారంభ తేదీ", "Start Date")}</Label>
-            <Input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-          </div>
+          {/* Daily Collections Tab */}
+          <TabsContent value="daily-collections" className="space-y-6 mt-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div>
+                  <Label htmlFor="selectedDate" className="text-foreground">{t("తేదీ ఎంచుకోండి", "Select Date")}</Label>
+                  <Input
+                    type="date"
+                    id="selectedDate"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <Button 
+                  onClick={fetchDailyCollections} 
+                  disabled={loading || !selectedDate}
+                  className="mt-6"
+                >
+                  {loading ? t("లోడ్ అవుతోంది...", "Loading...") : t("రిపోర్ట్ చూడండి", "View Report")}
+                </Button>
+              </div>
+              {dailyCollections.length > 0 && (
+                <Button 
+                  variant="outline" 
+                  onClick={downloadDailyCollectionsPDF}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  {t("PDF డౌన్‌లోడ్", "Download PDF")}
+                </Button>
+              )}
+            </div>
 
-          <div>
-            <Label htmlFor="endDate" className="text-foreground">{t("ముగింపు తేదీ", "End Date")}</Label>
-            <Input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
-        </div>
+            {/* Daily Summary */}
+            {dailyCollections.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="p-4 shadow-card bg-gradient-success">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <IndianRupee className="h-5 w-5 text-white" />
+                      <Calendar className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-white/90 font-semibold">{t("రోజువారీ వసూలు", "Daily Collections")}</p>
+                      <p className="text-lg font-bold text-white">
+                        ₹{dailyTotal.toLocaleString()}
+                      </p>
+                      <p className="text-xs text-white/80 font-medium">
+                        {dailyCollections.length} {t("వసూలు", "collections")}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            )}
 
-        <div className="flex gap-4">
-          <Button 
-            onClick={generateReport} 
-            disabled={loading}
-            className="flex items-center gap-2"
-          >
-            <TrendingUp className="h-4 w-4" />
-            {loading ? t("రూపొందిస్తోంది...", "Generating...") : t("రిపోర్ట్ రూపొందించండి", "Generate Report")}
-          </Button>
+            {/* Daily Collections Table */}
+            {dailyCollections.length > 0 ? (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t("కస్టమర్ పేరు", "Customer Name")}</TableHead>
+                      <TableHead>{t("మొబైల్", "Mobile")}</TableHead>
+                      <TableHead>{t("మొత్తం", "Amount")}</TableHead>
+                      <TableHead>{t("గమనికలు", "Notes")}</TableHead>
+                      <TableHead>{t("సమయం", "Time")}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {dailyCollections.map((collection) => (
+                      <TableRow key={collection.id}>
+                        <TableCell className="font-medium">{collection.loans?.customer_name || 'N/A'}</TableCell>
+                        <TableCell>{collection.loans?.customer_mobile || 'N/A'}</TableCell>
+                        <TableCell>₹{Number(collection.amount).toLocaleString()}</TableCell>
+                        <TableCell>{collection.notes || '-'}</TableCell>
+                        <TableCell>{new Date(collection.created_at).toLocaleTimeString()}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : selectedDate && !loading ? (
+              <Card className="p-8 text-center">
+                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">{t("ఈ తేదీకి వసూలు లేవు", "No collections found for this date")}</p>
+              </Card>
+            ) : null}
+          </TabsContent>
 
-          {reportData && (
-            <Button 
-              variant="outline" 
-              onClick={downloadPDF}
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              {t("PDF డౌన్‌లోడ్", "Download PDF")}
-            </Button>
-          )}
-        </div>
+          {/* Loan Database Tab */}
+          <TabsContent value="loan-database" className="space-y-6 mt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">{t("పూర్తి లోన్ డేటాబేస్", "Complete Loan Database")}</h3>
+                <p className="text-sm text-muted-foreground">{t("మీ అన్ని లోన్ల వివరాలు", "All your loan details")}</p>
+              </div>
+              {allLoans.length > 0 && (
+                <Button 
+                  variant="outline" 
+                  onClick={downloadLoanDatabasePDF}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  {t("PDF డౌన్‌లోడ్", "Download PDF")}
+                </Button>
+              )}
+            </div>
+
+            {/* Loan Database Summary */}
+            {allLoans.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="p-4 shadow-card bg-gradient-success">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Users className="h-5 w-5 text-white" />
+                      <TrendingUp className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-white/90 font-semibold">{t("మొత్తం లోన్లు", "Total Loans")}</p>
+                      <p className="text-lg font-bold text-white">{allLoans.length}</p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4 shadow-card bg-gradient-success">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <IndianRupee className="h-5 w-5 text-white" />
+                      <TrendingUp className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-white/90 font-semibold">{t("మొత్తం మొత్తం", "Total Amount")}</p>
+                      <p className="text-lg font-bold text-white">
+                        ₹{allLoans.reduce((sum, loan) => sum + Number(loan.amount), 0).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4 shadow-card bg-gradient-success">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Calendar className="h-5 w-5 text-white" />
+                      <TrendingUp className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-white/90 font-semibold">{t("క్రియాశీల లోన్లు", "Active Loans")}</p>
+                      <p className="text-lg font-bold text-white">
+                        {allLoans.filter(loan => loan.status === 'active').length}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            {/* Loan Database Table */}
+            {allLoans.length > 0 ? (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t("కస్టమర్ పేరు", "Customer Name")}</TableHead>
+                      <TableHead>{t("మొబైల్", "Mobile")}</TableHead>
+                      <TableHead>{t("మొత్తం", "Amount")}</TableHead>
+                      <TableHead>{t("వడ్డీ రేటు", "Interest Rate")}</TableHead>
+                      <TableHead>{t("వ్యవధి", "Duration")}</TableHead>
+                      <TableHead>{t("స్థితి", "Status")}</TableHead>
+                      <TableHead>{t("ప్రారంభ తేదీ", "Start Date")}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {allLoans.map((loan) => (
+                      <TableRow key={loan.id}>
+                        <TableCell className="font-medium">{loan.customer_name}</TableCell>
+                        <TableCell>{loan.customer_mobile || 'N/A'}</TableCell>
+                        <TableCell>₹{Number(loan.amount).toLocaleString()}</TableCell>
+                        <TableCell>{loan.interest_rate || 0}%</TableCell>
+                        <TableCell>{loan.duration_months || 0} months</TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            loan.status === 'active' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {loan.status || 'active'}
+                          </span>
+                        </TableCell>
+                        <TableCell>{loan.start_date}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : !loading ? (
+              <Card className="p-8 text-center">
+                <Database className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">{t("లోన్లు లేవు", "No loans found")}</p>
+              </Card>
+            ) : null}
+          </TabsContent>
+        </Tabs>
       </Card>
-
-      {/* Report Summary */}
-      {reportData && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-4 shadow-card bg-gradient-success">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <IndianRupee className="h-5 w-5 text-white" />
-                <TrendingUp className="h-4 w-4 text-white" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-white/90 font-semibold">{t("మొత్తం వసూలు", "Total Collections")}</p>
-                <p className="text-lg font-bold text-white">
-                  ₹{reportData.totalCollections.toLocaleString()}
-                </p>
-                <p className="text-xs text-white/80 font-medium">
-                  {reportData.collectionsCount} {t("వసూలు", "collections")}
-                </p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4 shadow-card bg-gradient-success">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Users className="h-5 w-5 text-white" />
-                <TrendingUp className="h-4 w-4 text-white" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-white/90 font-semibold">{t("మొత్తం లోన్లు", "Total Loans")}</p>
-                <p className="text-lg font-bold text-white">
-                  ₹{reportData.totalLoans.toLocaleString()}
-                </p>
-                <p className="text-xs text-white/80 font-medium">
-                  {reportData.loansCount} {t("లోన్లు", "loans")}
-                </p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4 shadow-card bg-gradient-success">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Calendar className="h-5 w-5 text-white" />
-                <TrendingUp className="h-4 w-4 text-white" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-white/90 font-semibold">{t("బాకీ మొత్తం", "Pending Amount")}</p>
-                <p className="text-lg font-bold text-white">
-                  ₹{reportData.pendingAmount.toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
     </div>
   );
 }
