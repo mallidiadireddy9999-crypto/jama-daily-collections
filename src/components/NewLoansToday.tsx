@@ -15,6 +15,14 @@ interface NewLoan {
   dailyAmount: number;
   createdTime: string;
   phoneNumber: string;
+  // Enhanced fields for the new loan structure
+  principalAmount: number;
+  disbursedAmount: number;
+  totalCollection: number;
+  profitInterest: number;
+  repaymentType: string;
+  disbursementType: string;
+  cuttingAmount: number;
 }
 
 interface NewLoansTodayProps {
@@ -48,14 +56,22 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
         id: loan.id,
         customerId: loan.customer_mobile || loan.id,
         customerName: loan.customer_name,
-        loanAmount: Number(loan.amount),
-        dailyAmount: Math.ceil(Number(loan.amount) / (loan.duration_months * 30)),
+        loanAmount: Number(loan.disbursed_amount || loan.amount), // Use disbursed amount if available
+        dailyAmount: Number(loan.installment_amount) || Math.ceil(Number(loan.amount) / (loan.duration_months * 30)),
         createdTime: new Date(loan.created_at).toLocaleTimeString('en-US', { 
           hour: '2-digit', 
           minute: '2-digit', 
           hour12: true 
         }),
-        phoneNumber: loan.customer_mobile || "N/A"
+        phoneNumber: loan.customer_mobile || "N/A",
+        // Additional fields for enhanced display
+        principalAmount: Number(loan.amount),
+        disbursedAmount: Number(loan.disbursed_amount || loan.amount),
+        totalCollection: Number(loan.total_collection || 0),
+        profitInterest: Number(loan.profit_interest || 0),
+        repaymentType: loan.repayment_type || 'daily',
+        disbursementType: loan.disbursement_type || 'full',
+        cuttingAmount: Number(loan.cutting_amount || 0)
       }));
 
       setNewLoansToday(formattedLoans);
@@ -207,41 +223,83 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">{t("లోన్ మొత్తం", "Loan Amount")}</p>
+                      <p className="text-xs text-muted-foreground">{t("ప్రిన్సిపల్ మొత్తం", "Principal Amount")}</p>
                       <div className="flex items-center space-x-1">
                         <IndianRupee className="h-4 w-4 text-primary" />
                         <p className="text-lg font-bold text-primary">
-                          {loan.loanAmount.toLocaleString()}
+                          ₹{loan.principalAmount.toLocaleString()}
                         </p>
                       </div>
                     </div>
                     
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">{t("రోజువారీ చెల్లింపు", "Daily Payment")}</p>
+                      <p className="text-xs text-muted-foreground">{t("డిస్బర్స్డ్ మొత్తం", "Disbursed Amount")}</p>
                       <div className="flex items-center space-x-1">
-                        <Calendar className="h-4 w-4 text-success" />
+                        <IndianRupee className="h-4 w-4 text-success" />
                         <p className="text-lg font-bold text-success">
+                          ₹{loan.disbursedAmount.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional loan details */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">{t("కిస్తు మొత్తం", "Installment Amount")}</p>
+                      <div className="flex items-center space-x-1">
+                        <Calendar className="h-4 w-4 text-warning" />
+                        <p className="text-lg font-bold text-warning">
                           ₹{loan.dailyAmount.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">{t("మొత్తం వసూలు", "Total Collection")}</p>
+                      <div className="flex items-center space-x-1">
+                        <IndianRupee className="h-4 w-4 text-primary" />
+                        <p className="text-lg font-bold text-primary">
+                          ₹{loan.totalCollection.toLocaleString()}
                         </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-muted/50 rounded-lg p-3">
-                    <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="grid grid-cols-3 gap-2 text-sm">
                       <div>
-                        <span className="text-muted-foreground">{t("వ్యవధి:", "Duration:")}</span>
+                        <span className="text-muted-foreground">{t("రకం:", "Type:")}</span>
                         <span className="ml-2 font-medium text-foreground">
-                          {Math.ceil(loan.loanAmount / loan.dailyAmount)} {t("రోజులు", "days")}
+                          {loan.disbursementType === 'full' ? t("పూర్తి", "Full") : t("కటింగ్", "Cutting")}
                         </span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">{t("రేట్:", "Rate:")}</span>
+                        <span className="text-muted-foreground">{t("చెల్లింపు:", "Payment:")}</span>
                         <span className="ml-2 font-medium text-foreground">
-                          {Math.round(((loan.dailyAmount * Math.ceil(loan.loanAmount / loan.dailyAmount)) / loan.loanAmount - 1) * 100)}%
+                          {loan.repaymentType === 'daily' ? t("రోజువారీ", "Daily") : 
+                           loan.repaymentType === 'weekly' ? t("వారానికి", "Weekly") : t("నెలకు", "Monthly")}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">{t("లాభం:", "Profit:")}</span>
+                        <span className="ml-2 font-medium text-success">
+                          ₹{loan.profitInterest.toLocaleString()}
                         </span>
                       </div>
                     </div>
+                    
+                    {/* Show cutting amount if applicable */}
+                    {loan.disbursementType === 'cutting' && loan.cuttingAmount > 0 && (
+                      <div className="mt-2 pt-2 border-t border-muted-foreground/20">
+                        <div className="text-sm">
+                          <span className="text-muted-foreground">{t("కటింగ్ మొత్తం:", "Cutting Amount:")}</span>
+                          <span className="ml-2 font-medium text-warning">
+                            ₹{loan.cuttingAmount.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>
