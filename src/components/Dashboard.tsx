@@ -237,10 +237,6 @@ const Dashboard = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen bg-gradient-card p-4 space-y-6">
-        {/* Debug info */}
-        <div className="fixed top-0 right-0 bg-red-500 text-white p-2 z-50 text-xs">
-          Sidebar Open: {sidebarOpen ? 'YES' : 'NO'}
-        </div>
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex justify-between items-center w-full mb-4">
@@ -262,16 +258,12 @@ const Dashboard = () => {
               </SheetTrigger>
               <SheetContent 
                 side="left" 
-                className="p-0 w-64 bg-background border-r z-50"
-                style={{ visibility: 'visible', display: 'block' }}
+                className="p-0 w-64"
               >
-                <div className="h-full bg-red-500 p-4">
-                  <div className="text-white font-bold mb-4">DEBUGGING SIDEBAR</div>
-                  <AppSidebar onClose={() => {
-                    console.log("Closing sidebar");
-                    setSidebarOpen(false);
-                  }} />
-                </div>
+                <AppSidebar onClose={() => {
+                  console.log("Closing sidebar");
+                  setSidebarOpen(false);
+                }} />
               </SheetContent>
             </Sheet>
 

@@ -187,9 +187,6 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
     },
   ];
 
-  console.log("AppSidebar component rendering...");
-  console.log("User state in AppSidebar:", user);
-  console.log("Language:", language);
   
   return (
     <Sidebar className="w-64 bg-background border-r border-border">
