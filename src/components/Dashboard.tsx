@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import PaymentKeypad from "./PaymentKeypad";
 import AddLoanModal from "./AddLoanModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardProps {
   onNavigate: (view: string) => void;
@@ -26,16 +27,79 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'payment'>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [showAddLoanModal, setShowAddLoanModal] = useState(false);
+  const [dashboardStats, setDashboardStats] = useState({
+    totalCollected: 0,
+    pendingBalance: 0,
+    activeLoans: 0,
+    newLoansToday: 0
+  });
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useLanguage();
-  
-  const [todayStats, setTodayStats] = useState({
-    totalCollected: 15750,
-    pendingBalance: 48200,
-    activeLoans: 12,
-    newLoansToday: 3
-  });
+  // Fetch dashboard statistics
+  const fetchDashboardStats = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+
+      // Fetch loans statistics
+      const { data: loans, error: loansError } = await supabase
+        .from('loans')
+        .select('amount, status, start_date')
+        .eq('user_id', user.id);
+
+      if (loansError) throw loansError;
+
+      // Fetch collections statistics
+      const { data: collections, error: collectionsError } = await supabase
+        .from('collections')
+        .select('amount, collection_date')
+        .eq('user_id', user.id);
+
+      if (collectionsError) throw collectionsError;
+
+      // Calculate statistics
+      const activeLoans = loans?.filter(loan => loan.status === 'active').length || 0;
+      const totalLoanAmount = loans?.reduce((sum, loan) => sum + Number(loan.amount), 0) || 0;
+      const totalCollected = collections?.reduce((sum, collection) => sum + Number(collection.amount), 0) || 0;
+      const pendingBalance = totalLoanAmount - totalCollected;
+      
+      // Count today's new loans
+      const today = new Date().toISOString().split('T')[0];
+      const newLoansToday = loans?.filter(loan => loan.start_date === today).length || 0;
+
+      setDashboardStats({
+        totalCollected,
+        pendingBalance,
+        activeLoans,
+        newLoansToday
+      });
+
+    } catch (error: any) {
+      console.error('Error fetching dashboard stats:', error);
+      toast({
+        title: t("లోపం", "Error"),
+        description: t("డేటా లోడ్ చేయడంలో లోపం", "Error loading data"),
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load data on component mount and when user changes
+  useEffect(() => {
+    fetchDashboardStats();
+  }, [user]);
+
+  // Refresh data when returning from other views
+  useEffect(() => {
+    if (currentView === 'dashboard') {
+      fetchDashboardStats();
+    }
+  }, [currentView]);
 
   const handleCollectPayment = () => {
     setCurrentView('payment');
@@ -76,11 +140,8 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
         customerName={selectedCustomer}
         onBack={handleBackToDashboard}
         onConfirm={(amount, customerId, customerName) => {
-          // Handle payment confirmation
-          toast({
-            title: t("చెల్లింపు విజయవంతం", "Payment Successful"),
-            description: t(`₹${amount} ${customerName} నుండి వసూలు చేయబడింది`, `₹${amount} collected from ${customerName}`),
-          });
+          // Refresh dashboard stats after payment collection
+          fetchDashboardStats();
           setCurrentView('dashboard');
         }}
       />
@@ -133,7 +194,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-semibold opacity-90">{t("క్రియాశీల లోన్‌లు", "Active Loans")}</p>
-                <p className="text-2xl font-bold">{todayStats.activeLoans}</p>
+                <p className="text-2xl font-bold">{loading ? "..." : dashboardStats.activeLoans}</p>
                 <p className="text-xs opacity-75">{t("మొత్తం లోన్‌లు", "Total loans")}</p>
               </div>
             </div>
@@ -150,7 +211,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-semibold opacity-90">{t("ఈ రోజు వసూలు", "Today's Collection")}</p>
-                <p className="text-xl font-bold">₹{todayStats.totalCollected.toLocaleString()}</p>
+                <p className="text-xl font-bold">₹{loading ? "..." : dashboardStats.totalCollected.toLocaleString()}</p>
                 <p className="text-xs opacity-75">{t("మొత్తం వసూలైనది", "Total collected")}</p>
               </div>
             </div>
@@ -167,7 +228,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-semibold opacity-90">{t("బాకీ మొత్తం", "Pending Amount")}</p>
-                <p className="text-xl font-bold">₹{todayStats.pendingBalance.toLocaleString()}</p>
+                <p className="text-xl font-bold">₹{loading ? "..." : dashboardStats.pendingBalance.toLocaleString()}</p>
                 <p className="text-xs opacity-75">{t("చెల్లించాల్సినది", "To be collected")}</p>
               </div>
             </div>
@@ -184,7 +245,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-semibold opacity-90">{t("ఈ రోజు కొత్త లోన్‌లు", "New Loans Today")}</p>
-                <p className="text-2xl font-bold">{todayStats.newLoansToday}</p>
+                <p className="text-2xl font-bold">{loading ? "..." : dashboardStats.newLoansToday}</p>
                 <p className="text-xs opacity-75">{t("నేడు జోడించబడినవి", "Added today")}</p>
               </div>
             </div>
@@ -235,8 +296,9 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
       <AddLoanModal 
         open={showAddLoanModal} 
         onOpenChange={setShowAddLoanModal}
-        onSave={(loanData) => {
-          // Handle loan save
+        onSave={() => {
+          // Refresh dashboard stats after adding new loan
+          fetchDashboardStats();
           toast({
             title: t("లోన్ జోడించబడింది", "Loan Added"),
             description: t("కొత్త లోన్ విజయవంతంగా జోడించబడింది", "New loan added successfully"),

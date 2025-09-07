@@ -7,6 +7,7 @@ import { ArrowLeft, Check, Mic, Delete, IndianRupee, User, Search, AlertCircle }
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PaymentKeypadProps {
   onBack: () => void;
@@ -20,8 +21,10 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
   const [selectedCustomerName, setSelectedCustomerName] = useState('');
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
   const [customerNotFound, setCustomerNotFound] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useLanguage();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Function to fetch customer data by ID or Name
   const fetchCustomerData = async (searchTerm: string) => {
@@ -142,10 +145,81 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
     setAmount(amount.slice(0, -1));
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const finalAmount = parseInt(amount) || 0;
-    if (finalAmount > 0 && customerId.trim() && selectedCustomerName.trim()) {
+    if (finalAmount <= 0 || !customerId.trim() || !selectedCustomerName.trim()) {
+      toast({
+        title: t("లోపం", "Error"),
+        description: t("దయచేసి అన్ని వివరాలను నమోదు చేయండి", "Please fill all details"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: t("లోపం", "Error"),
+        description: t("దయచేసి లాగిన్ చేయండి", "Please login first"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Find the loan to get loan_id
+      const { data: loans, error: loanError } = await supabase
+        .from('loans')
+        .select('id')
+        .eq('user_id', user.id)
+        .or(`customer_mobile.eq.${customerId},customer_name.ilike.%${selectedCustomerName}%`)
+        .limit(1);
+
+      if (loanError) {
+        throw loanError;
+      }
+
+      if (!loans || loans.length === 0) {
+        toast({
+          title: t("లోపం", "Error"),
+          description: t("ఈ కస్టమర్ కు లోన్ దొరకలేదు", "No loan found for this customer"),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Save collection to database
+      const { error: collectionError } = await supabase
+        .from('collections')
+        .insert({
+          user_id: user.id,
+          loan_id: loans[0].id,
+          amount: finalAmount,
+          notes: `Collection from ${selectedCustomerName} (${customerId})`
+        });
+
+      if (collectionError) {
+        throw collectionError;
+      }
+
+      toast({
+        title: t("విజయం", "Success"),
+        description: t(`₹${finalAmount} ${selectedCustomerName} నుండి విజయవంతంగా వసూలు చేయబడింది`, `₹${finalAmount} collected successfully from ${selectedCustomerName}`),
+      });
+
+      // Call original onConfirm for any additional handling
       onConfirm(finalAmount, customerId.trim(), selectedCustomerName.trim());
+
+    } catch (error: any) {
+      console.error('Error saving collection:', error);
+      toast({
+        title: t("లోపం", "Error"),
+        description: error.message || t("వసూలు సేవ్ చేయడంలో లోపం", "Error saving collection"),
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -321,11 +395,11 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
           variant="money"
           size="xl"
           onClick={handleConfirm}
-          disabled={!amount || parseInt(amount) === 0 || !customerId.trim() || !selectedCustomerName.trim()}
+          disabled={!amount || parseInt(amount) === 0 || !customerId.trim() || !selectedCustomerName.trim() || isSubmitting}
           className="w-full"
         >
           <Check className="h-6 w-6 mr-2" />
-          {t("వసూలు నమోదు చేయండి", "Record Collection")}
+          {isSubmitting ? t("సేవ్ చేస్తోంది...", "Saving...") : t("వసూలు నమోదు చేయండి", "Record Collection")}
         </Button>
 
         {/* Voice Input Button */}

@@ -7,15 +7,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Save, User, Phone, IndianRupee, Calendar } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface AddLoanModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (loan: any) => void;
+  onSave: () => void; // Updated to just notify of successful save
 }
 
 const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     customerName: '',
     phone: '',
@@ -23,32 +29,63 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
     duration: '30'
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const loan = {
-      id: Date.now().toString(),
-      customerName: formData.customerName,
-      phone: formData.phone,
-      amount: parseInt(formData.amount),
-      duration: parseInt(formData.duration),
-      dailyPayment: Math.ceil(parseInt(formData.amount) / parseInt(formData.duration)),
-      daysRemaining: parseInt(formData.duration),
-      status: 'active' as const,
-      lastPayment: 'Not yet',
-      date: new Date().toISOString().split('T')[0]
-    };
-    
-    onSave(loan);
-    
-    // Reset form and close modal
-    setFormData({
-      customerName: '',
-      phone: '',
-      amount: '',
-      duration: '30'
-    });
-    onOpenChange(false);
+    if (!user) {
+      toast({
+        title: t("లోపం", "Error"),
+        description: t("దయచేసి లాగిన్ చేయండి", "Please login first"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('loans')
+        .insert({
+          user_id: user.id,
+          customer_name: formData.customerName,
+          customer_mobile: formData.phone,
+          amount: parseInt(formData.amount),
+          duration_months: parseInt(formData.duration),
+          interest_rate: 10.0, // Default 10% interest
+          status: 'active'
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: t("విజయం", "Success"),
+        description: t("కొత్త లోన్ విజయవంతంగా జోడించబడింది", "New loan added successfully"),
+      });
+
+      // Reset form and close modal
+      setFormData({
+        customerName: '',
+        phone: '',
+        amount: '',
+        duration: '30'
+      });
+      
+      onSave(); // Notify parent of successful save
+      onOpenChange(false);
+
+    } catch (error: any) {
+      console.error('Error adding loan:', error);
+      toast({
+        title: t("లోపం", "Error"),
+        description: error.message || t("లోన్ జోడించడంలో లోపం", "Error adding loan"),
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

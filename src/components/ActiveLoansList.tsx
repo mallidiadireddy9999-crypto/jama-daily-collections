@@ -1,7 +1,11 @@
+import { useState, useEffect } from "react";
 import { ArrowLeft, Users, IndianRupee, Calendar, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface ActiveLoan {
   id: string;
@@ -21,55 +25,69 @@ interface ActiveLoansListProps {
 
 const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
   const { t } = useLanguage();
-  
-  // Mock data - this would come from your database
-  const activeLoans: ActiveLoan[] = [
-    {
-      id: "L001",
-      customerId: "C001",
-      customerName: "Rajesh Kumar",
-      loanAmount: 50000,
-      paidAmount: 35000,
-      pendingAmount: 15000,
-      startDate: "2023-12-01",
-      dailyAmount: 500,
-      status: 'active'
-    },
-    {
-      id: "L007",
-      customerId: "C007",
-      customerName: "Sudha Rani",
-      loanAmount: 25000,
-      paidAmount: 16500,
-      pendingAmount: 8500,
-      startDate: "2023-12-15",
-      dailyAmount: 300,
-      status: 'active'
-    },
-    {
-      id: "L015",
-      customerId: "C015",
-      customerName: "Venkat Rao",
-      loanAmount: 40000,
-      paidAmount: 27800,
-      pendingAmount: 12200,
-      startDate: "2023-11-20",
-      dailyAmount: 400,
-      status: 'overdue'
-    },
-    {
-      id: "L022",
-      customerId: "C022",
-      customerName: "Lakshmi Devi",
-      loanAmount: 30000,
-      paidAmount: 23200,
-      pendingAmount: 6800,
-      startDate: "2024-01-05",
-      dailyAmount: 350,
-      status: 'active'
-    }
-  ];
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [activeLoans, setActiveLoans] = useState<ActiveLoan[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch active loans from database
+  const fetchActiveLoans = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const { data: loans, error } = await supabase
+        .from('loans')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'active');
+
+      if (error) throw error;
+
+      // Get collections for each loan to calculate paid/pending amounts
+      const loansWithStats = await Promise.all(
+        (loans || []).map(async (loan) => {
+          const { data: collections } = await supabase
+            .from('collections')
+            .select('amount')
+            .eq('loan_id', loan.id);
+
+          const paidAmount = collections?.reduce((sum, col) => sum + Number(col.amount), 0) || 0;
+          const loanAmount = Number(loan.amount);
+          const pendingAmount = loanAmount - paidAmount;
+
+          return {
+            id: loan.id,
+            customerId: loan.customer_mobile || loan.id,
+            customerName: loan.customer_name,
+            loanAmount,
+            paidAmount,
+            pendingAmount: Math.max(0, pendingAmount),
+            startDate: loan.start_date,
+            dailyAmount: Math.ceil(loanAmount / (loan.duration_months * 30)), // Rough daily calculation
+            status: (pendingAmount <= 0 ? 'completed' : 'active') as 'active' | 'completed' | 'overdue'
+          };
+        })
+      );
+
+      setActiveLoans(loansWithStats);
+    } catch (error: any) {
+      console.error('Error fetching active loans:', error);
+      toast({
+        title: t("లోపం", "Error"),
+        description: t("లోన్ డేటా లోడ్ చేయడంలో లోపం", "Error loading loan data"),
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchActiveLoans();
+  }, [user]);
+
+  // Calculate totals from fetched data
   const totalActiveAmount = activeLoans.reduce((sum, loan) => sum + loan.loanAmount, 0);
   const totalCollected = activeLoans.reduce((sum, loan) => sum + loan.paidAmount, 0);
   const totalPending = activeLoans.reduce((sum, loan) => sum + loan.pendingAmount, 0);
@@ -106,7 +124,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-foreground">{t("క్రియాశీల లోన్‌లు", "Active Loans")}</h1>
           <p className="text-sm text-muted-foreground">
-            {t(`మొత్తం ${activeLoans.length} లోన్‌లు క్రియాశీలంగా ఉన్నాయి`, `Total ${activeLoans.length} loans are active`)}
+            {loading ? t("లోడ్ అవుతోంది...", "Loading...") : t(`మొత్తం ${activeLoans.length} లోన్‌లు క్రియాశీలంగా ఉన్నాయి`, `Total ${activeLoans.length} loans are active`)}
           </p>
         </div>
       </div>
@@ -142,7 +160,12 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-foreground">{t("లోన్ వివరాలు", "Loan Details")}</h2>
         
-        {activeLoans.length === 0 ? (
+        {loading ? (
+          <Card className="p-6 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+            <p className="text-muted-foreground">{t("లోడ్ అవుతోంది...", "Loading...")}</p>
+          </Card>
+        ) : activeLoans.length === 0 ? (
           <Card className="p-6 text-center">
             <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground">{t("క్రియాశీల లోన్‌లు లేవు", "No active loans")}</p>
@@ -161,7 +184,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
                           {loan.customerName}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          ID: {loan.customerId} • {t("లోన్", "Loan")} ID: {loan.id}
+                          ID: {loan.customerId} • {t("లోన్", "Loan")} ID: {loan.id.slice(0, 8)}...
                         </p>
                       </div>
                       <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(loan.status)}`}>
@@ -236,7 +259,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
               <div>
                 <p className="text-xs text-muted-foreground">{t("వసూలు రేట్", "Collection Rate")}</p>
                 <p className="text-lg font-bold text-success">
-                  {Math.round((totalCollected / totalActiveAmount) * 100)}%
+                  {totalActiveAmount > 0 ? Math.round((totalCollected / totalActiveAmount) * 100) : 0}%
                 </p>
               </div>
               <div>
