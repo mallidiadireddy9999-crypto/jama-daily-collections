@@ -177,12 +177,8 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   console.log("AppSidebar component rendering...");
   
   return (
-    <div className="w-full h-full bg-red-500 p-4">
-      <div className="bg-yellow-300 text-black p-4 font-bold text-xl mb-4">
-        SIDEBAR DEBUG - CAN YOU SEE THIS?
-      </div>
-      <Sidebar className="w-full bg-blue-500 border-r border-sidebar-border shadow-lg">
-        <SidebarContent className="bg-green-500 p-4">
+    <Sidebar className="w-64 bg-background border-r border-border">
+      <SidebarContent className="p-0">
        {/* Language Toggle */}
        <div className="p-4 border-b border-sidebar-border bg-sidebar-accent">
          <Button
@@ -257,6 +253,5 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
       </div>
       </SidebarContent>
     </Sidebar>
-    </div>
   );
 }
