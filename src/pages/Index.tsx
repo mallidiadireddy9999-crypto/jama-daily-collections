@@ -23,14 +23,18 @@ const Index = () => {
   const [currentView, setCurrentView] = useState<string>("dashboard");
 
   useEffect(() => {
+    console.log('Index useEffect - user:', user, 'loading:', loading, 'userRole:', userRole, 'currentView:', currentView);
+    
     if (!loading && !user) {
-      // Reset view to login prompt when user signs out or is not authenticated
+      console.log('Setting currentView to login-prompt');
       setCurrentView("login-prompt");
     } else if (!loading && user) {
-      // Reset to dashboard when user signs in
-      setCurrentView("dashboard");
+      console.log('User exists, setting currentView to dashboard');
+      if (currentView === "login-prompt") {
+        setCurrentView("dashboard");
+      }
     }
-  }, [user, loading]);
+  }, [user, loading, userRole]);
 
   if (loading) {
     return (
