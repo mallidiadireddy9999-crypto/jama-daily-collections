@@ -114,7 +114,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUserProfile(null);
         } else if (profile) {
           console.log('Profile found:', profile);
-          setUserRole(profile.role || 'jama_user');
+          console.log('Profile role:', profile.role);
+          const userRole = profile.role || 'jama_user';
+          console.log('Setting user role to:', userRole);
+          setUserRole(userRole);
           setUserProfile(profile);
         } else {
           console.log('No profile found for user, checking if this is a super admin...');
