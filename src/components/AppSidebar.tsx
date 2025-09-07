@@ -99,8 +99,10 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   };
 
   const handleReports = () => {
+    console.log("Reports clicked in sidebar");
     // This will be handled by the dashboard component's handleViewReports
     window.dispatchEvent(new CustomEvent('sidebarNavigate', { detail: 'reports' }));
+    console.log("Dispatched sidebarNavigate event with 'reports'");
     onClose();
   };
 

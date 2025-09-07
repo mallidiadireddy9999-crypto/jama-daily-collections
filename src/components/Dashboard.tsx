@@ -50,8 +50,10 @@ const Dashboard = () => {
 
     // Listen for sidebar navigation events
     const handleSidebarNavigate = (event: any) => {
+      console.log("Received sidebarNavigate event:", event.detail);
       const view = event.detail;
       if (view === 'reports') {
+        console.log("Setting current view to reports");
         setCurrentView('reports');
         setSidebarOpen(false);
       }
@@ -259,7 +261,12 @@ const Dashboard = () => {
               <SheetContent 
                 side="left" 
                 className="p-0 w-64"
+                aria-describedby="sidebar-description"
               >
+                <div className="sr-only">
+                  <h2 id="sidebar-title">Navigation Menu</h2>
+                  <p id="sidebar-description">Main navigation sidebar for the application</p>
+                </div>
                 <AppSidebar onClose={() => {
                   console.log("Closing sidebar");
                   setSidebarOpen(false);
