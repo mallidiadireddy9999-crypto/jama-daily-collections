@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Check, Mic, Delete, IndianRupee, User } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PaymentKeypadProps {
   onBack: () => void;
@@ -15,6 +16,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
   const [amount, setAmount] = useState('');
   const [customerId, setCustomerId] = useState('');
   const [selectedCustomerName, setSelectedCustomerName] = useState('');
+  const { t } = useLanguage();
 
   const quickAmounts = [100, 500, 1000];
 
@@ -57,7 +59,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-xl font-bold text-foreground">వసూలు నమోదు</h1>
+          <h1 className="text-xl font-bold text-foreground">{t("వసూలు నమోదు", "Record Collection")}</h1>
         </div>
       </div>
 
@@ -66,25 +68,25 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
         <div className="space-y-3">
           <Label htmlFor="customerId" className="flex items-center gap-2 text-sm font-medium">
             <User className="h-4 w-4" />
-            కస్టమర్ ID
+            {t("కస్టమర్ ID", "Customer ID")}
           </Label>
           <Input
             id="customerId"
             value={customerId}
             onChange={(e) => setCustomerId(e.target.value)}
-            placeholder="కస్టమర్ ID నమోదు చేయండి"
+            placeholder={t("కస్టమర్ ID నమోదు చేయండి", "Enter Customer ID")}
             className="h-11"
           />
           
           <Label htmlFor="customerName" className="flex items-center gap-2 text-sm font-medium">
             <User className="h-4 w-4" />
-            కస్టమర్ పేరు
+            {t("కస్టమర్ పేరు", "Customer Name")}
           </Label>
           <Input
             id="customerName"
             value={selectedCustomerName}
             onChange={(e) => setSelectedCustomerName(e.target.value)}
-            placeholder="కస్టమర్ పేరు నమోదు చేయండి"
+            placeholder={t("కస్టమర్ పేరు నమోదు చేయండి", "Enter Customer Name")}
             className="h-11"
           />
         </div>
@@ -182,7 +184,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
           className="w-full"
         >
           <Check className="h-6 w-6 mr-2" />
-          వసూలు నమోదు చేయండి
+          {t("వసూలు నమోదు చేయండి", "Record Collection")}
         </Button>
 
         {/* Voice Input Button */}

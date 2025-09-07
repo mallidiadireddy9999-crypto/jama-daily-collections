@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, IndianRupee, Clock, User } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Collection {
   id: string;
@@ -18,6 +19,7 @@ interface CollectionsListProps {
 }
 
 const CollectionsList = ({ onBack, collections }: CollectionsListProps) => {
+  const { t } = useLanguage();
   const totalAmount = collections.reduce((sum, collection) => sum + collection.amount, 0);
 
   const formatTime = (timestamp: string) => {
@@ -37,9 +39,9 @@ const CollectionsList = ({ onBack, collections }: CollectionsListProps) => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-xl font-bold text-foreground">నేటి వసూలు</h1>
+          <h1 className="text-xl font-bold text-foreground">{t("నేటి వసూలు", "Today's Collections")}</h1>
           <p className="text-sm text-muted-foreground">
-            మొత్తం వసూలు: ₹{totalAmount.toLocaleString()}
+            {t("మొత్తం వసూలు:", "Total Collections:")} ₹{totalAmount.toLocaleString()}
           </p>
         </div>
       </div>
