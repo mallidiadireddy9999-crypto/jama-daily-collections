@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CreateAdModalProps {
   onClose: () => void;
@@ -33,6 +34,7 @@ export const CreateAdModal = ({ onClose, onSuccess }: CreateAdModalProps) => {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -70,39 +72,59 @@ export const CreateAdModal = ({ onClose, onSuccess }: CreateAdModalProps) => {
     setLoading(true);
 
     try {
+      console.log('Creating ad with user:', user?.id);
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
       let imageUrl = '';
       let videoUrl = '';
 
       // Upload image if selected
       if (imageFile) {
+        console.log('Uploading image...');
         const imagePath = `${Date.now()}-${imageFile.name}`;
         imageUrl = await uploadFile(imageFile, imagePath);
+        console.log('Image uploaded:', imageUrl);
       }
 
       // Upload video if selected
       if (videoFile) {
+        console.log('Uploading video...');
         const videoPath = `${Date.now()}-${videoFile.name}`;
         videoUrl = await uploadFile(videoFile, videoPath);
+        console.log('Video uploaded:', videoUrl);
       }
 
       // Create ad
+      console.log('Creating ad record...');
+      const adData = {
+        title,
+        description,
+        image_url: imageUrl,
+        video_url: videoUrl,
+        target_audience: targetAudience,
+        start_date: startDate || new Date().toISOString(),
+        end_date: endDate || null,
+        is_recurring: isRecurring,
+        recurring_type: isRecurring ? recurringType : null,
+        user_id: user.id
+      };
+      
+      console.log('Ad data:', adData);
+      
       const { error } = await supabase
         .from('ads')
-        .insert([{
-          title,
-          description,
-          image_url: imageUrl,
-          video_url: videoUrl,
-          target_audience: targetAudience,
-          start_date: startDate || new Date().toISOString(),
-          end_date: endDate || null,
-          is_recurring: isRecurring,
-          recurring_type: isRecurring ? recurringType : null,
-          user_id: (await supabase.auth.getUser()).data.user?.id
-        }]);
+        .insert([adData]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating ad:', error);
+        throw error;
+      }
 
+      console.log('Ad created successfully');
+      
       toast({
         title: "Success",
         description: "Ad created successfully",
@@ -110,10 +132,10 @@ export const CreateAdModal = ({ onClose, onSuccess }: CreateAdModalProps) => {
 
       onSuccess();
     } catch (error) {
-      console.error('Error creating ad:', error);
+      console.error('Error in handleSubmit:', error);
       toast({
         title: "Error",
-        description: "Failed to create ad",
+        description: error instanceof Error ? error.message : "Failed to create ad",
         variant: "destructive",
       });
     } finally {
