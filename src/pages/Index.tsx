@@ -6,6 +6,7 @@ import Dashboard from "@/components/Dashboard";
 import ActiveLoansList from "@/components/ActiveLoansList";
 import PendingBalanceList from "@/components/PendingBalanceList";
 import NewLoansToday from "@/components/NewLoansToday";
+import AddLoanForm from "@/components/AddLoanForm";
 import CollectionsList from "@/components/CollectionsList";
 import RecentCollectionsList from "@/components/RecentCollectionsList";
 import ReportsPage from "@/components/ReportsPage";
@@ -137,6 +138,8 @@ const Index = () => {
         return <PendingBalanceList onBack={() => setCurrentView("dashboard")} />;
       case "new-loans":
         return <NewLoansToday onBack={() => setCurrentView("dashboard")} />;
+      case "add-loan":
+        return <AddLoanForm onBack={() => setCurrentView("dashboard")} />;
       case "collections":
         return <CollectionsList onBack={() => setCurrentView("dashboard")} collections={[]} />;
       case "recent-collections":

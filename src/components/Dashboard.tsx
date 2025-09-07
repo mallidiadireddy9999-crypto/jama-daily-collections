@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
-import AddLoanModal from "./AddLoanModal";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +27,6 @@ interface DashboardProps {
 const Dashboard = ({ onNavigate }: DashboardProps) => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'payment'>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
-  const [showAddLoanModal, setShowAddLoanModal] = useState(false);
   const [dashboardStats, setDashboardStats] = useState({
     totalCollected: 0,
     pendingBalance: 0,
@@ -148,7 +147,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
   };
 
   const handleAddNewLoan = () => {
-    setShowAddLoanModal(true);
+    onNavigate('add-loan');
   };
 
   const handleBackToDashboard = () => {
@@ -349,20 +348,6 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
         </div>
       </div>
 
-      {/* Add Loan Modal */}
-      <AddLoanModal 
-        open={showAddLoanModal} 
-        onOpenChange={setShowAddLoanModal}
-        onSave={() => {
-          // Refresh dashboard stats after adding new loan
-          fetchDashboardStats();
-          toast({
-            title: t("లోన్ జోడించబడింది", "Loan Added"),
-            description: t("కొత్త లోన్ విజయవంతంగా జోడించబడింది", "New loan added successfully"),
-          });
-          setShowAddLoanModal(false);
-        }}
-      />
     </div>
   );
 };
