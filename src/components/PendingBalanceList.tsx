@@ -1,7 +1,11 @@
+import { useState, useEffect } from "react";
 import { ArrowLeft, Clock, IndianRupee, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface PendingBalance {
   id: string;
@@ -19,55 +23,77 @@ interface PendingBalanceListProps {
 
 const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
   const { t } = useLanguage();
-  
-  // Mock data - this would come from your database
-  const pendingBalances: PendingBalance[] = [
-    {
-      id: "1",
-      customerId: "C001",
-      customerName: "Rajesh Kumar",
-      pendingAmount: 15000,
-      totalLoan: 50000,
-      lastPayment: "2024-01-10",
-      daysOverdue: 5
-    },
-    {
-      id: "2",
-      customerId: "C007",
-      customerName: "Sudha Rani",
-      pendingAmount: 8500,
-      totalLoan: 25000,
-      lastPayment: "2024-01-12",
-      daysOverdue: 3
-    },
-    {
-      id: "3",
-      customerId: "C015",
-      customerName: "Venkat Rao",
-      pendingAmount: 12200,
-      totalLoan: 40000,
-      lastPayment: "2024-01-08",
-      daysOverdue: 7
-    },
-    {
-      id: "4",
-      customerId: "C022",
-      customerName: "Lakshmi Devi",
-      pendingAmount: 6800,
-      totalLoan: 30000,
-      lastPayment: "2024-01-11",
-      daysOverdue: 4
-    },
-    {
-      id: "5",
-      customerId: "C009",
-      customerName: "Krishna Murthy",
-      pendingAmount: 5700,
-      totalLoan: 20000,
-      lastPayment: "2024-01-09",
-      daysOverdue: 6
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [pendingBalances, setPendingBalances] = useState<PendingBalance[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch pending balances from database
+  const fetchPendingBalances = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const { data: loans, error } = await supabase
+        .from('loans')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'active');
+
+      if (error) throw error;
+
+      // Get collections for each loan to calculate pending amounts
+      const loansWithPending = await Promise.all(
+        (loans || []).map(async (loan) => {
+          const { data: collections } = await supabase
+            .from('collections')
+            .select('amount, collection_date')
+            .eq('loan_id', loan.id)
+            .order('collection_date', { ascending: false });
+
+          const paidAmount = collections?.reduce((sum, col) => sum + Number(col.amount), 0) || 0;
+          const loanAmount = Number(loan.amount);
+          const pendingAmount = loanAmount - paidAmount;
+          
+          // Calculate days overdue (rough calculation)
+          const startDate = new Date(loan.start_date);
+          const today = new Date();
+          const expectedDays = loan.duration_months * 30;
+          const daysSinceStart = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+          const daysOverdue = Math.max(0, daysSinceStart - expectedDays);
+
+          const lastPaymentDate = collections?.[0]?.collection_date || loan.start_date;
+
+          return {
+            id: loan.id,
+            customerId: loan.customer_mobile || loan.id,
+            customerName: loan.customer_name,
+            pendingAmount: Math.max(0, pendingAmount),
+            totalLoan: loanAmount,
+            lastPayment: lastPaymentDate,
+            daysOverdue
+          };
+        })
+      );
+
+      // Only show loans with pending amounts
+      const filteredBalances = loansWithPending.filter(loan => loan.pendingAmount > 0);
+      setPendingBalances(filteredBalances);
+    } catch (error: any) {
+      console.error('Error fetching pending balances:', error);
+      toast({
+        title: t("లోపం", "Error"),
+        description: t("బాకీ డేటా లోడ్ చేయడంలో లోపం", "Error loading pending data"),
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchPendingBalances();
+  }, [user]);
 
   const totalPending = pendingBalances.reduce((sum, item) => sum + item.pendingAmount, 0);
 
@@ -109,7 +135,12 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-foreground">{t("బాకీ వివరాలు", "Pending Details")}</h2>
         
-        {pendingBalances.length === 0 ? (
+        {loading ? (
+          <Card className="p-6 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+            <p className="text-muted-foreground">{t("లోడ్ అవుతోంది...", "Loading...")}</p>
+          </Card>
+        ) : pendingBalances.length === 0 ? (
           <Card className="p-6 text-center">
             <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground">{t("ఈ రోజు బాకీలు లేవు", "No pending dues today")}</p>

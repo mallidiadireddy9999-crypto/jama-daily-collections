@@ -1,7 +1,11 @@
+import { useState, useEffect } from "react";
 import { ArrowLeft, PlusCircle, IndianRupee, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface NewLoan {
   id: string;
@@ -19,37 +23,57 @@ interface NewLoansTodayProps {
 
 const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
   const { t } = useLanguage();
-  
-  // Mock data - this would come from your database
-  const newLoansToday: NewLoan[] = [
-    {
-      id: "L025",
-      customerId: "C025",
-      customerName: "Anil Kumar",
-      loanAmount: 35000,
-      dailyAmount: 400,
-      createdTime: "10:30 AM",
-      phoneNumber: "9876543210"
-    },
-    {
-      id: "L026", 
-      customerId: "C026",
-      customerName: "Rama Devi",
-      loanAmount: 20000,
-      dailyAmount: 250,
-      createdTime: "02:15 PM",
-      phoneNumber: "9123456789"
-    },
-    {
-      id: "L027",
-      customerId: "C027", 
-      customerName: "Vijay Krishna",
-      loanAmount: 15000,
-      dailyAmount: 200,
-      createdTime: "04:45 PM",
-      phoneNumber: "9988776655"
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [newLoansToday, setNewLoansToday] = useState<NewLoan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch today's new loans from database
+  const fetchNewLoansToday = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const today = new Date().toISOString().split('T')[0];
+      
+      const { data: loans, error } = await supabase
+        .from('loans')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('start_date', today);
+
+      if (error) throw error;
+
+      const formattedLoans: NewLoan[] = (loans || []).map(loan => ({
+        id: loan.id,
+        customerId: loan.customer_mobile || loan.id,
+        customerName: loan.customer_name,
+        loanAmount: Number(loan.amount),
+        dailyAmount: Math.ceil(Number(loan.amount) / (loan.duration_months * 30)),
+        createdTime: new Date(loan.created_at).toLocaleTimeString('en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          hour12: true 
+        }),
+        phoneNumber: loan.customer_mobile || "N/A"
+      }));
+
+      setNewLoansToday(formattedLoans);
+    } catch (error: any) {
+      console.error('Error fetching new loans today:', error);
+      toast({
+        title: t("లోపం", "Error"),
+        description: t("కొత్త లోన్ డేటా లోడ్ చేయడంలో లోపం", "Error loading new loan data"),
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchNewLoansToday();
+  }, [user]);
 
   const totalNewLoansAmount = newLoansToday.reduce((sum, loan) => sum + loan.loanAmount, 0);
   const totalDailyCollection = newLoansToday.reduce((sum, loan) => sum + loan.dailyAmount, 0);
@@ -100,7 +124,12 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-foreground">{t("కొత్త లోన్‌ల వివరాలు", "New Loan Details")}</h2>
         
-        {newLoansToday.length === 0 ? (
+        {loading ? (
+          <Card className="p-6 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+            <p className="text-muted-foreground">{t("లోడ్ అవుతోంది...", "Loading...")}</p>
+          </Card>
+        ) : newLoansToday.length === 0 ? (
           <Card className="p-6 text-center">
             <PlusCircle className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground">{t("ఈ రోజు కొత్త లోన్‌లు లేవు", "No new loans today")}</p>
