@@ -35,12 +35,23 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
     setCustomerNotFound(false);
 
     try {
-      // Search by customer_mobile, customer_name, or loan id
-      let { data: loans, error } = await supabase
+      // Check if search term looks like a UUID (for loan ID search)
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(searchTerm);
+      
+      let query = supabase
         .from('loans')
-        .select('customer_name, customer_mobile, id')
-        .or(`customer_mobile.eq.${searchTerm},customer_name.ilike.%${searchTerm}%,id.eq.${searchTerm}`)
-        .limit(5); // Get up to 5 results for name matches
+        .select('customer_name, customer_mobile, id');
+
+      // Build the search query based on search term type
+      if (isUUID) {
+        // If it's a UUID, search by ID, mobile, and name
+        query = query.or(`id.eq.${searchTerm},customer_mobile.eq.${searchTerm},customer_name.ilike.%${searchTerm}%`);
+      } else {
+        // If it's not a UUID, only search by mobile and name (safer)
+        query = query.or(`customer_mobile.eq.${searchTerm},customer_name.ilike.%${searchTerm}%`);
+      }
+
+      const { data: loans, error } = await query.limit(5);
 
       if (error) {
         console.error('Error fetching customer:', error);
@@ -86,6 +97,11 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
       console.error('Unexpected error:', error);
       setSelectedCustomerName('');
       setCustomerNotFound(true);
+      toast({
+        title: t("లోపం", "Error"),
+        description: t("కస్టమర్ వెతకడంలో లోపం", "Error searching for customer"),
+        variant: "destructive",
+      });
     } finally {
       setIsLoadingCustomer(false);
     }
