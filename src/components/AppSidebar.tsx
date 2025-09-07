@@ -1,4 +1,4 @@
-import { Home, Users, DollarSign, Calendar, FileText, PlusCircle, TrendingUp, LogOut, User, Settings, Bell, Shield } from "lucide-react";
+import { Home, Users, DollarSign, Calendar, FileText, PlusCircle, TrendingUp, LogOut, User, Settings, Bell, Shield, Megaphone } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -50,6 +50,11 @@ export function AppSidebar({ onNavigate, userRole }: AppSidebarProps) {
       title: t("యూజర్ మేనేజ్‌మెంట్", "User Management"),
       icon: Users,
       view: "user-management"
+    },
+    {
+      title: t("యాడ్స్ మేనేజ్‌మెంట్", "Ads Management"),
+      icon: Megaphone,
+      view: "ads-management"
     },
     {
       title: t("రిపోర్ట్‌లు", "Reports"),
