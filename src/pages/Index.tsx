@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import Dashboard from "@/components/Dashboard";
 import ActiveLoansList from "@/components/ActiveLoansList";
@@ -128,8 +128,18 @@ const Index = () => {
     <SidebarProvider>
       <div className="flex h-screen w-full">
         <AppSidebar onNavigate={setCurrentView} userRole={userRole} />
-        <div className="flex-1 overflow-auto">
-          {renderCurrentView()}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Header with sidebar trigger */}
+          <header className="h-12 flex items-center border-b bg-background px-4 shrink-0">
+            <SidebarTrigger />
+            <div className="ml-4 font-semibold">
+              {userRole === 'super_admin' ? 'Jama - Super Admin Panel' : 'Jama - Daily Collection'}
+            </div>
+          </header>
+          {/* Main content */}
+          <main className="flex-1 overflow-auto p-6">
+            {renderCurrentView()}
+          </main>
         </div>
       </div>
     </SidebarProvider>
