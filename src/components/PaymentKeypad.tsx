@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Check, Mic, Delete, IndianRupee, User } from "lucide-react";
+import { ArrowLeft, Check, Mic, Delete, IndianRupee, User, Search, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface PaymentKeypadProps {
   onBack: () => void;
@@ -16,7 +18,78 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
   const [amount, setAmount] = useState('');
   const [customerId, setCustomerId] = useState('');
   const [selectedCustomerName, setSelectedCustomerName] = useState('');
+  const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
+  const [customerNotFound, setCustomerNotFound] = useState(false);
   const { t } = useLanguage();
+  const { toast } = useToast();
+
+  // Function to fetch customer data by ID
+  const fetchCustomerData = async (searchId: string) => {
+    if (!searchId.trim()) {
+      setSelectedCustomerName('');
+      setCustomerNotFound(false);
+      return;
+    }
+
+    setIsLoadingCustomer(true);
+    setCustomerNotFound(false);
+
+    try {
+      // First try to find by customer_mobile (assuming customer ID might be mobile number)
+      let { data: loans, error } = await supabase
+        .from('loans')
+        .select('customer_name, customer_mobile')
+        .or(`customer_mobile.eq.${searchId},id.eq.${searchId}`)
+        .limit(1);
+
+      if (error) {
+        console.error('Error fetching customer:', error);
+        toast({
+          title: t("లోపం", "Error"),
+          description: t("కస్టమర్ డేటా తెచ్చడంలో లోపం", "Error fetching customer data"),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (loans && loans.length > 0) {
+        setSelectedCustomerName(loans[0].customer_name);
+        setCustomerNotFound(false);
+        toast({
+          title: t("కస్టమర్ దొరికాడు", "Customer Found"),
+          description: `${loans[0].customer_name}`,
+        });
+      } else {
+        setSelectedCustomerName('');
+        setCustomerNotFound(true);
+        toast({
+          title: t("కస్టమర్ దొరకలేదు", "Customer Not Found"),
+          description: t("ఈ ID తో కస్టమర్ దొరకలేదు", "No customer found with this ID"),
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      setSelectedCustomerName('');
+      setCustomerNotFound(true);
+    } finally {
+      setIsLoadingCustomer(false);
+    }
+  };
+
+  // Auto-fetch when customer ID changes
+  useEffect(() => {
+    const delayedFetch = setTimeout(() => {
+      if (customerId.length >= 3) { // Only search when at least 3 characters
+        fetchCustomerData(customerId);
+      } else {
+        setSelectedCustomerName('');
+        setCustomerNotFound(false);
+      }
+    }, 500); // Debounce for 500ms
+
+    return () => clearTimeout(delayedFetch);
+  }, [customerId]);
 
   const quickAmounts = [100, 500, 1000];
 
@@ -70,25 +143,63 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
             <User className="h-4 w-4" />
             {t("కస్టమర్ ID", "Customer ID")}
           </Label>
-          <Input
-            id="customerId"
-            value={customerId}
-            onChange={(e) => setCustomerId(e.target.value)}
-            placeholder={t("కస్టమర్ ID నమోదు చేయండి", "Enter Customer ID")}
-            className="h-11"
-          />
+          <div className="relative">
+            <Input
+              id="customerId"
+              value={customerId}
+              onChange={(e) => setCustomerId(e.target.value)}
+              placeholder={t("కస్టమర్ ID లేదా మొబైల్ నంబర్", "Enter Customer ID or Mobile Number")}
+              className="h-11 pr-10"
+            />
+            {isLoadingCustomer && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <Search className="h-4 w-4 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </div>
           
-          <Label htmlFor="customerName" className="flex items-center gap-2 text-sm font-medium">
-            <User className="h-4 w-4" />
-            {t("కస్టమర్ పేరు", "Customer Name")}
-          </Label>
-          <Input
-            id="customerName"
-            value={selectedCustomerName}
-            onChange={(e) => setSelectedCustomerName(e.target.value)}
-            placeholder={t("కస్టమర్ పేరు నమోదు చేయండి", "Enter Customer Name")}
-            className="h-11"
-          />
+          {/* Auto-fetched Customer Name Display */}
+          {selectedCustomerName && (
+            <div className="bg-success/10 border border-success/20 rounded-lg p-3">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-success" />
+                <div>
+                  <p className="text-sm font-medium text-success">{t("కస్టమర్ దొరికాడు", "Customer Found")}</p>
+                  <p className="text-sm text-foreground font-semibold">{selectedCustomerName}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Customer Not Found */}
+          {customerNotFound && customerId.length >= 3 && (
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <div>
+                  <p className="text-sm font-medium text-destructive">{t("కస్టమర్ దొరకలేదు", "Customer Not Found")}</p>
+                  <p className="text-xs text-muted-foreground">{t("దయచేసి సరైన ID ని ధృవీకరించండి", "Please verify the correct ID")}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Manual Name Entry (fallback) */}
+          {customerId && !selectedCustomerName && !isLoadingCustomer && (
+            <>
+              <Label htmlFor="customerName" className="flex items-center gap-2 text-sm font-medium">
+                <User className="h-4 w-4" />
+                {t("కస్టమర్ పేరు (మాన్యువల్)", "Customer Name (Manual)")}
+              </Label>
+              <Input
+                id="customerName"
+                value={selectedCustomerName}
+                onChange={(e) => setSelectedCustomerName(e.target.value)}
+                placeholder={t("కస్టమర్ పేరు నమోదు చేయండి", "Enter Customer Name")}
+                className="h-11"
+              />
+            </>
+          )}
         </div>
       </Card>
 
