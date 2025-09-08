@@ -120,15 +120,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUserRole(userRole);
           setUserProfile(profile);
         } else {
-          console.log('No profile found for user, checking if this is a super admin...');
-          // If no profile exists, check if this is the super admin email
-          if (userId === '268f7f19-eb4b-44b0-8036-38f2741cc219') {
-            setUserRole('super_admin');
-            setUserProfile({ role: 'super_admin', user_id: userId });
-          } else {
-            setUserRole('jama_user');
-            setUserProfile(null);
-          }
+          console.log('No profile found for user, creating default profile...');
+          // If no profile exists, create a default jama_user profile
+          setUserRole('jama_user');
+          setUserProfile(null);
         }
       } catch (error) {
         console.error('Profile fetch failed:', error);
