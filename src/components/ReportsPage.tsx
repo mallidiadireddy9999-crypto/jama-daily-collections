@@ -452,18 +452,33 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
       {/* Reports Tabs */}
       <Card className="p-6 shadow-card bg-card">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="daily-collections" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              {t("రోజువారీ వసూలు", "Daily Collections")}
+          <TabsList className="grid w-full grid-cols-3 gap-2 h-auto p-2">
+            <TabsTrigger 
+              value="daily-collections" 
+              className="flex flex-col items-center gap-2 py-4 px-4 text-center min-h-[80px] data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <FileText className="h-5 w-5" />
+              <span className="text-sm font-medium leading-tight">
+                {t("రోజువారీ వసూలు", "Daily Collections")}
+              </span>
             </TabsTrigger>
-            <TabsTrigger value="loan-database" className="flex items-center gap-2">
-              <Database className="h-4 w-4" />
-              {t("లోన్ డేటాబేస్", "Loan Database")}
+            <TabsTrigger 
+              value="loan-database" 
+              className="flex flex-col items-center gap-2 py-4 px-4 text-center min-h-[80px] data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <Database className="h-5 w-5" />
+              <span className="text-sm font-medium leading-tight">
+                {t("లోన్ డేటాబేస్", "Loan Database")}
+              </span>
             </TabsTrigger>
-            <TabsTrigger value="customer-wise" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              {t("కస్టమర్ వైస్ రిపోర్ట్", "Customer Wise Report")}
+            <TabsTrigger 
+              value="customer-wise" 
+              className="flex flex-col items-center gap-2 py-4 px-4 text-center min-h-[80px] data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <Users className="h-5 w-5" />
+              <span className="text-sm font-medium leading-tight">
+                {t("కస్టమర్ వైస్ రిపోర్ట్", "Customer Wise Report")}
+              </span>
             </TabsTrigger>
           </TabsList>
 
