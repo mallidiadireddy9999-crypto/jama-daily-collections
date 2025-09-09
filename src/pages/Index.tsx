@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { LogIn, ArrowLeft } from "lucide-react";
 import { AdsManagement } from "@/components/AdsManagement";
+import CustomerWiseReport from "@/components/CustomerWiseReport";
 
 const Index = () => {
   const { user, loading, userRole } = useAuth();
@@ -146,6 +147,8 @@ const Index = () => {
         return <RecentCollectionsList onBack={() => setCurrentView("dashboard")} />;
       case "reports":
         return <ReportsPage onBack={() => setCurrentView("dashboard")} />;
+      case "customer-report":
+        return <CustomerWiseReport onBack={() => setCurrentView("dashboard")} />;
       default:
         return <Dashboard onNavigate={setCurrentView} />;
     }

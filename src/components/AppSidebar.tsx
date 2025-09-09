@@ -1,4 +1,4 @@
-import { Home, Users, DollarSign, Calendar, FileText, PlusCircle, TrendingUp, LogOut, User, Settings, Bell, Shield, Megaphone } from "lucide-react";
+import { Home, Users, DollarSign, Calendar, FileText, PlusCircle, TrendingUp, LogOut, User, Bell, Shield, Megaphone, BarChart3 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -99,6 +99,11 @@ export function AppSidebar({ onNavigate, userRole }: AppSidebarProps) {
       title: t("రిపోర్ట్‌లు", "Reports"),
       icon: FileText,
       view: "reports"
+    },
+    {
+      title: t("కస్టమర్ వైజ్ రిపోర్ట్", "Customer Wise Report"),
+      icon: BarChart3,
+      view: "customer-report"
     }
   ];
 
@@ -112,11 +117,11 @@ export function AppSidebar({ onNavigate, userRole }: AppSidebarProps) {
     <Sidebar className="border-r border-border bg-card">
       <SidebarHeader className="border-b border-border p-4">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center">
             <img 
               src="/lovable-uploads/5687e4de-9f9a-4de1-8c5c-92952cc9cd45.png" 
               alt="JAMA" 
-              className="w-8 h-8 object-contain"
+              className="w-12 h-12 object-contain"
             />
           </div>
           <div>
@@ -139,7 +144,7 @@ export function AppSidebar({ onNavigate, userRole }: AppSidebarProps) {
                 onClick={() => onNavigate(item.view)}
                 className="w-full justify-start space-x-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors"
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className="h-6 w-6" />
                 <span className="text-sm font-medium">{item.title}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -154,7 +159,7 @@ export function AppSidebar({ onNavigate, userRole }: AppSidebarProps) {
             size="sm"
             className="w-full"
           >
-            <TrendingUp className="h-4 w-4 mr-2" />
+            <TrendingUp className="h-5 w-5 mr-2" />
             {language === 'te' ? 'English' : 'తెలుగు'}
           </Button>
         </div>
@@ -164,7 +169,7 @@ export function AppSidebar({ onNavigate, userRole }: AppSidebarProps) {
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex items-center space-x-2 px-2 py-1 text-sm text-muted-foreground">
-              {userRole === 'super_admin' ? <Shield className="h-4 w-4" /> : <User className="h-4 w-4" />}
+              {userRole === 'super_admin' ? <Shield className="h-5 w-5" /> : <User className="h-5 w-5" />}
               <div className="flex-1 truncate">
                 <div className="truncate">{user?.email}</div>
                 {userRole === 'super_admin' && (
@@ -179,7 +184,7 @@ export function AppSidebar({ onNavigate, userRole }: AppSidebarProps) {
               onClick={handleSignOut}
               className="w-full justify-start text-muted-foreground hover:text-foreground"
             >
-              <LogOut className="h-4 w-4 mr-2" />
+              <LogOut className="h-5 w-5 mr-2" />
               {t("లాగ్ అవుట్", "Sign Out")}
             </Button>
           </SidebarMenuItem>
