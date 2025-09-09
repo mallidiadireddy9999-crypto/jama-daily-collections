@@ -100,11 +100,6 @@ export function AppSidebar({ onNavigate, userRole }: AppSidebarProps) {
       icon: FileText,
       view: "reports"
     },
-    {
-      title: t("కస్టమర్ వైజ్ రిపోర్ట్", "Customer Wise Report"),
-      icon: BarChart3,
-      view: "customer-report"
-    }
   ];
 
   const menuItems = userRole === 'super_admin' ? superAdminMenuItems : jamaUserMenuItems;

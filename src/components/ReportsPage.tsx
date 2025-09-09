@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Download, Calendar, TrendingUp, Users, IndianRupee, FileText, Database } from "lucide-react";
+import { ArrowLeft, Download, Calendar, TrendingUp, Users, IndianRupee, FileText, Database, FileBarChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,7 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [dailyCollections, setDailyCollections] = useState<any[]>([]);
   const [allLoans, setAllLoans] = useState<any[]>([]);
+  const [customerWiseData, setCustomerWiseData] = useState<any[]>([]);
   const [dailyTotal, setDailyTotal] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -37,6 +38,8 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
       fetchDailyCollections();
     } else if (activeTab === "loan-database") {
       fetchAllLoans();
+    } else if (activeTab === "customer-wise") {
+      fetchCustomerWiseData();
     }
   }, [activeTab, selectedDate]);
 
@@ -117,6 +120,62 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
       if (error) throw error;
 
       setAllLoans(loans || []);
+
+    } catch (error: any) {
+      toast({
+        title: t("లోపం", "Error"),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCustomerWiseData = async () => {
+    setLoading(true);
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) return;
+
+      // Fetch all loans with collections
+      const { data: loans, error } = await supabase
+        .from('loans')
+        .select(`
+          *,
+          collections(*)
+        `)
+        .eq('user_id', user.user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Calculate customer wise data
+      const customerData = (loans || []).map((loan) => {
+        const collections = loan.collections || [];
+        const totalCollected = collections.reduce((sum: number, coll: any) => sum + Number(coll.amount), 0);
+        const outstanding = Number(loan.amount) - totalCollected;
+        
+        // Calculate loan timeframe
+        const startDate = new Date(loan.start_date);
+        const endDate = new Date(startDate);
+        endDate.setMonth(endDate.getMonth() + (loan.duration_months || 12));
+        
+        return {
+          loan_id: loan.id,
+          customer_name: loan.customer_name,
+          principal_amount: Number(loan.amount),
+          outstanding_amount: outstanding,
+          total_collected: totalCollected,
+          collections: collections,
+          start_date: loan.start_date,
+          duration_months: loan.duration_months || 12,
+          end_date: endDate.toISOString().split('T')[0],
+          status: loan.status
+        };
+      });
+
+      setCustomerWiseData(customerData);
 
     } catch (error: any) {
       toast({
@@ -292,6 +351,88 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
     }
   };
 
+  const downloadCustomerWisePDF = () => {
+    if (!customerWiseData.length) {
+      toast({
+        title: t("లోపం", "Error"),
+        description: t("డేటా లేదు", "No data available"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const doc = new jsPDF();
+      
+      // Add logo
+      const logoImg = new Image();
+      logoImg.onload = () => {
+        // Add logo to top left
+        doc.addImage(logoImg, 'PNG', 20, 10, 30, 30);
+        
+        // Add title
+        doc.setFontSize(20);
+        doc.text('JAMA - Customer Wise Report', 105, 25, { align: 'center' });
+        
+        // Add summary
+        doc.setFontSize(12);
+        doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 50);
+        doc.text(`Total Customers: ${customerWiseData.length}`, 20, 60);
+        
+        const totalPrincipal = customerWiseData.reduce((sum, customer) => sum + customer.principal_amount, 0);
+        const totalOutstanding = customerWiseData.reduce((sum, customer) => sum + customer.outstanding_amount, 0);
+        
+        doc.text(`Total Principal: Rs.${totalPrincipal.toLocaleString()}`, 20, 70);
+        doc.text(`Total Outstanding: Rs.${totalOutstanding.toLocaleString()}`, 20, 80);
+        
+        // Add customer table
+        const customerData = customerWiseData.map((customer: any) => [
+          customer.loan_id.substring(0, 8),
+          customer.customer_name,
+          `Rs.${customer.principal_amount.toLocaleString()}`,
+          `Rs.${customer.outstanding_amount.toLocaleString()}`,
+          `${customer.collections.length} payments`,
+          `${customer.start_date} to ${customer.end_date}`
+        ]);
+
+        autoTable(doc, {
+          startY: 95,
+          head: [['Loan ID', 'Customer', 'Principal', 'Outstanding', 'Payments', 'Timeframe']],
+          body: customerData,
+          theme: 'grid',
+          styles: { fontSize: 8 },
+          headStyles: { fontSize: 9, fillColor: [34, 197, 94] },
+          columnStyles: {
+            0: { cellWidth: 25 },
+            1: { cellWidth: 30 },
+            2: { cellWidth: 25 },
+            3: { cellWidth: 25 },
+            4: { cellWidth: 20 },
+            5: { cellWidth: 45 }
+          }
+        });
+
+        const filename = `jama-customer-wise-report-${new Date().toISOString().split('T')[0]}.pdf`;
+        doc.save(filename);
+        
+        toast({
+          title: "PDF Downloaded",
+          description: `Report saved as ${filename}`,
+        });
+      };
+      
+      logoImg.src = "/lovable-uploads/ff3ffabf-f0ae-4db2-b9ae-0144863bfcf6.png";
+      
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "PDF Generation Error",
+        description: "Failed to generate PDF",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-card p-4 space-y-6">
       {/* Header */}
@@ -311,7 +452,7 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
       {/* Reports Tabs */}
       <Card className="p-6 shadow-card bg-card">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="daily-collections" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               {t("రోజువారీ వసూలు", "Daily Collections")}
@@ -319,6 +460,10 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
             <TabsTrigger value="loan-database" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               {t("లోన్ డేటాబేస్", "Loan Database")}
+            </TabsTrigger>
+            <TabsTrigger value="customer-wise" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              {t("కస్టమర్ వైస్ రిపోర్ట్", "Customer Wise Report")}
             </TabsTrigger>
           </TabsList>
 
@@ -528,6 +673,86 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
               <Card className="p-8 text-center">
                 <Database className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">{t("లోన్లు లేవు", "No loans found")}</p>
+              </Card>
+            ) : null}
+          </TabsContent>
+
+          {/* Customer Wise Report Tab */}
+          <TabsContent value="customer-wise" className="space-y-6 mt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">{t("కస్టమర్ వైస్ రిపోర్ట్", "Customer Wise Report")}</h3>
+                <p className="text-sm text-muted-foreground">{t("ప్రతి కస్టమర్ కు సంబంధించిన వివరాలు", "Details for each customer")}</p>
+              </div>
+              {customerWiseData.length > 0 && (
+                <Button 
+                  variant="outline" 
+                  onClick={downloadCustomerWisePDF}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  {t("PDF డౌన్‌లోడ్", "Download PDF")}
+                </Button>
+              )}
+            </div>
+
+            {/* Customer Wise Data Table */}
+            {customerWiseData.length > 0 ? (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t("లోన్ ID", "Loan ID")}</TableHead>
+                      <TableHead>{t("కస్టమర్ పేరు", "Customer Name")}</TableHead>
+                      <TableHead>{t("ప్రధాన మొత్తం", "Principal Amount")}</TableHead>
+                      <TableHead>{t("బకాయి మొత్తం", "Outstanding Amount")}</TableHead>
+                      <TableHead>{t("రోజువారీ చెల్లింపులు", "Day Wise Payments")}</TableHead>
+                      <TableHead>{t("లోన్ కాలవధి", "Loan Timeframe")}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {customerWiseData.map((customer) => (
+                      <TableRow key={customer.loan_id}>
+                        <TableCell className="font-mono text-sm">{customer.loan_id.substring(0, 8)}</TableCell>
+                        <TableCell className="font-medium">{customer.customer_name}</TableCell>
+                        <TableCell>₹{customer.principal_amount.toLocaleString()}</TableCell>
+                        <TableCell>₹{customer.outstanding_amount.toLocaleString()}</TableCell>
+                        <TableCell>
+                          <div className="max-w-xs">
+                            {customer.collections.length > 0 ? (
+                              <div className="text-xs space-y-1">
+                                {customer.collections.slice(0, 3).map((collection: any, index: number) => (
+                                  <div key={index} className="flex justify-between">
+                                    <span>{new Date(collection.collection_date).toLocaleDateString()}</span>
+                                    <span>₹{Number(collection.amount).toLocaleString()}</span>
+                                  </div>
+                                ))}
+                                {customer.collections.length > 3 && (
+                                  <div className="text-muted-foreground">
+                                    +{customer.collections.length - 3} more...
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">{t("చెల్లింపులు లేవు", "No payments")}</span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">
+                            <div>{customer.start_date} to {customer.end_date}</div>
+                            <div className="text-muted-foreground">{customer.duration_months} months</div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : !loading ? (
+              <Card className="p-8 text-center">
+                <FileBarChart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">{t("కస్టమర్ డేటా లేదు", "No customer data available")}</p>
               </Card>
             ) : null}
           </TabsContent>

@@ -147,8 +147,6 @@ const Index = () => {
         return <RecentCollectionsList onBack={() => setCurrentView("dashboard")} />;
       case "reports":
         return <ReportsPage onBack={() => setCurrentView("dashboard")} />;
-      case "customer-report":
-        return <CustomerWiseReport onBack={() => setCurrentView("dashboard")} />;
       default:
         return <Dashboard onNavigate={setCurrentView} />;
     }
