@@ -55,14 +55,30 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
     setLoading(true);
 
     try {
-      // Save to Supabase database with all the new fields
+      // First, create customer record
+      const { data: customerData, error: customerError } = await supabase
+        .from('customers')
+        .insert([
+          {
+            customer_name: formData.customerName,
+            customer_mobile: formData.mobileNumber,
+            created_by: user.id
+          }
+        ])
+        .select()
+        .single();
+
+      if (customerError) throw customerError;
+
+      // Then, save loan with customer reference
       const { data, error } = await supabase
         .from('loans')
         .insert([
           {
             user_id: user.id,
-            customer_name: formData.customerName,
-            customer_mobile: formData.mobileNumber,
+            customer_id: customerData.id,
+            customer_name: formData.customerName, // Keep for compatibility
+            customer_mobile: formData.mobileNumber, // Keep for compatibility
             amount: parseFloat(formData.principalAmount),
             disbursement_type: formData.disbursementType,
             cutting_amount: parseFloat(formData.cuttingAmount) || 0,

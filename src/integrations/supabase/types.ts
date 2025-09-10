@@ -206,10 +206,38 @@ export type Database = {
           },
         ]
       }
+      customers: {
+        Row: {
+          created_at: string
+          created_by: string
+          customer_mobile: string | null
+          customer_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          customer_mobile?: string | null
+          customer_name: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          customer_mobile?: string | null
+          customer_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       loans: {
         Row: {
           amount: number
           created_at: string
+          customer_id: string | null
           customer_mobile: string | null
           customer_name: string
           cutting_amount: number | null
@@ -231,6 +259,7 @@ export type Database = {
         Insert: {
           amount: number
           created_at?: string
+          customer_id?: string | null
           customer_mobile?: string | null
           customer_name: string
           cutting_amount?: number | null
@@ -252,6 +281,7 @@ export type Database = {
         Update: {
           amount?: number
           created_at?: string
+          customer_id?: string | null
           customer_mobile?: string | null
           customer_name?: string
           cutting_amount?: number | null
@@ -270,7 +300,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "loans_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -364,6 +402,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      audit_admin_access: {
+        Args: {
+          action_param: string
+          record_id_param: string
+          table_name_param: string
+        }
+        Returns: boolean
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -374,6 +420,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      migrate_customer_data: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
     }
     Enums: {
