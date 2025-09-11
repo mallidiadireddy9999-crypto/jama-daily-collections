@@ -32,12 +32,13 @@ const CollectionsList = ({ onBack, collections }: CollectionsListProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-card p-4 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+    <div className="min-h-screen bg-gradient-card pb-24">
+      <div className="p-4 space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <Button variant="default" size="icon" onClick={onBack} className="shadow-lg">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
         <div>
           <h1 className="text-xl font-bold text-foreground">{t("నేటి వసూలు", "Today's Collections")}</h1>
           <p className="text-sm text-muted-foreground">
@@ -100,27 +101,43 @@ const CollectionsList = ({ onBack, collections }: CollectionsListProps) => {
         )}
       </div>
 
-      {/* Summary Footer */}
-      {collections.length > 0 && (
-        <Card className="p-4 shadow-card bg-muted">
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t("మొత్తం వసూలు:", "Total Collections:")}</span>
-              <span className="font-medium text-foreground">{collections.length}</span>
+      </div>
+      
+      {/* Sticky Summary Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border shadow-lg z-10">
+        <div className="p-4">
+          <div className="flex justify-between items-center max-w-6xl mx-auto">
+            <div className="flex items-center space-x-8">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("వసూలు రేట్", "Collection Rate")}</p>
+                <p className="text-lg font-bold text-success">
+                  {collections.length > 0 ? Math.round(collections.length / 10 * 100) : 0}%
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("మొత్తం వసూలు", "Total Collections")}</p>
+                <p className="text-lg font-bold text-primary">
+                  {collections.length}
+                </p>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t("మొత్తం మొత్తం:", "Total Amount:")}</span>
-              <span className="font-medium text-success">₹{totalAmount.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t("సగటు వసూలు:", "Average Collection:")}</span>
-              <span className="font-medium text-primary">
-                ₹{Math.round(totalAmount / collections.length).toLocaleString()}
-              </span>
+            <div className="flex items-center space-x-8">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("సగటు వసూలు", "Average Collection")}</p>
+                <p className="text-lg font-bold text-warning">
+                  ₹{collections.length > 0 ? Math.round(totalAmount / collections.length).toLocaleString() : 0}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("మొత్తం వసూలైనది", "Total Collected")}</p>
+                <p className="text-lg font-bold text-success">
+                  ₹{totalAmount.toLocaleString()}
+                </p>
+              </div>
             </div>
           </div>
-        </Card>
-      )}
+        </div>
+      </div>
     </div>
   );
 };

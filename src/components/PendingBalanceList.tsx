@@ -104,12 +104,13 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-card p-4 space-y-6">
-      {/* Header */}
-      <div className="flex items-center space-x-4">
-        <Button variant="outline" size="icon" onClick={onBack}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+    <div className="min-h-screen bg-gradient-card pb-24">
+      <div className="p-4 space-y-6">
+        {/* Header */}
+        <div className="flex items-center space-x-4">
+          <Button variant="default" size="icon" onClick={onBack} className="shadow-lg">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-foreground">{t("బాకీ మొత్తాలు", "Pending Balances")}</h1>
           <p className="text-sm text-muted-foreground">
@@ -195,18 +196,42 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
         )}
       </div>
 
-      {/* Quick Actions */}
-      <div className="sticky bottom-4">
-        <Card className="p-4 bg-primary/5 border-primary/20">
-          <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">
-              {t("మొత్తం బాకీ మొత్తం", "Total Pending Amount")}
-            </p>
-            <p className="text-2xl font-bold text-warning">
-              ₹{totalPending.toLocaleString()}
-            </p>
+      </div>
+      
+      {/* Sticky Summary Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border shadow-lg z-10">
+        <div className="p-4">
+          <div className="flex justify-between items-center max-w-6xl mx-auto">
+            <div className="flex items-center space-x-8">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("ఓవర్‌డ్యూ కస్టమర్లు", "Overdue Customers")}</p>
+                <p className="text-lg font-bold text-destructive">
+                  {pendingBalances.filter(b => b.daysOverdue >= 7).length}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("మొత్తం కస్టమర్లు", "Total Customers")}</p>
+                <p className="text-lg font-bold text-primary">
+                  {pendingBalances.length}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-8">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("యావరేజ్ బాకీ", "Average Pending")}</p>
+                <p className="text-lg font-bold text-warning">
+                  ₹{pendingBalances.length > 0 ? Math.round(totalPending / pendingBalances.length).toLocaleString() : 0}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("మొత్తం బాకీ", "Total Pending")}</p>
+                <p className="text-lg font-bold text-warning">
+                  ₹{totalPending.toLocaleString()}
+                </p>
+              </div>
+            </div>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

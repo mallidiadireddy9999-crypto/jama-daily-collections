@@ -133,12 +133,13 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
   const totalDailyCollection = newLoansToday.reduce((sum, loan) => sum + loan.dailyAmount, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-card p-4 space-y-6">
-      {/* Header */}
-      <div className="flex items-center space-x-4">
-        <Button variant="outline" size="icon" onClick={onBack}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+    <div className="min-h-screen bg-gradient-card pb-24">
+      <div className="p-4 space-y-6">
+        {/* Header */}
+        <div className="flex items-center space-x-4">
+          <Button variant="default" size="icon" onClick={onBack} className="shadow-lg">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-foreground">{t("నేడు కొత్త లోన్‌లు", "New Loans Today")}</h1>
           <p className="text-sm text-muted-foreground">
@@ -308,29 +309,42 @@ const NewLoansToday = ({ onBack }: NewLoansTodayProps) => {
         )}
       </div>
 
-      {/* Today's Summary */}
-      <div className="sticky bottom-4">
-        <Card className="p-4 bg-gradient-money text-primary-foreground">
-          <div className="text-center space-y-2">
-            <p className="text-sm opacity-90">
-              {t("ఈ రోజు మొత్తం కొత్త వ్యాపారం", "Today's Total New Business")}
-            </p>
-            <div className="flex justify-around">
-              <div>
-                <p className="text-xs opacity-75">{newLoansToday.length} {t("లోన్‌లు", "loans")}</p>
-                <p className="text-xl font-bold">
+      </div>
+      
+      {/* Sticky Summary Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border shadow-lg z-10">
+        <div className="p-4">
+          <div className="flex justify-between items-center max-w-6xl mx-auto">
+            <div className="flex items-center space-x-8">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("కొత్త లోన్‌లు", "New Loans")}</p>
+                <p className="text-lg font-bold text-primary">
+                  {newLoansToday.length}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("యావరేజ్ లోన్", "Average Loan")}</p>
+                <p className="text-lg font-bold text-primary">
+                  ₹{newLoansToday.length > 0 ? Math.round(totalNewLoansAmount / newLoansToday.length).toLocaleString() : 0}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-8">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("మొత్తం రాశి", "Total Amount")}</p>
+                <p className="text-lg font-bold text-success">
                   ₹{totalNewLoansAmount.toLocaleString()}
                 </p>
               </div>
-              <div>
-                <p className="text-xs opacity-75">{t("రోజువారీ వసూలు", "Daily Collections")}</p>
-                <p className="text-xl font-bold">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("రోజువారీ వసూలు", "Daily Collections")}</p>
+                <p className="text-lg font-bold text-warning">
                   ₹{totalDailyCollection.toLocaleString()}
                 </p>
               </div>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

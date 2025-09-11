@@ -117,12 +117,13 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-card p-4 space-y-6">
-      {/* Header */}
-      <div className="flex items-center space-x-4">
-        <Button variant="outline" size="icon" onClick={onBack}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+    <div className="min-h-screen bg-gradient-card pb-24">
+      <div className="p-4 space-y-6">
+        {/* Header */}
+        <div className="flex items-center space-x-4">
+          <Button variant="default" size="icon" onClick={onBack} className="shadow-lg">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-foreground">{t("క్రియాశీల లోన్‌లు", "Active Loans")}</h1>
           <p className="text-sm text-muted-foreground">
@@ -131,32 +132,15 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-3">
-        <Card className="p-3 text-center">
-          <IndianRupee className="h-5 w-5 text-primary mx-auto mb-1" />
-          <p className="text-xs text-muted-foreground">{t("మొత్తం రాశి", "Total Amount")}</p>
-          <p className="text-sm font-bold text-foreground">
-            ₹{totalActiveAmount.toLocaleString()}
-          </p>
+        {/* Quick Overview */}
+        <Card className="p-4 bg-muted/50">
+          <div className="text-center">
+            <h2 className="text-lg font-semibold text-foreground mb-2">{t("క్రియాశీల లోన్‌ల సారాంశం", "Active Loans Overview")}</h2>
+            <p className="text-sm text-muted-foreground">
+              {activeLoans.length} {t("లోన్‌లు క్రియాశీలంగా ఉన్నాయి", "active loans")}
+            </p>
+          </div>
         </Card>
-        
-        <Card className="p-3 text-center bg-success/10">
-          <TrendingUp className="h-5 w-5 text-success mx-auto mb-1" />
-          <p className="text-xs text-muted-foreground">{t("వసూలైనది", "Collected")}</p>
-          <p className="text-sm font-bold text-success">
-            ₹{totalCollected.toLocaleString()}
-          </p>
-        </Card>
-        
-        <Card className="p-3 text-center bg-warning/10">
-          <Users className="h-5 w-5 text-warning mx-auto mb-1" />
-          <p className="text-xs text-muted-foreground">{t("బాకీ", "Pending")}</p>
-          <p className="text-sm font-bold text-warning">
-            ₹{totalPending.toLocaleString()}
-          </p>
-        </Card>
-      </div>
 
       {/* Active Loans List */}
       <div className="space-y-3">
@@ -259,21 +243,34 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
         )}
       </div>
 
-      {/* Summary Footer */}
-      <div className="sticky bottom-4">
-        <Card className="p-4 bg-primary/5 border-primary/20">
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground mb-1">
-              {activeLoans.length} {t("క్రియాశీల లోన్‌లు", "active loans")}
-            </p>
-            <div className="flex justify-around">
-              <div>
+      </div>
+      
+      {/* Sticky Summary Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border shadow-lg z-10">
+        <div className="p-4">
+          <div className="flex justify-between items-center max-w-6xl mx-auto">
+            <div className="flex items-center space-x-8">
+              <div className="text-center">
                 <p className="text-xs text-muted-foreground">{t("వసూలు రేట్", "Collection Rate")}</p>
                 <p className="text-lg font-bold text-success">
                   {totalActiveAmount > 0 ? Math.round((totalCollected / totalActiveAmount) * 100) : 0}%
                 </p>
               </div>
-              <div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("మొత్తం లోన్‌లు", "Total Loans")}</p>
+                <p className="text-lg font-bold text-primary">
+                  ₹{totalActiveAmount.toLocaleString()}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-8">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t("వసూలైనది", "Collected")}</p>
+                <p className="text-lg font-bold text-success">
+                  ₹{totalCollected.toLocaleString()}
+                </p>
+              </div>
+              <div className="text-center">
                 <p className="text-xs text-muted-foreground">{t("బాకీ మొత్తం", "Pending Amount")}</p>
                 <p className="text-lg font-bold text-warning">
                   ₹{totalPending.toLocaleString()}
@@ -281,7 +278,7 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
               </div>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       <EditLoanModal
