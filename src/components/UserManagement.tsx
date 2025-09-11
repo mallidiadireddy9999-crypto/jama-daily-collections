@@ -173,7 +173,7 @@ export const UserManagement = ({ onBack }: UserManagementProps) => {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={() => setSelectedUser(null)}>
+          <Button variant="default" onClick={() => setSelectedUser(null)} className="shadow-lg">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Users
           </Button>
@@ -237,7 +237,7 @@ export const UserManagement = ({ onBack }: UserManagementProps) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={onBack}>
+        <Button variant="default" onClick={onBack} className="shadow-lg">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>

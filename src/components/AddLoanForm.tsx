@@ -140,7 +140,7 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
     <div className="min-h-screen bg-gradient-card p-4 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onBack}>
+        <Button variant="default" size="icon" onClick={onBack} className="shadow-lg">
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>

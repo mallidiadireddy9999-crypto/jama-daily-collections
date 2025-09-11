@@ -74,7 +74,7 @@ const RecentCollectionsList = ({ onBack }: RecentCollectionsListProps) => {
       <div className="min-h-screen bg-gradient-card p-4 space-y-6">
         {/* Header */}
         <div className="flex items-center space-x-4">
-          <Button variant="outline" size="icon" onClick={onBack}>
+          <Button variant="default" size="icon" onClick={onBack} className="shadow-lg">
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">

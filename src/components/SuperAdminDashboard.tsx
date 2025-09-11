@@ -142,7 +142,7 @@ export const SuperAdminDashboard = ({ onNavigate, onBack }: SuperAdminDashboardP
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           {onBack && (
-            <Button variant="ghost" onClick={onBack} className="p-2">
+            <Button variant="default" onClick={onBack} className="p-2 shadow-lg">
               <ArrowLeft className="h-4 w-4" />
             </Button>
           )}

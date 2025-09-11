@@ -192,7 +192,7 @@ export const AdAnalytics = ({ onBack, selectedAdId }: AdAnalyticsProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={onBack} className="p-2">
+          <Button variant="default" onClick={onBack} className="p-2 shadow-lg">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-3xl font-bold">Ad Analytics</h1>

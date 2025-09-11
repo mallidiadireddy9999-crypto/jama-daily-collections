@@ -438,10 +438,10 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button
-          variant="outline"
+          variant="default"
           size="sm"
           onClick={onBack}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 shadow-lg"
         >
           <ArrowLeft className="h-4 w-4" />
           {t("వెనుకకు", "Back")}
