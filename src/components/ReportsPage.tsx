@@ -452,31 +452,31 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
       {/* Reports Tabs */}
       <Card className="p-6 shadow-card bg-card">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 gap-4 h-auto p-4 bg-muted/50 rounded-lg">
+          <TabsList className="flex flex-col w-full gap-3 h-auto p-4 bg-muted/50 rounded-lg">
             <TabsTrigger 
               value="daily-collections" 
-              className="flex flex-col items-center gap-3 py-6 px-6 text-center min-h-[100px] rounded-md border-2 border-transparent transition-all duration-200 hover:bg-muted/80 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-md"
+              className="flex items-center justify-start gap-4 py-4 px-6 w-full text-left min-h-[60px] rounded-md border-2 border-transparent transition-all duration-200 hover:bg-muted/80 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-md"
             >
-              <FileText className="h-6 w-6" />
-              <span className="text-sm font-semibold leading-tight">
+              <FileText className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm font-semibold">
                 {t("రోజువారీ వసూలు", "Daily Collections")}
               </span>
             </TabsTrigger>
             <TabsTrigger 
               value="loan-database" 
-              className="flex flex-col items-center gap-3 py-6 px-6 text-center min-h-[100px] rounded-md border-2 border-transparent transition-all duration-200 hover:bg-muted/80 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-md"
+              className="flex items-center justify-start gap-4 py-4 px-6 w-full text-left min-h-[60px] rounded-md border-2 border-transparent transition-all duration-200 hover:bg-muted/80 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-md"
             >
-              <Database className="h-6 w-6" />
-              <span className="text-sm font-semibold leading-tight">
+              <Database className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm font-semibold">
                 {t("లోన్ డేటాబేస్", "Loan Database")}
               </span>
             </TabsTrigger>
             <TabsTrigger 
               value="customer-wise" 
-              className="flex flex-col items-center gap-3 py-6 px-6 text-center min-h-[100px] rounded-md border-2 border-transparent transition-all duration-200 hover:bg-muted/80 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-md"
+              className="flex items-center justify-start gap-4 py-4 px-6 w-full text-left min-h-[60px] rounded-md border-2 border-transparent transition-all duration-200 hover:bg-muted/80 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-md"
             >
-              <Users className="h-6 w-6" />
-              <span className="text-sm font-semibold leading-tight">
+              <Users className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm font-semibold">
                 {t("కస్టమర్ వైస్ రిపోర్ట్", "Customer Wise Report")}
               </span>
             </TabsTrigger>
