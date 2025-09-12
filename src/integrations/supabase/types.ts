@@ -312,7 +312,7 @@ export type Database = {
             foreignKeyName: "loans_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
-            referencedRelation: "secure_customers"
+            referencedRelation: "masked_customers"
             referencedColumns: ["id"]
           },
         ]
@@ -406,7 +406,7 @@ export type Database = {
       }
     }
     Views: {
-      secure_customers: {
+      masked_customers: {
         Row: {
           created_at: string | null
           created_by: string | null
@@ -433,7 +433,7 @@ export type Database = {
         }
         Relationships: []
       }
-      secure_profiles: {
+      masked_profiles: {
         Row: {
           company_name: string | null
           created_at: string | null
