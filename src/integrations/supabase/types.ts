@@ -308,13 +308,6 @@ export type Database = {
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "loans_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "secure_customers"
-            referencedColumns: ["id"]
-          },
         ]
       }
       profiles: {
@@ -406,81 +399,7 @@ export type Database = {
       }
     }
     Views: {
-      secure_customers: {
-        Row: {
-          created_at: string | null
-          created_by: string | null
-          customer_mobile: string | null
-          customer_name: string | null
-          id: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by?: string | null
-          customer_mobile?: never
-          customer_name?: string | null
-          id?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string | null
-          customer_mobile?: never
-          customer_name?: string | null
-          id?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      secure_profiles: {
-        Row: {
-          company_name: string | null
-          created_at: string | null
-          full_name: string | null
-          id: string | null
-          is_active: boolean | null
-          mobile_number: string | null
-          monthly_fee: number | null
-          referral_id: string | null
-          role: Database["public"]["Enums"]["app_role"] | null
-          subscription_start_date: string | null
-          subscription_status: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          company_name?: string | null
-          created_at?: string | null
-          full_name?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          mobile_number?: never
-          monthly_fee?: number | null
-          referral_id?: string | null
-          role?: Database["public"]["Enums"]["app_role"] | null
-          subscription_start_date?: string | null
-          subscription_status?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          company_name?: string | null
-          created_at?: string | null
-          full_name?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          mobile_number?: never
-          monthly_fee?: number | null
-          referral_id?: string | null
-          role?: Database["public"]["Enums"]["app_role"] | null
-          subscription_start_date?: string | null
-          subscription_status?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       audit_admin_access: {
