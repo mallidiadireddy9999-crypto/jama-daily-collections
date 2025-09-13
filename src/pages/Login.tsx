@@ -57,12 +57,29 @@ const Login = () => {
       } else {
         // For login, try with email first, then mobile
         const loginEmail = email.includes('@') ? email : `${email}@jama.app`;
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: loginEmail,
           password,
         });
         
         if (error) throw error;
+        
+        // Check if user account is active after successful login
+        if (data.user) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('is_active')
+            .eq('user_id', data.user.id)
+            .maybeSingle();
+            
+          if (profileError) {
+            console.error('Error checking profile status:', profileError);
+          } else if (profile && profile.is_active === false) {
+            // Sign out immediately if account is deactivated
+            await supabase.auth.signOut();
+            throw new Error("Your account has been deactivated. Please contact administrator for assistance.");
+          }
+        }
         
         toast({
           title: "విజయవంతంగా లాగిన్ అయ్యారు!",

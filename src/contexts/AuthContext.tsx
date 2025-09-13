@@ -115,6 +115,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else if (profile) {
           console.log('Profile found:', profile);
           console.log('Profile role:', profile.role);
+          
+          // Check if user account is deactivated
+          if (profile.is_active === false) {
+            console.log('User account is deactivated, signing out...');
+            // Sign out the user immediately
+            await supabase.auth.signOut();
+            // Show deactivation message
+            import('@/hooks/use-toast').then(({ toast }) => {
+              toast({
+                title: "Account Deactivated",
+                description: "Your account has been deactivated. Please contact administrator for assistance.",
+                variant: "destructive",
+              });
+            });
+            return;
+          }
+          
           const userRole = profile.role || 'jama_user';
           console.log('Setting user role to:', userRole);
           setUserRole(userRole);

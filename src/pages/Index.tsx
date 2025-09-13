@@ -18,9 +18,10 @@ import { Card } from "@/components/ui/card";
 import { LogIn, ArrowLeft } from "lucide-react";
 import { AdsManagement } from "@/components/AdsManagement";
 import CustomerWiseReport from "@/components/CustomerWiseReport";
+import { DeactivatedAccount } from "@/components/DeactivatedAccount";
 
 const Index = () => {
-  const { user, loading, userRole } = useAuth();
+  const { user, loading, userRole, userProfile } = useAuth();
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<string>("dashboard");
 
@@ -64,7 +65,7 @@ const Index = () => {
               </p>
             </div>
             <Button 
-              onClick={() => navigate("/auth")} 
+              onClick={() => navigate("/login")} 
               className="w-full"
               size="lg"
             >
@@ -79,6 +80,11 @@ const Index = () => {
 
   if (!user) {
     return null;
+  }
+
+  // Check if user account is deactivated
+  if (userProfile && userProfile.is_active === false) {
+    return <DeactivatedAccount />;
   }
 
   const renderCurrentView = () => {
