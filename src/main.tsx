@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./contexts/AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,8 +19,8 @@ const router = createBrowserRouter([
     element: <Index />,
   },
   {
-    path: "/auth",
-    element: <Auth />,
+    path: "/login",
+    element: <Login />,
   },
   {
     path: "*",
