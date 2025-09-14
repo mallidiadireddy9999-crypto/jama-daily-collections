@@ -36,6 +36,21 @@ export const AdDisplay = ({
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
+  const getPositionStyles = () => {
+    switch (position) {
+      case 'top':
+        return "mb-4";
+      case 'bottom':
+        return "mt-4";
+      case 'side':
+        return "fixed right-4 top-20 z-50 w-80 max-w-sm";
+      case 'inline':
+        return "my-4";
+      default:
+        return "";
+    }
+  };
+
   useEffect(() => {
     fetchActiveAds();
     
@@ -120,24 +135,40 @@ export const AdDisplay = ({
     });
   }, [ads]);
 
-  if (loading || ads.length === 0) {
-    return null;
+  if (loading) {
+    return (
+      <div className={`${getPositionStyles()} ${className}`}>
+        <Card className="p-4 animate-pulse bg-muted/20">
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 bg-muted rounded"></div>
+            <div className="flex-1">
+              <div className="h-3 bg-muted rounded mb-2"></div>
+              <div className="h-2 bg-muted rounded"></div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
   }
 
-  const getPositionStyles = () => {
-    switch (position) {
-      case 'top':
-        return "mb-4";
-      case 'bottom':
-        return "mt-4";
-      case 'side':
-        return "fixed right-4 top-20 z-50 w-80 max-w-sm";
-      case 'inline':
-        return "my-4";
-      default:
-        return "";
-    }
-  };
+  // Show placeholder for super admin or when no ads available
+  if (ads.length === 0) {
+    return (
+      <div className={`${getPositionStyles()} ${className}`}>
+        <Card className="p-4 border-dashed border-2 border-muted-foreground/30 bg-muted/10">
+          <div className="flex items-center space-x-3 text-muted-foreground">
+            <div className="w-12 h-12 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center">
+              <Eye className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">Ad Space - {position}</p>
+              <p className="text-xs">Ads will appear here when published by admin</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className={`${getPositionStyles()} ${className}`}>
