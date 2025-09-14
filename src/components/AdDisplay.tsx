@@ -43,9 +43,9 @@ export const AdDisplay = ({
       case 'bottom':
         return "mt-4";
       case 'side':
-        return "fixed right-4 top-20 z-50 w-80 max-w-sm";
+        return "hidden lg:block fixed right-4 top-1/2 -translate-y-1/2 z-40 w-72 max-w-sm";
       case 'inline':
-        return "my-4";
+        return "my-6";
       default:
         return "";
     }
@@ -155,14 +155,17 @@ export const AdDisplay = ({
   if (ads.length === 0) {
     return (
       <div className={`${getPositionStyles()} ${className}`}>
-        <Card className="p-4 border-dashed border-2 border-muted-foreground/30 bg-muted/10">
+        <Card className={`
+          p-3 border-dashed border-2 border-muted-foreground/20 bg-muted/5
+          ${position === 'side' ? 'shadow-md' : ''}
+        `}>
           <div className="flex items-center space-x-3 text-muted-foreground">
-            <div className="w-12 h-12 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center">
-              <Eye className="h-5 w-5" />
+            <div className="w-8 h-8 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Eye className="h-4 w-4" />
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium">Ad Space - {position}</p>
-              <p className="text-xs">Ads will appear here when published by admin</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium truncate">Ad Space - {position}</p>
+              <p className="text-xs opacity-75">Admin ads appear here</p>
             </div>
           </div>
         </Card>
@@ -177,9 +180,9 @@ export const AdDisplay = ({
           key={ad.id}
           className={`
             relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg
-            ${position === 'side' ? 'mb-4 bg-background/95 backdrop-blur-sm border-primary/20' : ''}
-            ${position === 'top' || position === 'bottom' ? 'bg-gradient-to-r from-primary/5 to-primary/10' : ''}
-            ${position === 'inline' ? 'bg-muted/30' : ''}
+            ${position === 'side' ? 'mb-3 bg-background/98 backdrop-blur border-primary/20 shadow-lg' : ''}
+            ${position === 'top' || position === 'bottom' ? 'bg-gradient-to-r from-primary/5 to-primary/10 border-primary/10' : ''}
+            ${position === 'inline' ? 'bg-muted/20 border-muted/40' : ''}
           `}
           onClick={() => handleAdClick(ad)}
         >

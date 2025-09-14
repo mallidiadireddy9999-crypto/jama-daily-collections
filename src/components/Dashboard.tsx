@@ -350,10 +350,10 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
             </div>
           </Card>
         </div>
-
-        {/* Sidebar Ad Display */}
-        <AdDisplay position="side" maxAds={2} />
       </div>
+
+      {/* Sidebar Ad Display - Only on larger screens to avoid collision */}
+      <AdDisplay position="side" maxAds={2} />
 
     </div>
   );
