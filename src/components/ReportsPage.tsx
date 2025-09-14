@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { AdDisplay } from "./AdDisplay";
 
 interface ReportsPageProps {
   onBack: () => void;
@@ -448,6 +449,9 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
         </Button>
         <h1 className="text-2xl font-bold text-foreground">{t("రిపోర్ట్‌లు", "Reports")}</h1>
       </div>
+
+      {/* Ad Display - Top */}
+      <AdDisplay position="top" maxAds={1} />
 
       {/* Reports Tabs */}
       <Card className="p-6 shadow-card bg-card">

@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import EditLoanModal from "./EditLoanModal";
+import { AdDisplay } from "./AdDisplay";
 
 interface ActiveLoan {
   id: string;
@@ -141,6 +142,9 @@ const ActiveLoansList = ({ onBack }: ActiveLoansListProps) => {
             </p>
           </div>
         </Card>
+
+      {/* Ad Display - Inline */}
+      <AdDisplay position="inline" maxAds={1} />
 
       {/* Active Loans List */}
       <div className="space-y-3">

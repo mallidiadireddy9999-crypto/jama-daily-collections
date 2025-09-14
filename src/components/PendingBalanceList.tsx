@@ -6,6 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { AdDisplay } from "./AdDisplay";
 
 interface PendingBalance {
   id: string;
@@ -131,6 +132,9 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
           </div>
         </div>
       </Card>
+
+      {/* Ad Display - Bottom */}
+      <AdDisplay position="bottom" maxAds={1} />
 
       {/* Pending Balance List */}
       <div className="space-y-3">

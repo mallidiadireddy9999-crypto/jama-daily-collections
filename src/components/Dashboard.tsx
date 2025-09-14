@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
+import { AdDisplay } from "./AdDisplay";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -296,6 +297,9 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
           </Card>
         </div>
 
+        {/* Ad Display - Top Banner */}
+        <AdDisplay position="top" maxAds={1} className="mb-4" />
+
         {/* Action Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={handleCollectPayment}>
@@ -346,6 +350,9 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
             </div>
           </Card>
         </div>
+
+        {/* Sidebar Ad Display */}
+        <AdDisplay position="side" maxAds={2} />
       </div>
 
     </div>
