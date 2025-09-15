@@ -204,7 +204,7 @@ export const CreateAdModal = ({ onClose, onSuccess }: CreateAdModalProps) => {
             <div className="space-y-4">
               <div>
                 <Label>Image Upload</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-4">
+                <div className="border-2 border-dashed border-border rounded-lg p-4 relative">
                   {imagePreview ? (
                     <div className="relative">
                       <img src={imagePreview} alt="Preview" className="w-full h-32 object-cover rounded" />
@@ -222,14 +222,14 @@ export const CreateAdModal = ({ onClose, onSuccess }: CreateAdModalProps) => {
                       </Button>
                     </div>
                   ) : (
-                    <div className="text-center">
+                    <div className="text-center relative">
                       <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
                       <p className="mt-2 text-sm text-muted-foreground">Click to upload image</p>
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleImageUpload}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                       />
                     </div>
                   )}
@@ -238,7 +238,7 @@ export const CreateAdModal = ({ onClose, onSuccess }: CreateAdModalProps) => {
 
               <div>
                 <Label>Video Upload (Optional)</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-4">
+                <div className="border-2 border-dashed border-border rounded-lg p-4 relative">
                   {videoFile ? (
                     <div className="flex items-center justify-between">
                       <span className="text-sm">{videoFile.name}</span>
@@ -252,14 +252,14 @@ export const CreateAdModal = ({ onClose, onSuccess }: CreateAdModalProps) => {
                       </Button>
                     </div>
                   ) : (
-                    <div className="text-center">
+                    <div className="text-center relative">
                       <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
                       <p className="mt-2 text-sm text-muted-foreground">Click to upload video</p>
                       <input
                         type="file"
                         accept="video/*"
                         onChange={handleVideoUpload}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                       />
                     </div>
                   )}
