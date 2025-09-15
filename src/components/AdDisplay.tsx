@@ -67,8 +67,6 @@ export const AdDisplay = ({
         .from('ads')
         .select('*')
         .eq('is_active', true)
-        .gte('end_date', new Date().toISOString().split('T')[0])
-        .lte('start_date', new Date().toISOString().split('T')[0])
         .order('created_at', { ascending: false })
         .limit(maxAds);
 
