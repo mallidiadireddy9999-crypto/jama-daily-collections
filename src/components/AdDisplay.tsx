@@ -39,15 +39,15 @@ export const AdDisplay = ({
   const getPositionStyles = () => {
     switch (position) {
       case 'top':
-        return "mb-4";
+        return "mb-6 w-full";
       case 'bottom':
-        return "mt-4";
+        return "mt-6 w-full";
       case 'side':
-        return "hidden lg:block fixed right-4 top-1/2 -translate-y-1/2 z-40 w-72 max-w-sm";
+        return "hidden lg:block fixed right-4 top-1/2 -translate-y-1/2 z-40 w-80 max-w-md";
       case 'inline':
-        return "my-6";
+        return "my-8 w-full";
       default:
-        return "";
+        return "w-full";
     }
   };
 
@@ -177,10 +177,11 @@ export const AdDisplay = ({
         <Card 
           key={ad.id}
           className={`
-            relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg
-            ${position === 'side' ? 'mb-3 bg-background/98 backdrop-blur border-primary/20 shadow-lg' : ''}
-            ${position === 'top' || position === 'bottom' ? 'bg-gradient-to-r from-primary/5 to-primary/10 border-primary/10' : ''}
-            ${position === 'inline' ? 'bg-muted/20 border-muted/40' : ''}
+            relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl group
+            ${position === 'side' ? 'mb-4 bg-gradient-to-br from-background via-background to-primary/5 backdrop-blur border-primary/20 shadow-lg min-h-[280px]' : ''}
+            ${position === 'top' || position === 'bottom' ? 'bg-gradient-to-r from-primary/10 via-background to-primary/10 border-primary/20 min-h-[200px] lg:min-h-[250px]' : ''}
+            ${position === 'inline' ? 'bg-gradient-to-br from-background to-primary/5 border-primary/10 min-h-[240px] lg:min-h-[300px]' : ''}
+            animate-fade-in
           `}
           onClick={() => handleAdClick(ad)}
         >
@@ -188,62 +189,86 @@ export const AdDisplay = ({
           <Button
             variant="ghost"
             size="sm"
-            className="absolute top-2 right-2 z-10 h-6 w-6 p-0 hover:bg-background/80"
+            className="absolute top-3 right-3 z-20 h-8 w-8 p-0 bg-background/80 hover:bg-background/90 backdrop-blur-sm border border-border/50 opacity-70 group-hover:opacity-100 transition-all duration-200"
             onClick={(e) => {
               e.stopPropagation();
               dismissAd(ad.id);
             }}
           >
-            <X className="h-3 w-3" />
+            <X className="h-4 w-4" />
           </Button>
 
-          <div className="p-4">
-            <div className="flex items-start space-x-3">
-              {/* Ad Image */}
-              {ad.image_url && (
-                <div className="flex-shrink-0">
-                  <img
-                    src={ad.image_url}
-                    alt={ad.title}
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
-                </div>
-              )}
-              
-              {/* Ad Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center space-x-2 mb-1">
-                  <h3 className="font-semibold text-sm text-foreground truncate">
+          {/* Billboard Layout */}
+          <div className="relative h-full">
+            {/* Background Image */}
+            {ad.image_url && (
+              <div className="absolute inset-0 overflow-hidden">
+                <img
+                  src={ad.image_url}
+                  alt={ad.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+              </div>
+            )}
+            
+            {/* Content Overlay */}
+            <div className="relative z-10 h-full flex flex-col justify-between p-6">
+              {/* Top Section */}
+              <div className="flex items-start justify-between">
+                <Badge 
+                  variant="secondary" 
+                  className={`
+                    bg-background/90 backdrop-blur-sm border border-border/50 text-foreground font-medium
+                    ${position === 'side' ? 'text-xs' : 'text-sm'}
+                  `}
+                >
+                  Advertisement
+                </Badge>
+              </div>
+
+              {/* Bottom Section */}
+              <div className="space-y-3">
+                <div>
+                  <h3 className={`
+                    font-bold text-white drop-shadow-lg leading-tight
+                    ${position === 'side' ? 'text-lg' : 'text-xl lg:text-2xl'}
+                  `}>
                     {ad.title}
                   </h3>
-                  <Badge variant="secondary" className="text-xs">
-                    Ad
-                  </Badge>
+                  
+                  {ad.description && (
+                    <p className={`
+                      text-white/90 drop-shadow-md mt-2 leading-relaxed
+                      ${position === 'side' ? 'text-sm line-clamp-2' : 'text-base lg:text-lg line-clamp-3'}
+                    `}>
+                      {ad.description}
+                    </p>
+                  )}
                 </div>
-                
-                <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                  {ad.description}
-                </p>
 
                 {/* Action Button */}
                 <Button 
-                  size="sm" 
-                  variant="outline"
-                  className="h-7 text-xs px-2"
+                  size={position === 'side' ? 'sm' : 'default'}
+                  className={`
+                    bg-primary hover:bg-primary/90 text-primary-foreground font-semibold
+                    shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105
+                    ${position === 'side' ? 'h-8 text-xs px-4' : 'h-10 text-sm px-6'}
+                  `}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleAdClick(ad);
                   }}
                 >
-                  <Eye className="h-3 w-3 mr-1" />
-                  View Details
+                  <ExternalLink className={`mr-2 ${position === 'side' ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                  Learn More
                 </Button>
               </div>
             </div>
           </div>
 
-          {/* Subtle gradient overlay for visual appeal */}
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent to-primary/5 pointer-events-none" />
+          {/* Enhanced gradient overlay for depth */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
         </Card>
       ))}
     </div>
