@@ -16,8 +16,6 @@ import {
 import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
 import { AdDisplay } from "./AdDisplay";
-import { BannerCarousel } from "./BannerCarousel";
-import { SponsoredProducts } from "./SponsoredProducts";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -299,9 +297,6 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
           </Card>
         </div>
 
-        {/* Banner Carousel */}
-        <BannerCarousel className="mb-6" />
-
         {/* Ad Display - Top Banner */}
         <AdDisplay position="top" maxAds={1} className="mb-4" />
 
@@ -355,9 +350,6 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
             </div>
           </Card>
         </div>
-
-        {/* Sponsored Products Section */}
-        <SponsoredProducts className="mt-8" />
       </div>
 
       {/* Sidebar Ad Display - Only on larger screens to avoid collision */}
