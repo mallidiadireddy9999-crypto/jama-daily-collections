@@ -214,21 +214,8 @@ export const AdDisplay = ({
             
             {/* Content Overlay */}
             <div className="relative z-10 h-full flex flex-col justify-between p-6">
-              {/* Top Section */}
-              <div className="flex items-start justify-between">
-                <Badge 
-                  variant="secondary" 
-                  className={`
-                    bg-background/90 backdrop-blur-sm border border-border/50 text-foreground font-medium
-                    ${position === 'side' ? 'text-xs' : 'text-sm'}
-                  `}
-                >
-                  Advertisement
-                </Badge>
-              </div>
-
-              {/* Bottom Section */}
-              <div className="space-y-3">
+              {/* Content Section */}
+              <div className="flex flex-col justify-end h-full">
                 <div>
                   <h3 className={`
                     font-bold text-white drop-shadow-lg leading-tight
@@ -246,23 +233,6 @@ export const AdDisplay = ({
                     </p>
                   )}
                 </div>
-
-                {/* Action Button */}
-                <Button 
-                  size={position === 'side' ? 'sm' : 'default'}
-                  className={`
-                    bg-primary hover:bg-primary/90 text-primary-foreground font-semibold
-                    shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105
-                    ${position === 'side' ? 'h-8 text-xs px-4' : 'h-10 text-sm px-6'}
-                  `}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAdClick(ad);
-                  }}
-                >
-                  <ExternalLink className={`mr-2 ${position === 'side' ? 'h-3 w-3' : 'h-4 w-4'}`} />
-                  Learn More
-                </Button>
               </div>
             </div>
           </div>
