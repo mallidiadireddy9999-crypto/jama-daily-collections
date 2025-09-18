@@ -300,34 +300,72 @@ export default function ReportsPage({ onBack }: ReportsPageProps) {
         doc.text(`Active Loans: ${activeLoans}`, 20, 70);
         doc.text(`Total Amount: Rs.${totalAmount.toLocaleString()}`, 20, 80);
         
-        // Add loans table with customer ID
-        const loansData = allLoans.map((loan: any, index: number) => [
+        // Basic loan info table
+        const basicLoansData = allLoans.map((loan: any, index: number) => [
           `L${String(index + 1).padStart(3, '0')}`,
           loan.customer_name || 'N/A',
           loan.customer_mobile || 'N/A',
           `Rs.${Number(loan.amount).toLocaleString()}`,
-          `${loan.interest_rate || 0}%`,
-          `${loan.duration_months || 0}m`,
-          loan.status || 'active',
-          loan.start_date || 'N/A'
+          loan.disbursement_type || 'full',
+          `Rs.${Number(loan.cutting_amount || 0).toLocaleString()}`,
+          `Rs.${Number(loan.disbursed_amount || loan.amount).toLocaleString()}`,
+          loan.status || 'active'
         ]);
 
         autoTable(doc, {
           startY: 95,
-          head: [['ID', 'Customer', 'Mobile', 'Amount', 'Rate', 'Duration', 'Status', 'Start Date']],
-          body: loansData,
+          head: [['Loan ID', 'Customer', 'Mobile', 'Principal', 'Disburse Type', 'Cutting', 'Disbursed', 'Status']],
+          body: basicLoansData,
           theme: 'grid',
-          styles: { fontSize: 8 },
-          headStyles: { fontSize: 9, fillColor: [34, 197, 94] },
+          styles: { fontSize: 7 },
+          headStyles: { fontSize: 8, fillColor: [34, 197, 94] },
           columnStyles: {
-            0: { cellWidth: 20 },
+            0: { cellWidth: 18 },
             1: { cellWidth: 25 },
             2: { cellWidth: 20 },
-            3: { cellWidth: 25 },
-            4: { cellWidth: 15 },
+            3: { cellWidth: 20 },
+            4: { cellWidth: 18 },
             5: { cellWidth: 18 },
-            6: { cellWidth: 18 },
-            7: { cellWidth: 25 }
+            6: { cellWidth: 20 },
+            7: { cellWidth: 15 }
+          }
+        });
+
+        // Add second table for repayment details
+        const repaymentData = allLoans.map((loan: any, index: number) => [
+          `L${String(index + 1).padStart(3, '0')}`,
+          loan.repayment_type || 'daily',
+          `Rs.${Number(loan.installment_amount || 0).toLocaleString()}`,
+          `${loan.duration_months || 0} ${loan.duration_unit || 'months'}`,
+          `Rs.${Number(loan.total_collection || 0).toLocaleString()}`,
+          `Rs.${Number(loan.profit_interest || 0).toLocaleString()}`,
+          `${loan.interest_rate || 0}%`,
+          loan.start_date || 'N/A'
+        ]);
+
+        // Get Y position after first table
+        let finalY = (doc as any).lastAutoTable.finalY || 95;
+        
+        // Add space before second table
+        doc.setFontSize(14);
+        doc.text('Repayment Details', 20, finalY + 20);
+        
+        autoTable(doc, {
+          startY: finalY + 30,
+          head: [['Loan ID', 'Repayment', 'Installment', 'Duration', 'Total Collection', 'Profit', 'Rate', 'Start Date']],
+          body: repaymentData,
+          theme: 'grid',
+          styles: { fontSize: 7 },
+          headStyles: { fontSize: 8, fillColor: [59, 130, 246] },
+          columnStyles: {
+            0: { cellWidth: 18 },
+            1: { cellWidth: 18 },
+            2: { cellWidth: 18 },
+            3: { cellWidth: 20 },
+            4: { cellWidth: 22 },
+            5: { cellWidth: 18 },
+            6: { cellWidth: 12 },
+            7: { cellWidth: 22 }
           }
         });
 
