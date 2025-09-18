@@ -32,7 +32,6 @@ export const AdDisplay = ({
   className = ""
 }: AdDisplayProps) => {
   const [ads, setAds] = useState<Ad[]>([]);
-  const [dismissedAds, setDismissedAds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
@@ -53,12 +52,6 @@ export const AdDisplay = ({
 
   useEffect(() => {
     fetchActiveAds();
-    
-    // Load dismissed ads from localStorage
-    const dismissed = localStorage.getItem('dismissedAds');
-    if (dismissed) {
-      setDismissedAds(new Set(JSON.parse(dismissed)));
-    }
   }, []);
 
   const fetchActiveAds = async () => {
@@ -72,11 +65,8 @@ export const AdDisplay = ({
 
       if (error) throw error;
 
-      // Filter ads that haven't been dismissed and match target audience
+      // Filter ads that match target audience
       const relevantAds = (data || []).filter(ad => {
-        // Check if ad is dismissed
-        if (dismissedAds.has(ad.id)) return false;
-
         // Check target audience (if specified)
         if (ad.target_audience && Array.isArray(ad.target_audience) && ad.target_audience.length > 0) {
           // For now, show to all users since we don't have village/user targeting implemented
@@ -94,18 +84,7 @@ export const AdDisplay = ({
     }
   };
 
-  const dismissAd = (adId: string) => {
-    const newDismissed = new Set([...dismissedAds, adId]);
-    setDismissedAds(newDismissed);
-    localStorage.setItem('dismissedAds', JSON.stringify([...newDismissed]));
-    
-    setAds(prev => prev.filter(ad => ad.id !== adId));
-    
-    // Track ad interaction (optional analytics)
-    trackAdInteraction(adId, 'dismiss');
-  };
-
-  const trackAdInteraction = async (adId: string, action: 'view' | 'click' | 'dismiss') => {
+  const trackAdInteraction = async (adId: string, action: 'view' | 'click') => {
     try {
       await supabase
         .from('ad_analytics')
@@ -185,18 +164,6 @@ export const AdDisplay = ({
           `}
           onClick={() => handleAdClick(ad)}
         >
-          {/* Dismiss Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute top-3 right-3 z-20 h-8 w-8 p-0 bg-background/80 hover:bg-background/90 backdrop-blur-sm border border-border/50 opacity-70 group-hover:opacity-100 transition-all duration-200"
-            onClick={(e) => {
-              e.stopPropagation();
-              dismissAd(ad.id);
-            }}
-          >
-            <X className="h-4 w-4" />
-          </Button>
 
           {/* Billboard Layout */}
           <div className="relative h-full">
