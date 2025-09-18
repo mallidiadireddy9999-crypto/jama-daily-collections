@@ -157,9 +157,9 @@ export const AdDisplay = ({
           key={ad.id}
           className={`
             relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl group
-            ${position === 'side' ? 'mb-4 bg-gradient-to-br from-background via-background to-primary/5 backdrop-blur border-primary/20 shadow-lg min-h-[280px]' : ''}
-            ${position === 'top' || position === 'bottom' ? 'bg-gradient-to-r from-primary/10 via-background to-primary/10 border-primary/20 min-h-[200px] lg:min-h-[250px]' : ''}
-            ${position === 'inline' ? 'bg-gradient-to-br from-background to-primary/5 border-primary/10 min-h-[240px] lg:min-h-[300px]' : ''}
+            ${position === 'side' ? 'mb-4 bg-gradient-to-br from-background via-background to-primary/5 backdrop-blur border-primary/20 shadow-lg h-[320px]' : ''}
+            ${position === 'top' || position === 'bottom' ? 'bg-gradient-to-r from-primary/10 via-background to-primary/10 border-primary/20 h-[280px] lg:h-[320px]' : ''}
+            ${position === 'inline' ? 'bg-gradient-to-br from-background to-primary/5 border-primary/10 h-[280px] lg:h-[350px]' : ''}
             animate-fade-in
           `}
           onClick={() => handleAdClick(ad)}
@@ -173,7 +173,7 @@ export const AdDisplay = ({
                 <img
                   src={ad.image_url}
                   alt={ad.title}
-                  className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
               </div>
