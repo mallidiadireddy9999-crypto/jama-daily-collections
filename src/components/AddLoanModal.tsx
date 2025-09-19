@@ -52,7 +52,7 @@ const AddLoanModal = ({ open, onOpenChange, onSave }: AddLoanModalProps) => {
           customer_mobile: formData.phone,
           amount: parseInt(formData.amount),
           duration_months: parseInt(formData.duration),
-          interest_rate: 10.0, // Default 10% interest
+          interest_rate: 0, // Will be calculated based on actual terms
           status: 'active'
         });
 

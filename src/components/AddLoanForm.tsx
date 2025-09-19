@@ -39,6 +39,15 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
   const totalCollection = (parseFloat(formData.installmentAmount) || 0) * (parseFloat(formData.duration) || 0);
   
   const profitInterest = totalCollection - disbursedAmount;
+  
+  // Calculate interest rate as annual percentage
+  const durationInDays = formData.durationUnit === 'days' ? parseInt(formData.duration) || 0 :
+                        formData.durationUnit === 'weeks' ? (parseInt(formData.duration) || 0) * 7 :
+                        (parseInt(formData.duration) || 0) * 30;
+  
+  const interestRate = disbursedAmount > 0 && durationInDays > 0 
+    ? (profitInterest / disbursedAmount) * (365 / durationInDays) * 100 
+    : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +98,7 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
             duration_unit: formData.durationUnit,
             total_collection: totalCollection,
             profit_interest: profitInterest,
-            interest_rate: 10, // Default interest rate
+            interest_rate: parseFloat(interestRate.toFixed(2)),
             status: 'active'
           }
         ])
@@ -337,6 +346,9 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
                 <p className="text-sm text-primary-foreground/80">Profit / Interest / లాభం</p>
                 <p className="text-xl font-bold text-primary-foreground">
                   ₹{profitInterest.toLocaleString()}
+                </p>
+                <p className="text-xs text-primary-foreground/70 mt-1">
+                  Interest Rate: {interestRate.toFixed(2)}% per annum
                 </p>
               </div>
             </Card>
