@@ -16,6 +16,7 @@ import {
 import jamaLogo from "@/assets/jama-logo.png";
 import PaymentKeypad from "./PaymentKeypad";
 import { AdDisplay } from "./AdDisplay";
+import { CoinFlowAnimation } from "./CoinFlowAnimation";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +29,7 @@ interface DashboardProps {
 const Dashboard = ({ onNavigate }: DashboardProps) => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'payment'>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
+  const [showCoinAnimation, setShowCoinAnimation] = useState(false);
   const [dashboardStats, setDashboardStats] = useState({
     totalCollected: 0,
     pendingBalance: 0,
@@ -70,6 +72,12 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
       // Count today's new loans
       const today = new Date().toISOString().split('T')[0];
       const newLoansToday = loans?.filter(loan => loan.start_date === today).length || 0;
+
+      // Show coin animation if total collected increased significantly
+      const previousTotal = dashboardStats.totalCollected;
+      if (totalCollected > previousTotal + 500) { // Show animation for increases > 500
+        setShowCoinAnimation(true);
+      }
 
       setDashboardStats({
         totalCollected,
@@ -185,6 +193,10 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
         customerName={selectedCustomer}
         onBack={handleBackToDashboard}
         onConfirm={(amount, customerId, customerName) => {
+          // Show celebration animation for large collections
+          if (amount > 1000) {
+            setShowCoinAnimation(true);
+          }
           // Refresh dashboard stats after payment collection
           fetchDashboardStats();
           setCurrentView('dashboard');
@@ -194,7 +206,16 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-card">
+    <>
+      {/* Coin Flow Animation for Dashboard */}
+      <CoinFlowAnimation 
+        isActive={showCoinAnimation}
+        amount={dashboardStats.totalCollected}
+        coinCount={10}
+        onComplete={() => setShowCoinAnimation(false)}
+      />
+      
+      <div className="min-h-screen bg-gradient-card">
       <div className="p-4 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -356,6 +377,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
       <AdDisplay position="side" maxAds={2} />
 
     </div>
+    </>
   );
 };
 

@@ -8,6 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { CoinFlowAnimation } from "./CoinFlowAnimation";
 
 interface PaymentKeypadProps {
   onBack: () => void;
@@ -22,6 +23,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
   const [customerNotFound, setCustomerNotFound] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCoinAnimation, setShowCoinAnimation] = useState(false);
   const { t } = useLanguage();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -208,8 +210,13 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
         description: t(`₹${finalAmount} ${selectedCustomerName} నుండి విజయవంతంగా వసూలు చేయబడింది`, `₹${finalAmount} collected successfully from ${selectedCustomerName}`),
       });
 
-      // Call original onConfirm for any additional handling
-      onConfirm(finalAmount, customerId.trim(), selectedCustomerName.trim());
+      // Trigger coin flow animation
+      setShowCoinAnimation(true);
+
+      // Call original onConfirm for any additional handling after animation completes
+      setTimeout(() => {
+        onConfirm(finalAmount, customerId.trim(), selectedCustomerName.trim());
+      }, 2500);
 
     } catch (error: any) {
       console.error('Error saving collection:', error);
@@ -229,7 +236,15 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
   };
 
   return (
-    <div className="min-h-screen bg-gradient-card p-4 space-y-6">
+    <>
+      {/* Coin Flow Animation */}
+      <CoinFlowAnimation 
+        isActive={showCoinAnimation}
+        amount={parseInt(amount) || 0}
+        onComplete={() => setShowCoinAnimation(false)}
+      />
+      
+      <div className="min-h-screen bg-gradient-card p-4 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Button variant="default" size="icon" onClick={onBack} className="shadow-lg">
@@ -422,6 +437,7 @@ const PaymentKeypad = ({ onBack, onConfirm, customerName = "Customer" }: Payment
         </Card>
       )}
     </div>
+    </>
   );
 };
 

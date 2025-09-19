@@ -9,6 +9,7 @@ import { ArrowLeft, Save, User, Phone, IndianRupee, Calendar, Scissors, Calculat
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { CoinFlowAnimation } from "./CoinFlowAnimation";
 
 interface AddLoanFormProps {
   onBack: () => void;
@@ -19,6 +20,7 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [showCoinAnimation, setShowCoinAnimation] = useState(false);
   const [formData, setFormData] = useState({
     customerName: '',
     mobileNumber: '',
@@ -112,26 +114,31 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
         description: "Loan added successfully",
       });
 
+      // Trigger coin flow animation for loan disbursement
+      setShowCoinAnimation(true);
+
       // Call onSave callback if provided (for parent component to handle)
       if (onSave) {
         onSave(data);
       }
 
-      // Reset form
-      setFormData({
-        customerName: '',
-        mobileNumber: '',
-        principalAmount: '',
-        disbursementType: 'full',
-        cuttingAmount: '',
-        repaymentType: 'daily',
-        installmentAmount: '',
-        duration: '',
-        durationUnit: 'days'
-      });
+      // Reset form after animation
+      setTimeout(() => {
+        setFormData({
+          customerName: '',
+          mobileNumber: '',
+          principalAmount: '',
+          disbursementType: 'full',
+          cuttingAmount: '',
+          repaymentType: 'daily',
+          installmentAmount: '',
+          duration: '',
+          durationUnit: 'days'
+        });
 
-      // Go back to previous screen
-      onBack();
+        // Go back to previous screen
+        onBack();
+      }, 2500);
 
     } catch (error) {
       console.error('Error adding loan:', error);
@@ -146,7 +153,16 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-card p-4 space-y-6">
+    <>
+      {/* Coin Flow Animation for Loan Disbursement */}
+      <CoinFlowAnimation 
+        isActive={showCoinAnimation}
+        amount={disbursedAmount}
+        coinCount={6}
+        onComplete={() => setShowCoinAnimation(false)}
+      />
+      
+      <div className="min-h-screen bg-gradient-card p-4 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Button variant="default" size="icon" onClick={onBack} className="shadow-lg">
@@ -362,6 +378,7 @@ const AddLoanForm = ({ onBack, onSave }: AddLoanFormProps) => {
         </form>
       </Card>
     </div>
+    </>
   );
 };
 
