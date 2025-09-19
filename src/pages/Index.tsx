@@ -37,10 +37,46 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-card flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground">Loading...</p>
+      <div className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-secondary/20 flex items-center justify-center overflow-hidden">
+        <div className="text-center space-y-8 relative">
+          {/* Animated background circles */}
+          <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/10 rounded-full animate-pulse"></div>
+          <div className="absolute -bottom-20 -right-20 w-32 h-32 bg-secondary/10 rounded-full animate-pulse delay-300"></div>
+          
+          {/* Logo animation */}
+          <div className="relative">
+            <div className="animate-scale-in">
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary-glow shadow-lg mb-4">
+                <img 
+                  src="/lovable-uploads/5687e4de-9f9a-4de1-8c5c-92952cc9cd45.png" 
+                  alt="JAMA" 
+                  className="w-16 h-16 object-contain animate-fade-in"
+                />
+              </div>
+            </div>
+            {/* Logo glow effect */}
+            <div className="absolute inset-0 w-24 h-24 rounded-full bg-primary/20 animate-ping mx-auto"></div>
+          </div>
+
+          {/* App title animation */}
+          <div className="animate-fade-in delay-500">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
+              JAMA
+            </h1>
+            <p className="text-lg text-muted-foreground">Daily Collection App</p>
+          </div>
+
+          {/* Loading animation */}
+          <div className="animate-fade-in delay-700">
+            <div className="w-48 h-2 bg-muted rounded-full overflow-hidden mx-auto">
+              <div className="h-full bg-gradient-to-r from-primary to-secondary rounded-full animate-pulse w-3/4"></div>
+            </div>
+            <p className="text-sm text-muted-foreground mt-4 animate-pulse">Loading your dashboard...</p>
+          </div>
+
+          {/* Floating elements */}
+          <div className="absolute top-10 right-10 w-6 h-6 bg-primary/20 rounded-full animate-bounce delay-200"></div>
+          <div className="absolute bottom-10 left-10 w-4 h-4 bg-secondary/20 rounded-full animate-bounce delay-500"></div>
         </div>
       </div>
     );
@@ -48,30 +84,50 @@ const Index = () => {
 
   if (!user && currentView === "login-prompt") {
     return (
-      <div className="min-h-screen bg-gradient-card flex items-center justify-center p-4">
-        <Card className="p-8 text-center max-w-md w-full">
+      <div className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-secondary/20 flex items-center justify-center p-4 overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-primary/5 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-24 h-24 bg-secondary/5 rounded-full animate-pulse delay-300"></div>
+          <div className="absolute top-1/2 left-10 w-16 h-16 bg-accent/5 rounded-full animate-pulse delay-500"></div>
+        </div>
+
+        <Card className="p-8 text-center max-w-md w-full animate-scale-in shadow-2xl border-0 bg-background/95 backdrop-blur-sm relative z-10">
           <div className="space-y-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4">
-              <img 
-                src="/lovable-uploads/5687e4de-9f9a-4de1-8c5c-92952cc9cd45.png" 
-                alt="JAMA" 
-                className="w-16 h-16 object-contain"
-              />
+            {/* Animated logo */}
+            <div className="relative animate-fade-in">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary-glow shadow-lg mb-4">
+                <img 
+                  src="/lovable-uploads/5687e4de-9f9a-4de1-8c5c-92952cc9cd45.png" 
+                  alt="JAMA" 
+                  className="w-14 h-14 object-contain"
+                />
+              </div>
+              {/* Logo pulse effect */}
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-20 rounded-full bg-primary/20 animate-ping"></div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground mb-2">Welcome to JAMA</h1>
+
+            {/* Animated text */}
+            <div className="animate-fade-in delay-300">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
+                Welcome to JAMA
+              </h1>
               <p className="text-muted-foreground mb-6">
                 Please sign in to access your daily collection management dashboard
               </p>
             </div>
-            <Button 
-              onClick={() => navigate("/login")} 
-              className="w-full"
-              size="lg"
-            >
-              <LogIn className="mr-2 h-4 w-4" />
-              Sign In / Sign Up
-            </Button>
+
+            {/* Animated button */}
+            <div className="animate-fade-in delay-500">
+              <Button 
+                onClick={() => navigate("/login")} 
+                className="w-full hover-scale shadow-lg"
+                size="lg"
+              >
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In / Sign Up
+              </Button>
+            </div>
           </div>
         </Card>
       </div>
