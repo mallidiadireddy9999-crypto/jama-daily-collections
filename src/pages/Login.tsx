@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Lock, Eye, EyeOff, Phone, Users } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Mail, Lock, Eye, EyeOff, Phone, Users, Languages } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +19,7 @@ const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t, toggleLanguage, language } = useLanguage();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,8 +44,8 @@ const Login = () => {
         if (error) throw error;
         
         toast({
-          title: "అకౌంట్ సృష్టించబడింది!",
-          description: `మోబైల్ ${mobile} తో అకౌంట్ సృష్టించబడింది`,
+          title: t("అకౌంట్ సృష్టించబడింది!", "Account Created!"),
+          description: t(`మోబైల్ ${mobile} తో అకౌంట్ సృష్టించబడింది`, `Account created with mobile ${mobile}`),
         });
       } else {
         // For login, try with email first, then mobile
@@ -73,15 +75,15 @@ const Login = () => {
         }
         
         toast({
-          title: "విజయవంతంగా లాగిన్ అయ్యారు!",
-          description: "డాష్‌బోర్డ్‌కు వెళ్లుతున్నాము...",
+          title: t("విజయవంతంగా లాగిన్ అయ్యారు!", "Login Successful!"),
+          description: t("డాష్‌బోర్డ్‌కు వెళ్లుతున్నాము...", "Redirecting to dashboard..."),
         });
         
         navigate("/");
       }
     } catch (error: any) {
       toast({
-        title: "లోపం",
+        title: t("లోపం", "Error"),
         description: error.message,
         variant: "destructive",
       });
@@ -92,25 +94,38 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-xl border-border/50">
+      <Card className="w-full max-w-md shadow-xl border-border/50 relative">
         <CardHeader className="space-y-4 text-center">
+          {/* Language Toggle */}
+          <div className="absolute top-4 right-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLanguage}
+              className="gap-2"
+            >
+              <Languages className="h-4 w-4" />
+              {language === 'te' ? 'EN' : 'తె'}
+            </Button>
+          </div>
+          
           {/* Logo Section */}
           <div className="flex justify-center">
             <div className="bg-gradient-money px-6 py-3 rounded-lg shadow-money flex items-center gap-3">
               <img src="/lovable-uploads/6931d901-421c-4070-833d-a383481866ec.png" alt="Wallet" className="h-10 w-10" />
               <h1 className="text-xl font-bold text-primary-foreground">
-                JAMA <span className="text-lg">చేయి</span>
+                JAMA <span className="text-lg">{t("చేయి", "App")}</span>
               </h1>
             </div>
           </div>
           
           <CardTitle className="text-2xl font-bold text-foreground">
-            {isSignUp ? "అకౌంట్ సృష్టించండి" : "లాగిన్"}
+            {isSignUp ? t("అకౌంట్ సృష్టించండి", "Create Account") : t("లాగిన్", "Login")}
           </CardTitle>
           <CardDescription className="text-muted-foreground">
             {isSignUp 
-              ? "మీ వివరాలతో కొత్త అకౌంట్ సృష్టించండి" 
-              : "మీ అకౌంట్‌లోకి ప్రవేశించండి"
+              ? t("మీ వివరాలతో కొత్త అకౌంట్ సృష్టించండి", "Create a new account with your details") 
+              : t("మీ అకౌంట్‌లోకి ప్రవేశించండి", "Sign in to your account")
             }
           </CardDescription>
         </CardHeader>
@@ -121,7 +136,7 @@ const Login = () => {
               <>
                 <div className="space-y-2">
                   <Label htmlFor="mobile" className="text-sm font-medium">
-                    మోబైల్ నంబర్
+                    {t("మోబైల్ నంబర్", "Mobile Number")}
                   </Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -130,7 +145,7 @@ const Login = () => {
                       type="tel"
                       value={mobile}
                       onChange={(e) => setMobile(e.target.value)}
-                      placeholder="మీ మోబైల్ నంబర్ ఎంటర్ చేయండి"
+                      placeholder={t("మీ మోబైల్ నంబర్ ఎంటర్ చేయండి", "Enter your mobile number")}
                       className="pl-10"
                       required
                     />
@@ -139,7 +154,7 @@ const Login = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="referralId" className="text-sm font-medium">
-                    రిఫరల్ ID (ఐచ్ఛికం)
+                    {t("రిఫరల్ ID (ఐచ్ఛికం)", "Referral ID (Optional)")}
                   </Label>
                   <div className="relative">
                     <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -148,7 +163,7 @@ const Login = () => {
                       type="text"
                       value={referralId}
                       onChange={(e) => setReferralId(e.target.value)}
-                      placeholder="రిఫరల్ ID ఎంటర్ చేయండి"
+                      placeholder={t("రిఫరల్ ID ఎంటర్ చేయండి", "Enter referral ID")}
                       className="pl-10"
                     />
                   </div>
@@ -158,7 +173,7 @@ const Login = () => {
               /* Login Form */
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  ఇమెయిల్ / మోబైల్
+                  {t("ఇమెయిల్ / మోబైల్", "Email / Mobile")}
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -167,7 +182,7 @@ const Login = () => {
                     type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="మీ ఇమెయిల్ లేదా మోబైల్ ఎంటర్ చేయండి"
+                    placeholder={t("మీ ఇమెయిల్ లేదా మోబైల్ ఎంటర్ చేయండి", "Enter your email or mobile")}
                     className="pl-10"
                     required
                   />
@@ -177,7 +192,7 @@ const Login = () => {
             
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium">
-                పాస్‌వర్డ్
+                {t("పాస్‌వర్డ్", "Password")}
               </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -186,7 +201,7 @@ const Login = () => {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="మీ పాస్‌వర్డ్ ఎంటర్ చేయండి"
+                  placeholder={t("మీ పాస్‌వర్డ్ ఎంటర్ చేయండి", "Enter your password")}
                   className="pl-10 pr-10"
                   required
                 />
@@ -207,10 +222,10 @@ const Login = () => {
               variant="default"
             >
               {isLoading 
-                ? "దయచేసి వేచివుండండి..." 
+                ? t("దయచేసి వేచివుండండి...", "Please wait...") 
                 : isSignUp 
-                  ? "అకౌంట్ సృష్టించండి" 
-                  : "లాగిన్"
+                  ? t("అకౌంట్ సృష్టించండి", "Create Account") 
+                  : t("లాగిన్", "Login")
               }
             </Button>
           </form>
@@ -221,8 +236,8 @@ const Login = () => {
               className="text-sm text-primary hover:underline"
             >
               {isSignUp 
-                ? "ఇప్పటికే అకౌంట్ ఉందా? లాగిన్ చేయండి" 
-                : "అకౌంట్ లేదా? సృష్టించండి"
+                ? t("ఇప్పటికే అకౌంట్ ఉందా? లాగిన్ చేయండి", "Already have an account? Login") 
+                : t("అకౌంట్ లేదా? సృష్టించండి", "No account? Create one")
               }
             </button>
           </div>
