@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -34,6 +34,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any | null>(null);
+  
+  // Auto logout after 5 minutes of inactivity
+  const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -161,6 +165,53 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       subscription.unsubscribe();
     };
   }, []);
+
+  // Auto logout functionality
+  useEffect(() => {
+    if (!user || !session) {
+      // Clear any existing timeout if user is not authenticated
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      return;
+    }
+
+    const resetInactivityTimer = () => {
+      // Clear existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      // Set new timeout
+      timeoutRef.current = setTimeout(() => {
+        console.log('Auto logout due to inactivity');
+        signOut();
+      }, INACTIVITY_TIMEOUT);
+    };
+
+    // Events that indicate user activity
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+
+    // Reset timer on any user activity
+    events.forEach(event => {
+      document.addEventListener(event, resetInactivityTimer, true);
+    });
+
+    // Start initial timer
+    resetInactivityTimer();
+
+    // Cleanup
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, resetInactivityTimer, true);
+      });
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [user, session]);
 
   const signOut = async () => {
     console.log('SignOut called - clearing state immediately');
