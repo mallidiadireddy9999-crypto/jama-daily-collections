@@ -7,6 +7,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import EditCollectionModal from "./EditCollectionModal";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface Collection {
   id: string;
@@ -31,12 +39,28 @@ const RecentCollectionsList = ({ onBack }: RecentCollectionsListProps) => {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingCollection, setEditingCollection] = useState<Collection | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const pageSize = 20;
 
   const fetchRecentCollections = async () => {
     if (!user) return;
 
     try {
       setLoading(true);
+      
+      // Get total count
+      const { count } = await supabase
+        .from('collections')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      
+      setTotalCount(count || 0);
+      
+      // Get paginated data
+      const from = (currentPage - 1) * pageSize;
+      const to = from + pageSize - 1;
+      
       const { data, error } = await supabase
         .from('collections')
         .select(`
@@ -46,7 +70,7 @@ const RecentCollectionsList = ({ onBack }: RecentCollectionsListProps) => {
         .eq('user_id', user.id)
         .order('collection_date', { ascending: false })
         .order('created_at', { ascending: false })
-        .limit(20);
+        .range(from, to);
 
       if (error) throw error;
 
@@ -65,7 +89,7 @@ const RecentCollectionsList = ({ onBack }: RecentCollectionsListProps) => {
 
   useEffect(() => {
     fetchRecentCollections();
-  }, [user]);
+  }, [user, currentPage]);
 
   const totalCollected = collections.reduce((sum, collection) => sum + Number(collection.amount), 0);
 
@@ -167,6 +191,37 @@ const RecentCollectionsList = ({ onBack }: RecentCollectionsListProps) => {
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {!loading && totalCount > pageSize && (
+          <Pagination className="mt-6">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+              {Array.from({ length: Math.ceil(totalCount / pageSize) }, (_, i) => i + 1).map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(page)}
+                    isActive={currentPage === page}
+                    className="cursor-pointer"
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setCurrentPage(p => Math.min(Math.ceil(totalCount / pageSize), p + 1))}
+                  className={currentPage === Math.ceil(totalCount / pageSize) ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
 
       <EditCollectionModal

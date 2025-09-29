@@ -7,6 +7,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { AdDisplay } from "./AdDisplay";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface PendingBalance {
   id: string;
@@ -28,6 +36,9 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
   const { toast } = useToast();
   const [pendingBalances, setPendingBalances] = useState<PendingBalance[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const pageSize = 20;
 
   // Fetch pending balances from database
   const fetchPendingBalances = async () => {
@@ -35,11 +46,18 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
 
     try {
       setLoading(true);
+      
+      // Get paginated data
+      const from = (currentPage - 1) * pageSize;
+      const to = from + pageSize - 1;
+      
       const { data: loans, error } = await supabase
         .from('loans')
         .select('*')
         .eq('user_id', user.id)
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .range(from, to)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -80,6 +98,7 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
       // Only show loans with pending amounts
       const filteredBalances = loansWithPending.filter(loan => loan.pendingAmount > 0);
       setPendingBalances(filteredBalances);
+      setTotalCount(filteredBalances.length);
     } catch (error: any) {
       console.error('Error fetching pending balances:', error);
       toast({
@@ -94,7 +113,7 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
 
   useEffect(() => {
     fetchPendingBalances();
-  }, [user]);
+  }, [user, currentPage]);
 
   const totalPending = pendingBalances.reduce((sum, item) => sum + item.pendingAmount, 0);
 
@@ -199,6 +218,37 @@ const PendingBalanceList = ({ onBack }: PendingBalanceListProps) => {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {!loading && totalCount > pageSize && (
+        <Pagination className="mt-6">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+            {Array.from({ length: Math.ceil(totalCount / pageSize) }, (_, i) => i + 1).map((page) => (
+              <PaginationItem key={page}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(page)}
+                  isActive={currentPage === page}
+                  className="cursor-pointer"
+                >
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext 
+                onClick={() => setCurrentPage(p => Math.min(Math.ceil(totalCount / pageSize), p + 1))}
+                className={currentPage === Math.ceil(totalCount / pageSize) ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
 
       </div>
       
