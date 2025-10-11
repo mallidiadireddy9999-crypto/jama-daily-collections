@@ -82,9 +82,18 @@ const Login = () => {
         navigate("/");
       }
     } catch (error: any) {
+      console.error('Login error:', error);
+      
+      let errorMessage = error.message;
+      
+      // Check for specific error types
+      if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+        errorMessage = "Cannot connect to server. Your Supabase project may be paused or there's a network issue. Please check your Supabase dashboard.";
+      }
+      
       toast({
         title: t("లోపం", "Error"),
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
