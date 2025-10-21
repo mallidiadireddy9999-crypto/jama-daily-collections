@@ -7,11 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Mail, Lock, Eye, EyeOff, Phone, Users, Languages } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Users, Languages } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
-  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [referralId, setReferralId] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -28,14 +27,12 @@ const Login = () => {
 
     try {
       if (isSignUp) {
-        // For signup, use mobile number as the primary identifier
-        const userEmail = mobile.includes('@') ? mobile : `${mobile}@jama.app`;
+        // For signup, use email directly
         const { error } = await supabase.auth.signUp({
-          email: userEmail,
+          email,
           password,
           options: {
             data: {
-              mobile_number: mobile,
               referral_id: referralId
             }
           }
@@ -45,13 +42,12 @@ const Login = () => {
         
         toast({
           title: t("అకౌంట్ సృష్టించబడింది!", "Account Created!"),
-          description: t(`మోబైల్ ${mobile} తో అకౌంట్ సృష్టించబడింది`, `Account created with mobile ${mobile}`),
+          description: t(`ఇమెయిల్ ${email} తో అకౌంట్ సృష్టించబడింది`, `Account created with email ${email}`),
         });
       } else {
-        // For login, try with email first, then mobile
-        const loginEmail = email.includes('@') ? email : `${email}@jama.app`;
+        // For login, use email
         const { data, error } = await supabase.auth.signInWithPassword({
-          email: loginEmail,
+          email,
           password,
         });
         
@@ -144,17 +140,17 @@ const Login = () => {
               /* Sign Up Form */
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="mobile" className="text-sm font-medium">
-                    {t("మోబైల్ నంబర్", "Mobile Number")}
+                  <Label htmlFor="email" className="text-sm font-medium">
+                    {t("ఇమెయిల్", "Email")}
                   </Label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      id="mobile"
-                      type="tel"
-                      value={mobile}
-                      onChange={(e) => setMobile(e.target.value)}
-                      placeholder={t("మీ మోబైల్ నంబర్ ఎంటర్ చేయండి", "Enter your mobile number")}
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder={t("మీ ఇమెయిల్ ఎంటర్ చేయండి", "Enter your email")}
                       className="pl-10"
                       required
                     />
@@ -182,16 +178,16 @@ const Login = () => {
               /* Login Form */
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  {t("ఇమెయిల్ / మోబైల్", "Email / Mobile")}
+                  {t("ఇమెయిల్", "Email")}
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
-                    type="text"
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t("మీ ఇమెయిల్ లేదా మోబైల్ ఎంటర్ చేయండి", "Enter your email or mobile")}
+                    placeholder={t("మీ ఇమెయిల్ ఎంటర్ చేయండి", "Enter your email")}
                     className="pl-10"
                     required
                   />
