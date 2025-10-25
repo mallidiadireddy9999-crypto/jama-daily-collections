@@ -320,7 +320,6 @@ export type Database = {
           mobile_number: string | null
           monthly_fee: number | null
           referral_id: string | null
-          role: Database["public"]["Enums"]["app_role"]
           subscription_start_date: string | null
           subscription_status: string | null
           updated_at: string
@@ -335,7 +334,6 @@ export type Database = {
           mobile_number?: string | null
           monthly_fee?: number | null
           referral_id?: string | null
-          role?: Database["public"]["Enums"]["app_role"]
           subscription_start_date?: string | null
           subscription_status?: string | null
           updated_at?: string
@@ -350,7 +348,6 @@ export type Database = {
           mobile_number?: string | null
           monthly_fee?: number | null
           referral_id?: string | null
-          role?: Database["public"]["Enums"]["app_role"]
           subscription_start_date?: string | null
           subscription_status?: string | null
           updated_at?: string
@@ -397,6 +394,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -410,10 +428,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      cleanup_old_audit_logs: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_old_audit_logs: { Args: never; Returns: undefined }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -425,18 +440,9 @@ export type Database = {
         }
         Returns: boolean
       }
-      mask_financial_amount: {
-        Args: { amount: number }
-        Returns: string
-      }
-      mask_mobile_number: {
-        Args: { mobile_number: string }
-        Returns: string
-      }
-      migrate_customer_data: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      mask_financial_amount: { Args: { amount: number }; Returns: string }
+      mask_mobile_number: { Args: { mobile_number: string }; Returns: string }
+      migrate_customer_data: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "super_admin" | "jama_user"
