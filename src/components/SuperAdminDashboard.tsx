@@ -45,13 +45,22 @@ export const SuperAdminDashboard = ({ onNavigate, onBack }: SuperAdminDashboardP
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch all users
+      // Fetch all users (excluding super admins will be handled by getting their roles separately)
       const { data: allUsers, error: usersError } = await supabase
         .from('profiles')
-        .select('*')
-        .neq('role', 'super_admin');
+        .select('*');
 
       if (usersError) throw usersError;
+      
+      // Filter out super admins by checking their roles
+      const nonAdminUsers = [];
+      for (const user of allUsers || []) {
+        const { data: roleData } = await supabase
+          .rpc('get_user_role', { _user_id: user.user_id });
+        if (roleData !== 'super_admin') {
+          nonAdminUsers.push(user);
+        }
+      }
 
       // Fetch all loans
       const { data: allLoans, error: loansError } = await supabase
@@ -68,8 +77,8 @@ export const SuperAdminDashboard = ({ onNavigate, onBack }: SuperAdminDashboardP
       if (collectionsError) throw collectionsError;
 
       // Calculate stats
-      const totalUsers = allUsers?.length || 0;
-      const activeUsers = allUsers?.filter(user => user.is_active)?.length || 0;
+      const totalUsers = nonAdminUsers?.length || 0;
+      const activeUsers = nonAdminUsers?.filter(user => user.is_active)?.length || 0;
       const inactiveUsers = totalUsers - activeUsers;
       
       const monthlyRevenue = activeUsers * 1000; // ₹1000 per user per month
@@ -95,7 +104,7 @@ export const SuperAdminDashboard = ({ onNavigate, onBack }: SuperAdminDashboardP
         totalCollections: totalCollectionsAmount,
       });
 
-      setUsers(allUsers || []);
+      setUsers(nonAdminUsers || []);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       toast({

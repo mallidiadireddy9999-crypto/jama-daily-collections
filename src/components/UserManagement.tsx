@@ -29,11 +29,21 @@ export const UserManagement = ({ onBack }: UserManagementProps) => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .neq('role', 'super_admin')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setUsers(data || []);
+      
+      // Filter out super admins
+      const nonAdminUsers = [];
+      for (const user of data || []) {
+        const { data: roleData } = await supabase
+          .rpc('get_user_role', { _user_id: user.user_id });
+        if (roleData !== 'super_admin') {
+          nonAdminUsers.push(user);
+        }
+      }
+      
+      setUsers(nonAdminUsers || []);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({

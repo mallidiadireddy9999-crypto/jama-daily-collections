@@ -118,7 +118,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUserProfile(null);
         } else if (profile) {
           console.log('Profile found:', profile);
-          console.log('Profile role:', profile.role);
           
           // Check if user account is deactivated
           if (profile.is_active === false) {
@@ -136,7 +135,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             return;
           }
           
-          const userRole = profile.role || 'jama_user';
+          // Fetch user role from user_roles table using RPC function
+          const { data: roleData, error: roleError } = await supabase
+            .rpc('get_user_role', { _user_id: userId });
+          
+          const userRole = roleData || 'jama_user';
           console.log('Setting user role to:', userRole);
           setUserRole(userRole);
           setUserProfile(profile);

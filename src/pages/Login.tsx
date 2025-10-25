@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -16,6 +17,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
   const { t, toggleLanguage, language } = useLanguage();
@@ -90,6 +93,35 @@ const Login = () => {
       toast({
         title: t("లోపం", "Error"),
         description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: t("ఇమెయిల్ పంపబడింది", "Email Sent"),
+        description: t("పాస్‌వర్డ్ రీసెట్ లింక్ మీ ఇమెయిల్‌కు పంపబడింది", "Password reset link has been sent to your email"),
+      });
+      
+      setShowForgotPassword(false);
+      setResetEmail("");
+    } catch (error: any) {
+      toast({
+        title: t("లోపం", "Error"),
+        description: error.message,
         variant: "destructive",
       });
     } finally {
@@ -233,6 +265,19 @@ const Login = () => {
                   : t("లాగిన్", "Login")
               }
             </Button>
+
+            {!isSignUp && (
+              <div className="text-center">
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm"
+                >
+                  {t("పాస్‌వర్డ్ మర్చిపోయారా?", "Forgot Password?")}
+                </Button>
+              </div>
+            )}
           </form>
 
           <div className="mt-6 text-center">
@@ -248,6 +293,37 @@ const Login = () => {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("పాస్‌వర్డ్ రీసెట్ చేయండి", "Reset Password")}</DialogTitle>
+            <DialogDescription>
+              {t("మీ ఇమెయిల్ చిరునామాను నమోదు చేయండి మరియు మేము మీకు పాస్‌వర్డ్ రీసెట్ లింక్ పంపుతాము", "Enter your email address and we'll send you a password reset link")}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="reset-email">{t("ఇమెయిల్", "Email")}</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="reset-email"
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  placeholder={t("మీ ఇమెయిల్ ఎంటర్ చేయండి", "Enter your email")}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? t("పంపుతోంది...", "Sending...") : t("రీసెట్ లింక్ పంపండి", "Send Reset Link")}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
